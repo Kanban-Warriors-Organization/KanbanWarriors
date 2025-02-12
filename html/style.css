@@ -43,10 +43,105 @@ html, body {
     background-color: #0fce14;
 }
 
+/* Container to hold leaderboard and map */
 .main-container {
     display: flex;
-    flex: 1;
+    height: 100%;
 }
+
+/*Leaderboard Elements*/
+.leaderboard {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 45px 0px 15px 60px;
+}
+
+.leaderboard-header {
+    display: flex;
+    align-items: center;
+    background-color: #096079;
+    width: 300px;
+    box-sizing: border-box;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
+}
+
+.leaderboard h1 {
+    font-family: kanit;
+    color: white;
+    width: 300px;
+}
+
+.leaderboard img {
+    filter: invert(100%) sepia(0%) saturate(7500%) hue-rotate(70deg) brightness(99%) contrast(107%);
+    height: 40px;
+    padding: 20px;
+}
+
+.leaderboard-links {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
+    width: 300px;
+    border-radius: 20px 20px 20px 20px;
+    background-color: #08546B;
+    box-sizing: border-box;  
+}
+
+.leaderboard-links a {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold ;
+    width: 300px;
+    text-decoration: none;
+    width: auto;
+    color: white;
+}
+
+.leaderboard-links p {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding-left: 125px;
+    color: white;
+}
+
+.leaderboard-one {
+    display: flex;
+    align-items: center;
+    background-color: #12c5f8;
+}
+
+.leaderboard-two {
+    display: flex;
+    align-items: center;
+    background-color: #0fa3ce;
+}
+
+.leaderboard-three {
+    display: flex;
+    align-items: center;
+    background-color: #0c82a3;
+}
+
+.leaderboard-four {
+    display: flex;
+    align-items: center;
+    background-color: #096079;
+}
+
+.leaderboard-five {
+    display: flex;
+    align-items: center;
+    background-color: #08546B;
+    border-radius: 0 0 20px 20px;
+}
+
+
+/*Map Elements */
+.map {
+    flex: 2;
+}
+
 /*Footer Elements*/
 .footer {
     display: flex;
@@ -54,6 +149,7 @@ html, body {
     background: linear-gradient(90deg, rgba(106,149,37,1) 0%, rgba(9,121,12,1) 35%);
     align-items: center;
     justify-content: center;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
 }
 
 .footer p {
