@@ -8,10 +8,10 @@ class CardSet(models.Model):
     Identifies a set of cards, foreign key is held in Card
     one->many relationship with cards
     """
-    name = models.CharField(max_length=40, primary_key=True)
-    description = models.CharField(max_length=200)
+    card_set_name = models.CharField(max_length=40, primary_key=True)
+    card_set_description = models.CharField(max_length=200)
     def __str__(self):
-        return str(self.name)
+        return str(self.card_set_name)
 
 class Card(models.Model):
     """
@@ -27,7 +27,7 @@ class Card(models.Model):
     card_subtitle = models.CharField(max_length=50)
     card_description = models.CharField(max_length=400)
     #card_image_link = models.FieldFile() TODO Figure out how to store images
-    card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True)
+    card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True, blank=True)
     def __str__(self):
         return str(self.card_name)
 
@@ -38,5 +38,5 @@ class UserProfile(models.Model):
     one->one relationship with User
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    points = models.IntegerField(default=0)
-    collected_cards = models.ManyToManyField(Card)
+    user_profile_points = models.IntegerField(default=0)
+    user_profile_collected_cards = models.ManyToManyField(Card)
