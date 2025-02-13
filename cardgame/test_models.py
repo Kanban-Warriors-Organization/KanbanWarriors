@@ -1,6 +1,10 @@
+"""
+Tests for the models Card, CardSet, UserProfile
+"""
+
 from django.test import TestCase
-from .models import Card, CardSet, UserProfile
 from django.contrib.auth.models import User
+from .models import Card, CardSet, UserProfile
 
 class CardModelTests(TestCase):
     """
@@ -10,37 +14,68 @@ class CardModelTests(TestCase):
         """
         Card should return the same details it was created with
         """
+        #Create the test CardSet
+        test_card_set_name = "Test_Card_Set_Name"
+        test_card_set_description = "Test_Card_Set_Description"
+        test_card_set = CardSet(card_set_name = test_card_set_name,
+                                card_set_description = test_card_set_description)
+        test_card_set.save()
+
+        #Create the test Card
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
-
         test_card = Card(card_name = test_card_name, card_subtitle = test_card_subtitle,
-                         card_description = test_card_description, card_set = None)
+                         card_description = test_card_description, card_set = test_card_set)
+        test_card.save()
 
+        #Test card_name is the expected value
         self.assertIs(test_card.card_name, test_card_name,
-                      "card_name was not set or returned correctly")
+                      "card_name was not set or returned correctly\n\
+                      expected: " + str(test_card_name) + "\n\
+                      actual:   " + str(test_card.card_name))
 
+        #Test card_subtitle is the expected value
         self.assertIs(test_card.card_subtitle, test_card_subtitle,
-                      "card_subtitle was not set or returned correctly")
+                      "card_subtitle was not set or returned correctly\n\
+                      expected: " + str(test_card_subtitle) + "\n\
+                      actual:   " + str(test_card.card_subtitle))
 
+        #Test card_description is the expected value
         self.assertIs(test_card.card_description, test_card_description,
-                      "card_description was not set or returned correctly")
+                      "card_description was not set or returned correctly\n\
+                      expected: " + str(test_card_description) + "\n\
+                      actual:   " + str(test_card.card_description))
+
+        #Test card_set is the expected value
+        self.assertIs(test_card.card_set, test_card_set,
+                      "card_set was not set or returned correctly\n\
+                      expected: " + str(test_card_set) + "\n\
+                      actual:   " + str(test_card.card_set))
 
     def test_card_set_with_correct_details(self):
         """
         CardSet should return the same details it was created with
         """
+        #Create the test CardSet
         test_card_set_name = "Test_Card_Set_Name"
         test_card_set_description = "Test_Card_Set_Description"
-
         test_card_set = CardSet(card_set_name = test_card_set_name,
                                 card_set_description = test_card_set_description)
 
+        #Test card_set_name is the expected value
         self.assertIs(test_card_set.card_set_name, test_card_set_name,
-                      "card_set_name was not set or returned correctly")
+                      "card_set_name was not set or returned correctly\n\
+                      expected: " + str(test_card_set_name) + "\n\
+                      actual:   " + str(test_card_set.card_set_name))
 
+        #Test card_set_description is the expected value
         self.assertIs(test_card_set.card_set_description, test_card_set_description,
-                      "card_set_name was not set or returned correctly")
+                      "card_set_name was not set or returned correctly\n\
+                      expected: " + str(test_card_set_description) + "\n\
+                      actual:   " + str(test_card_set.card_set_description))
+
+        #TODO Create tests for image once implemented
 
     def test_user_profile_set_with_correct_details_and_links_to_user(self):
         """
@@ -84,6 +119,8 @@ class CardModelTests(TestCase):
                       expected: " + str(test_user_profile_collected_cards) + "\n\
                       actual:   " + str(test_user_profile.user_profile_collected_cards.all()[0]))
 
+        #Test that the user is the expected value
         self.assertIs(test_user_profile.user, test_user,
-                      "user was not set or returned correctly")
-        
+                      "user was not set or returned correctly\n\
+                      expected: " + str(test_user) + "\n\
+                      actual:   " + str(test_user_profile.user))

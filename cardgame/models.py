@@ -1,3 +1,8 @@
+"""
+Module storing the models for the WebApp\n
+Contains Card, CardSet, and UserProfile
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
 
