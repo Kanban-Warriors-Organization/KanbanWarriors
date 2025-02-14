@@ -2,9 +2,8 @@
 Module storing the models for the WebApp\n
 Contains Card, CardSet, and UserProfile
 """
-
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 # Create your models here.
 
@@ -45,3 +44,13 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card)
+
+    #for reference: django's "User" model has field "username" for the username
+
+class Challenge(models.Model):
+    long = models.FloatField(default=0)
+    lat = models.FloatField(default=0)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    #add questions later!
+    Card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=False)
