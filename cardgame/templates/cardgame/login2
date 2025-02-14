@@ -1,0 +1,18 @@
+<form method="POST" action="{% url 'login' %}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label class="text-primary text-dark font-weight-bold">Enter Username</label>
+                      <input type="text" class="form-control" name="username" placeholder="Enter Username">
+                  </div>
+
+                  <br>
+                  <div class="form-group">
+                      <label class="text-primary text-dark font-weight-bold">Enter Password</label>
+                      <input type="password" class="form-control" name="password" placeholder="Enter Password">
+                  </div>
+     
+
+                  <br>
+                  <button type="submit" class="btn btn-primary btn-lg">Log in</button>
+              </form>
+
