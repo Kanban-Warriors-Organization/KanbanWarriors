@@ -23,6 +23,7 @@ def card_col(request, user_name):
         imgs = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
+            print(i.card_image_link)
             imgs.append(i.card_image_link) #remember, this is an in image field!
         return render(request, 'cardgame/card_col.html', {'images':imgs}) 
     
@@ -111,4 +112,17 @@ def signout(request):
     #so that the ".html" at the end of the URL is removed.
     #proceed with caution! -AGP-
 
+def profile(request, user_name):
+
+    try:
+        u = UserProfile.objects.get(user__username=user_name)
+        ctx = {"username": user_name} #just puts out the username at the moment
+        #return render(request, "cardgame/profile.html", ctx)
+        #profile.html not implemented yet!
+        return HttpResponse("profile of " + user_name)
+
+    except ObjectDoesNotExist:
+        pass
+
+    return HttpResponse("failure!")
 
