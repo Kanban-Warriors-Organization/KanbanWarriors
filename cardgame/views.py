@@ -103,6 +103,15 @@ def get_locations(request):
 
     return JsonResponse({"locations": formatted_locations})
 
+def leaderboard_data(request):
+    print("yellow")
+    top_players = UserProfile.objects.order_by('-user_profile_points')[:5] # Retrives Top 5 Players
+    data = [
+        {"username": player.user.username, "points": player.user_profile_points}
+        for player in top_players
+    ]
+    return JsonResponse(data, safe=False)
+
 def signout(request):
 
     logout(request)

@@ -14,7 +14,8 @@ urlpatterns = [
     ),
     path("signup", views.signup, name="signup"),
     path("create_card", views.create_card, name="create_card"),
-    path("logout", views.logout, name="logout")
+    path("logout", views.logout, name="logout"),
+    path("leaderboard-data/", views.leaderboard_data, name="leaderboard_data")
     # uses django's inbuilt login view
 ]
 

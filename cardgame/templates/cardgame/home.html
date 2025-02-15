@@ -82,13 +82,39 @@
                             });
                         })
                         .catch(error => console.error('Error loading locations:', error));
-                </script>
+                </script> 
 
             </div>
         </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
-        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                fetchLeaderboard();
+
+                function fetchLeaderboard() {
+                    fetch("http://127.0.0.1:8000/leaderboard-data/")
+                    .then(response => response.json())
+                    .then(data => {
+                        const leaderboardSlots = document.querySelectorAll(".leaderboard-links > div");
+            
+                        data.forEach((player, index) => {
+                            if (leaderboardSlots[index]) {  // Ensure we don’t access out-of-bounds elements
+                                let playerName = leaderboardSlots[index].querySelector("a");
+                                let playerScore = leaderboardSlots[index].querySelector("p");
+            
+                                playerName.textContent = player.username;
+                                playerScore.textContent = player.points;
+                            }
+                        });
+                    })
+                    .catch(error => console.error("Error loading leaderboard:", error));
+                }
+            
+                //Updates every 100 seconds
+                setInterval(fetchLeaderboard, 100000);
+            });
+            </script>
     </body>
 </html>

@@ -82,9 +82,10 @@ html, body {
 .leaderboard-links {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
     width: 300px;
-    border-radius: 20px 20px 20px 20px;
+    border-radius: 0 0 20px 20px;
     background-color: #08546B;
     box-sizing: border-box;  
 }
@@ -96,13 +97,14 @@ html, body {
     text-decoration: none;
     width: auto;
     color: white;
+    flex: 1;
 }
 
 .leaderboard-links p {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    padding-left: 125px;
     color: white;
+    padding-right: 30px;
 }
 
 .leaderboard-one {
