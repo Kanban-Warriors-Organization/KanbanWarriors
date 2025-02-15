@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Contains a dynamic map, leaderboards and navigational menus">
+        <title>Home</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" 
+        rel="stylesheet">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="user.html">Profile</a>
+                <a href="social.html">Social</a>
+                <a href="about.html">About Us</a>
+                <a href="home.html">Sign Out</a>
+            </nav>
+        </header>
+        <div class="main-container">
+            <div class="leaderboard">
+                <div class="leaderboard-header">
+                    <img src="{% static 'img\trophy.svg' %}">
+                    <h1>
+                        Top Players
+                    </h1>
+                </div>
+                <div class="leaderboard-links">
+                    <div class="leaderboard-one">
+                        <img src="{% static 'img/one.svg' %}">
+                        <a href="">User 1</a>
+                        <p>000</p>
+                    </div>
+                    <div class="leaderboard-two">
+                        <img src="{% static 'img/two.svg' %}">
+                        <a href="">User 2</a>
+                        <p>000</p>
+                    </div>
+                    <div class="leaderboard-three">
+                        <img src="{% static 'img/three.svg' %}">
+                        <a href="">User 3</a>
+                        <p>000</p>
+                    </div>
+                    <div class="leaderboard-four">
+                        <img src="{% static 'img/four.svg' %}">
+                        <a href="">User 4</a>
+                        <p>000</p>
+                    </div>
+                    <div class="leaderboard-five">
+                        <img src="{% static 'img/five.svg' %}">
+                        <a href="">User 5</a>
+                        <p>000</p>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="map" id="map">
+                <script>
+                    //Centers Map on University Campus
+                    var map = L.map("map").setView([50.7371, -3.5251], 15); 
+            
+                    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+            
+                    fetch("http://127.0.0.1:8000/locations-data/")
+                        .then(response => response.json())
+                        .then(data => {
+                            data.locations.forEach(location => {
+                                L.marker([location.latitude, location.longitude])
+                                    .addTo(map)
+                                    .bindPopup(`<b>${location.name}</b>`);
+                            });
+                        })
+                        .catch(error => console.error('Error loading locations:', error));
+                </script>
+
+            </div>
+        </div>
+        <footer class="footer">
+            <p>@Copyirght 2025. All rights reserved.</p>
+        </footer>
+        
+    </body>
+</html>

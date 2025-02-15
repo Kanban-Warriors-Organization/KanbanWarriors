@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
 from django.contrib.auth import views as auth_views
+from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -14,7 +14,9 @@ urlpatterns = [
     ),
     path("signup", views.signup, name="signup"),
     path("create_card", views.create_card, name="create_card"),
+    path("logout", views.logout, name="logout")
     # uses django's inbuilt login view
 ]
 
 # (template_name="cardgame/login.html")
+

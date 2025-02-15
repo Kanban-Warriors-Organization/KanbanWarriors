@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.template import loader
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import *
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,28 +12,25 @@ from django.http import JsonResponse
 
 # Create your views here.
 
-
 def index(request):
     return HttpResponse("index page test")
-
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'cardgame/home.html')
 
 def card_col(request, user_name):
-    response = "you're at the collection of %s"
-
-    # gets file names from database
-    a = "number of cards: "
+    #gets the cards from a user's collection and inserts them into the template as context
     try:
-        u = UserProfile.objects.get(user__username=user_name)  # this is a query set
+        imgs = []
+        u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
-            a += "s"
+            imgs.append(i.card_image_link) #remember, this is an in image field!
+        return render(request, 'cardgame/card_col.html', {'images':imgs}) 
+    
     except ObjectDoesNotExist:
-        return HttpResponse("skibidi")  # this seems to happen every time
+        #if user does not exist
+        pass
+    return HttpResponse("fail") #change this later!
 
-    return HttpResponse("a")
-
-    return HttpResponse(response % user_name)
 
 
 def login(LoginView):
@@ -106,3 +102,13 @@ def get_locations(request):
     ]
 
     return JsonResponse({"locations": formatted_locations})
+
+def signout(request):
+
+    logout(request)
+    redirect("home") #this is currently bugged!
+    #when this is deployed in production, you HAVE to modify the htaccess file
+    #so that the ".html" at the end of the URL is removed.
+    #proceed with caution! -AGP-
+
+
