@@ -1,0 +1,21 @@
+{% block content %}
+
+<h1>Create a New Card</h1>
+
+<form method="post" action="{% url 'create_card' %}">
+    {% csrf_token %}
+    <label for="card_name">Card Name:</label><br>
+    <input type="text" id="card_name" name="card_name"><br>
+
+    <label for="card_subtitle">Card Subtitle:</label><br>
+    <input type="text" id="card_subtitle" name="card_subtitle"><br>
+
+    <label for="card_description">Card Description:</label><br>
+    <textarea id="card_description" name="card_description"></textarea><br>
+
+    <label for="card_set">Card Set (Optional):</label><br>
+    <input type="text" id="card_set" name="card_set"><br>
+
+    <input type="submit" value="Create Card">
+</form>
+{% endblock %}
