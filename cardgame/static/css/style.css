@@ -139,7 +139,10 @@ html, body {
 
 /*Map Elements */
 .map {
+    padding: 40px;
+    display: flex;
     flex: 2;
+    height: 70%;
 }
 
 /*Footer Elements*/

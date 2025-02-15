@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -16,6 +17,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 def index(request):
     return HttpResponse("index page test")
 
+def home(request):
+    return render(request, 'home.html')
 
 def card_col(request, user_name):
     response = "you're at the collection of %s"
@@ -89,3 +92,17 @@ def create_card(request):
             return HttpResponse(f"Error creating card: {e}")
     else:  # GET: Render UI for creating a card
         return render(request, "cardgame/create_card.html")
+
+def get_locations(request):
+    locations = list(Challenge.objects.select_related("Card").values(
+        "Card__card_name",  
+        "lat",
+        "long"
+    ))
+
+    formatted_locations = [
+        {"name": loc["Card__card_name"], "latitude": loc["lat"], "longitude": loc["long"]}
+        for loc in locations
+    ]
+
+    return JsonResponse({"locations": formatted_locations})
