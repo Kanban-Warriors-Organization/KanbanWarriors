@@ -14,8 +14,18 @@ from django.http import JsonResponse
 
 def index(request):
     return HttpResponse("index page test")
+
 def home(request):
-    return render(request, 'cardgame/home.html')
+    #we render the top scoring players, so we have to get their scores!
+    users = UserProfile.objects.all().order_by('-user_profile_points').values()[:5]
+    names = []
+    scores = []
+    for usr in users:
+        up_record = UserProfile.objects.get(user_id= usr['user_id'])
+
+        names.append(up_record.user.username)
+        scores.append(up_record.user_profile_points)
+    return render(request, 'cardgame/home.html', {'names': names, 'scores':scores})
 
 def card_col(request, user_name):
     #gets the cards from a user's collection and inserts them into the template as context
@@ -23,7 +33,6 @@ def card_col(request, user_name):
         imgs = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
-            print(i.card_image_link)
             imgs.append(i.card_image_link) #remember, this is an in image field!
         return render(request, 'cardgame/card_col.html', {'images':imgs}) 
     
@@ -82,6 +91,7 @@ def create_card(request):
                 card_name=card_name,
                 card_subtitle=card_subtitle,
                 card_description=card_description,
+                #TODO: add image parameter!!!!
                 card_set=card_set_instance,
             )
             return HttpResponse("Card created successfully!")
@@ -120,6 +130,16 @@ def profile(request, user_name):
         #return render(request, "cardgame/profile.html", ctx)
         #profile.html not implemented yet!
         return HttpResponse("profile of " + user_name)
+
+    except ObjectDoesNotExist:
+        pass
+
+    return HttpResponse("failure!")##do something more verbose
+
+def challenge(request, challenge_id):
+
+#we need to get the challenge, the questions, and the answers.
+    try:
 
     except ObjectDoesNotExist:
         pass
