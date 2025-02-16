@@ -141,6 +141,7 @@ def challenge(request, challenge_id):
 
 #we need to get the challenge, the questions, and the answers.
     try:
+        pass
 
     except ObjectDoesNotExist:
         pass

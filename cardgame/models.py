@@ -69,13 +69,13 @@ class Challenge(models.Model):
     # add questions later!
     Card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=False)
 
-class Answer(models.Model):
-    text = models.CharField(max_length = 400)
-    question = models.ForeignKey(Question,models.SET_NULL, null=True, blank=True)
-    
-
 class Question(models.Model):
     text = models.CharField(max_length = 400)
     challenge = models.ForeignKey(Challenge, models.SET_NULL, null=True, blank=True)
-    right = models.OneToOneField(Answer)
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, models.SET_NULL, null=True, blank=True)
+    text = models.CharField(max_length = 400)
+    correct = models.BooleanField()
+
 
