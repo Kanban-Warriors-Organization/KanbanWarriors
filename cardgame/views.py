@@ -12,35 +12,27 @@ from django.http import JsonResponse
 
 # Create your views here.
 
+
 def index(request):
     return HttpResponse("index page test")
 
 def home(request):
-    #we render the top scoring players, so we have to get their scores!
-    users = UserProfile.objects.all().order_by('-user_profile_points').values()[:5]
-    names = []
-    scores = []
-    for usr in users:
-        up_record = UserProfile.objects.get(user_id= usr['user_id'])
-
-        names.append(up_record.user.username)
-        scores.append(up_record.user_profile_points)
-    return render(request, 'cardgame/home.html', {'names': names, 'scores':scores})
+    return render(request, "cardgame/home.html")
 
 def card_col(request, user_name):
-    #gets the cards from a user's collection and inserts them into the template as context
+    # gets the cards from a user's collection and inserts them into the template as context
     try:
         imgs = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
-            imgs.append(i.card_image_link) #remember, this is an in image field!
-        return render(request, 'cardgame/card_col.html', {'images':imgs}) 
-    
-    except ObjectDoesNotExist:
-        #if user does not exist
-        pass
-    return HttpResponse("fail") #change this later!
+            print(i.card_image_link)
+            imgs.append(i.card_image_link)  # remember, this is an in image field!
+        return render(request, "cardgame/card_col.html", {"images": imgs})
 
+    except ObjectDoesNotExist:
+        # if user does not exist
+        pass
+    return HttpResponse("fail")  # change this later!
 
 
 def login(LoginView):
@@ -73,6 +65,7 @@ def create_card(request):
         card_subtitle = request.POST.get("card_subtitle")
         card_description = request.POST.get("card_description")
         card_set_name = request.POST.get("card_set")
+        card_image = request.FILES.get("card_image")
 
         # Check that the required parameters are provided
         if not (card_name and card_subtitle and card_description):
@@ -87,12 +80,13 @@ def create_card(request):
                 return HttpResponse("Specified CardSet does not exist", status=400)
 
         try:
-            Card.objects.create(
+            card = Card.objects.create(
                 card_name=card_name,
                 card_subtitle=card_subtitle,
                 card_description=card_description,
                 #TODO: add image parameter!!!!
                 card_set=card_set_instance,
+                card_image_link=card_image,
             )
             return HttpResponse("Card created successfully!")
         except IntegrityError as e:  # catches errors such as non-unique primary key
@@ -100,35 +94,42 @@ def create_card(request):
     else:  # GET: Render UI for creating a card
         return render(request, "cardgame/create_card.html")
 
+
 def get_locations(request):
-    locations = list(Challenge.objects.select_related("Card").values(
-        "Card__card_name",  
-        "lat",
-        "long"
-    ))
+    locations = list(
+        Challenge.objects.select_related("Card").values(
+            "Card__card_name", "lat", "long"
+        )
+    )
 
     formatted_locations = [
-        {"name": loc["Card__card_name"], "latitude": loc["lat"], "longitude": loc["long"]}
+        {
+            "name": loc["Card__card_name"],
+            "latitude": loc["lat"],
+            "longitude": loc["long"],
+        }
         for loc in locations
     ]
 
     return JsonResponse({"locations": formatted_locations})
 
+
 def signout(request):
 
     logout(request)
-    redirect("home") #this is currently bugged!
-    #when this is deployed in production, you HAVE to modify the htaccess file
-    #so that the ".html" at the end of the URL is removed.
-    #proceed with caution! -AGP-
+    redirect("home")  # this is currently bugged!
+    # when this is deployed in production, you HAVE to modify the htaccess file
+    # so that the ".html" at the end of the URL is removed.
+    # proceed with caution! -AGP-
+
 
 def profile(request, user_name):
 
     try:
         u = UserProfile.objects.get(user__username=user_name)
-        ctx = {"username": user_name} #just puts out the username at the moment
-        #return render(request, "cardgame/profile.html", ctx)
-        #profile.html not implemented yet!
+        ctx = {"username": user_name}  # just puts out the username at the moment
+        # return render(request, "cardgame/profile.html", ctx)
+        # profile.html not implemented yet!
         return HttpResponse("profile of " + user_name)
 
     except ObjectDoesNotExist:
@@ -145,4 +146,3 @@ def challenge(request, challenge_id):
         pass
 
     return HttpResponse("failure!")
-
