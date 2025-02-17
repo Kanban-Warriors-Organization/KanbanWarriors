@@ -97,7 +97,7 @@ class Challenge(models.Model):
     lat = models.FloatField(default=0)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    #new 
+    # new
     # add questions later!
     Card = models.OneToOneField(Card, on_delete=models.CASCADE,
                                 primary_key=False)

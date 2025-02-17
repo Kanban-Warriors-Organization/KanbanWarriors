@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import *
+from .models import Card, CardSet, UserProfile, Challenge, Question, Answer
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
@@ -48,7 +48,9 @@ def card_col(request, user_name):
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
             print(i.card_image_link)
-            imgs.append(i.card_image_link)  # remember, this is an in image field!
+
+            # remember, this is an in image field!
+            imgs.append(i.card_image_link)
         return render(request, "cardgame/card_col.html", {"images": imgs})
 
     except ObjectDoesNotExist:
@@ -58,6 +60,9 @@ def card_col(request, user_name):
 
 
 def login(LoginView):
+    """
+    Presumably login
+    """
     pass
 
 
@@ -78,7 +83,8 @@ def signup(request):
         if form.is_valid():  # validation later
             try:
                 User.objects.create_user(
-                    form.cleaned_data["username"], None, form.cleaned_data["password1"]
+                    form.cleaned_data["username"], None,
+                    form.cleaned_data["password1"]
                 )
                 return HttpResponse("you did good!")
             except IntegrityError:
@@ -87,7 +93,8 @@ def signup(request):
 
     else:
         form = UserCreationForm()
-        return HttpResponse(render(request, "cardgame/signup.html", {"form": form}))
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
 
 @staff_member_required  # Makes sure only system admins can execute this code
@@ -122,9 +129,11 @@ def create_card(request):
         card_set_instance = None
         if card_set_name:
             try:
-                card_set_instance = CardSet.objects.get(card_set_name=card_set_name)
+                card_set_instance = CardSet.objects.get(
+                    card_set_name=card_set_name)
             except CardSet.DoesNotExist:
-                return HttpResponse("Specified CardSet does not exist", status=400)
+                return HttpResponse("Specified CardSet does not exist",
+                                    status=400)
 
         try:
             card = Card.objects.create(
@@ -136,7 +145,9 @@ def create_card(request):
                 card_image_link=card_image,
             )
             return HttpResponse("Card created successfully!")
-        except IntegrityError as e:  # catches errors such as non-unique primary key
+
+        # catches errors such as non-unique primary key
+        except IntegrityError as e:
             return HttpResponse(f"Error creating card: {e}")
     else:  # GET: Render UI for creating a card
         return render(request, "cardgame/create_card.html")
@@ -206,7 +217,7 @@ def profile(request, user_name):
     """
     try:
         u = UserProfile.objects.get(user__username=user_name)
-        ctx = {"username": user_name}  # just puts out the username at the moment
+        ctx = {"username": user_name}  # puts out the username at the moment
         # return render(request, "cardgame/profile.html", ctx)
         # profile.html not implemented yet!
         return HttpResponse("profile of " + user_name)
@@ -214,7 +225,7 @@ def profile(request, user_name):
     except ObjectDoesNotExist:
         pass
 
-    return HttpResponse("failure!")  ##do something more verbose
+    return HttpResponse("failure!")  # do something more verbose
 
 
 def challenge(request, challenge_id):
