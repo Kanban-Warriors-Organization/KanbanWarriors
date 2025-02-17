@@ -40,7 +40,9 @@ def card_col(request, user_name):
     Returns:
         Rendered template with user's card images or failure message
     """
-    # gets the cards from a user's collection and inserts them into the template as context
+
+    # gets the cards from a user's collection and inserts them into the
+    # template as context
     try:
         imgs = []
         u = UserProfile.objects.get(user__username=user_name)
