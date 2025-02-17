@@ -1,27 +1,36 @@
 """
-Tests for the models Card, CardSet, UserProfile
+Test suite for model validation and data integrity.
+Verifies the correct functionality of data models including creation, 
+attribute storage, and relationship management.
 """
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Card, CardSet, UserProfile
 
+
 class CardModelTests(TestCase):
     """
-    Tests for the models Card, CardSet, UserProfile
+    Test suite for validating model functionality.
+    Ensures proper creation and storage of Card, CardSet, and UserProfile
+    including their relationships and attributes.
+
+    Author: BLANK
     """
+
     def test_card_created_with_correct_details(self):
         """
-        Card should return the same details it was created with
+        Validates that a card stores and returns its creation attributes correctly.
+        Tests card name, subtitle, description, and card set relationship.
         """
-        #Create the test CardSet
+        # Create the test CardSet
         test_card_set_name = "Test_Card_Set_Name"
         test_card_set_description = "Test_Card_Set_Description"
         test_card_set = CardSet(card_set_name = test_card_set_name,
                                 card_set_description = test_card_set_description)
         test_card_set.save()
 
-        #Create the test Card
+        # Create the test Card
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
@@ -55,9 +64,10 @@ class CardModelTests(TestCase):
 
     def test_card_set_with_correct_details(self):
         """
-        CardSet should return the same details it was created with
+        Verifies that a card set maintains accurate attribute storage.
+        Tests card set name and description fields.
         """
-        #Create the test CardSet
+        # Create the test CardSet
         test_card_set_name = "Test_Card_Set_Name"
         test_card_set_description = "Test_Card_Set_Description"
         test_card_set = CardSet(card_set_name = test_card_set_name,
@@ -79,17 +89,17 @@ class CardModelTests(TestCase):
 
     def test_user_profile_set_with_correct_details_and_links_to_user(self):
         """
-        UserDetails should return the same details it was created with and link 
-        to a User
+        Ensures user profile creation with proper attribute storage and user linkage.
+        Tests points system, card collection relationships, and user association.
         """
-        #Create test User
+        # Create test User
         test_user_username = "Test_User"
         test_user_password = "Test_Password"
         test_user = User.objects.create_user(username = test_user_username,
                                              password = test_user_password)
         test_user.save()
 
-        #Create a test Card for the collected_cards field
+        # Create a test Card for the collected_cards field
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
@@ -99,7 +109,7 @@ class CardModelTests(TestCase):
                                                 card_set = None)
         test_user_profile_collected_cards.save()
 
-        #Create the actual UserProfile model
+        # Create the actual UserProfile model
         test_user_profile_points = 100
         test_user_profile = UserProfile(user = test_user,
                                         user_profile_points = test_user_profile_points)

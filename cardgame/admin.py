@@ -1,3 +1,11 @@
+"""
+Admin configuration.
+
+This file registers the models with the Django admin interface.
+
+Author: BLANK
+"""
+
 from django.contrib import admin
 from .models import Card, CardSet, UserProfile, Challenge
 
