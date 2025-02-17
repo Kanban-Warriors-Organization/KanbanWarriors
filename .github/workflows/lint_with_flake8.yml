@@ -1,4 +1,4 @@
-name: Django CI - Testing
+name: Django CI - Linting
 run-name: ${{ github.actor }} is running tests
 on:
   push:
@@ -26,8 +26,8 @@ jobs:
         python -m venv .venv
         source .venv/bin/activate
         python -m pip install --upgrade pip
-        pip install -r .github/requirements.txt
-    - name: Run Tests'
+        pip install -r .github/requirements_lint.txt
+    - name: Lint with flake8
       run: |
-        source .venv/bin/activate
-        python manage.py test
+        pip install flake8
+        flake8 cardgame/
