@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
+import datetime
 
 # Create your views here.
 
@@ -137,11 +138,50 @@ def profile(request, user_name):
 
     return HttpResponse("failure!")##do something more verbose
 
+
 def challenge(request, challenge_id):
+
+    #we need to return: the card, the location, all that kind of stuff
+    try:
+        c = Challenge.objects.get(id = challenge_id)
+        ctime = datetime.datetime.now()
+        valid = True if ctime > c.start and ctime < c.end else False
+
+        #we don't validate location here! we just return what we need to
+
+        ctx = {'long': c.long, 'lat': c.lat, 'start': c.start, 'end': c.end,
+               'valid': valid, 'c_name' : c.card.name, 'c_clink': c.card.card_image_link}
+
+        return render(request, "challenge.html", ctx)
+
+        ##get card image and stuff
+
+        except ObjectDoesNotExist():
+            pass
+
+def questions(request, challenge_id)
+
+'''
+def questions(request, challenge_id):
 
 #we need to get the challenge, the questions, and the answers.
     try:
-        pass
+        questions = []
+        c = Challenge.objects.get(id = challenge_id)
+        #get the questions based on their foreign key
+        q = c.questions.all()
+        print(c)
+        print(q)
+        for i in q:
+            answers = []
+            a = i.answers.all()
+            for j in a:
+                answers.append
+
+        questions.append({q.text: answers})
+        
+
+        
 
     except ObjectDoesNotExist:
         pass

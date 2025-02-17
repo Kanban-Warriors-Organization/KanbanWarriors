@@ -65,16 +65,17 @@ class Challenge(models.Model):
     lat = models.FloatField(default=0)
     start = models.DateTimeField()
     end = models.DateTimeField()
+    text = models.CharField(max_length = 2000)
     #new 
     # add questions later!
-    Card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=False)
+    card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=False)
 
 class Question(models.Model):
     text = models.CharField(max_length = 400)
-    challenge = models.ForeignKey(Challenge, models.SET_NULL, null=True, blank=True)
+    challenge = models.ForeignKey(Challenge, models.SET_NULL, null=True, blank=True, related_name="questions")
 
 class Answer(models.Model):
-    question = models.ForeignKey(Question, models.SET_NULL, null=True, blank=True)
+    question = models.ForeignKey(Question, models.SET_NULL, null=True, blank=True, related_name="answers")
     text = models.CharField(max_length = 400)
     correct = models.BooleanField()
 
