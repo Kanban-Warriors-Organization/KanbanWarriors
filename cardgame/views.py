@@ -1,3 +1,9 @@
+"""
+Core functionality for user interactions, authentication, and data management.
+Handles routing and processing for user profiles, card collections, challenges,
+and administrative functions.
+"""
+
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template import loader
@@ -22,6 +28,18 @@ def home(request):
 
 
 def card_col(request, user_name):
+    """
+    Displays a user's card collection.
+
+    Author: BLANK
+
+    Args:
+        request: HTTP request object
+        user_name: Username whose collection to display
+
+    Returns:
+        Rendered template with user's card images or failure message
+    """
     # gets the cards from a user's collection and inserts them into the template as context
     try:
         imgs = []
@@ -42,6 +60,17 @@ def login(LoginView):
 
 
 def signup(request):
+    """
+    Processes new user registration.
+
+    Author: BLANK
+
+    Args:
+        request: HTTP request object containing form data
+
+    Returns:
+        HttpResponse: Success/failure message or signup form
+    """
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():  # validation later
@@ -62,26 +91,18 @@ def signup(request):
 @staff_member_required  # Makes sure only system admins can execute this code
 def create_card(request):
     """
-    Handles the creation of a new card.
+    Creates new cards with provided details and images.
 
-    This view function processes POST requests to create a new card with the provided
-    details such as name, subtitle, description, set, and image. It also handles GET
-    requests to render the card creation UI.
-
-    Author: Samuel
+    Author: BLANK
 
     Args:
-        request (HttpRequest): The HTTP request object containing POST data for card creation.
+        request: HTTP request with card data or GET for form
 
     Returns:
-        HttpResponse: A response indicating the success or failure of the card creation process.
-                    On success, returns a message "Card created successfully!".
-                    On failure, returns an error message with the appropriate status code.
+        HttpResponse: Creation status or form template
 
-    Error Handling:
-        - Returns a 400 status code if required parameters (name, subtitle, description) are missing.
-        - Returns a 400 status code if the specified CardSet does not exist.
-        - Catches IntegrityError and returns an error message if there is a database integrity issue.
+    Raises:
+        400: Missing parameters or invalid card set
     """
     if request.method == "POST":  # Create a card
         # Get info from request
@@ -120,6 +141,17 @@ def create_card(request):
 
 
 def get_locations(request):
+    """
+    Retrieves challenge location data for map display.
+
+    Author: BLANK
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        JsonResponse: Formatted location data with coordinates
+    """
     locations = list(
         Challenge.objects.select_related("Card").values(
             "Card__card_name", "lat", "long"
@@ -139,7 +171,17 @@ def get_locations(request):
 
 
 def signout(request):
+    """
+    Handles user logout process.
 
+    Author: BLANK
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Redirect to home page
+    """
     logout(request)
     redirect("home")  # this is currently bugged!
     # when this is deployed in production, you HAVE to modify the htaccess file
@@ -148,7 +190,18 @@ def signout(request):
 
 
 def profile(request, user_name):
+    """
+    Displays user profile information.
 
+    Author: BLANK
+
+    Args:
+        request: HTTP request object
+        user_name: Username to display profile for
+
+    Returns:
+        HttpResponse: Profile data or failure message
+    """
     try:
         u = UserProfile.objects.get(user__username=user_name)
         ctx = {"username": user_name}  # just puts out the username at the moment
@@ -163,7 +216,18 @@ def profile(request, user_name):
 
 
 def challenge(request, challenge_id):
+    """
+    Manages challenge interactions and responses.
 
+    Author: BLANK
+
+    Args:
+        request: HTTP request object
+        challenge_id: ID of the challenge to process
+
+    Returns:
+        HttpResponse: Challenge data or failure message
+    """
     # we need to get the challenge, the questions, and the answers.
     try:
         pass
