@@ -1,5 +1,5 @@
 name: Django CI
-
+run-name: ${{ github.actor }} is running tests
 on:
   push:
     branches: [ master ]
