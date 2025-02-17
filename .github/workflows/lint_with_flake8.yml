@@ -1,5 +1,5 @@
 name: Django CI - Linting
-run-name: ${{ github.actor }} is running tests
+run-name: ${{ github.actor }} is running linting
 on:
   push:
     branches: [ main ]
@@ -30,4 +30,5 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 cardgame/
+        flake8 cardgame/*.py
+        flake8 cardgame/tests/
