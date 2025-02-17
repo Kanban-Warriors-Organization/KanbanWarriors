@@ -29,8 +29,8 @@ jobs:
         pip install -r .github/requirements.txt
     - name: Lint with flake8
       run: |
+        pip install flake8
         flake8
-        
     - name: Run Tests'
       run: |
         source .venv/bin/activate
