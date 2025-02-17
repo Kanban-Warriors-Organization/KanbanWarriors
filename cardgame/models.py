@@ -53,7 +53,8 @@ class Card(models.Model):
         upload_to="cardgame/static/card_images",
         default="static/card_images/do_not_remove.png",
     )
-    card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True, blank=True)
+    card_set = models.ForeignKey(CardSet, models.SET_NULL,
+                                 null=True, blank=True)
 
     def __str__(self):
         return str(self.card_name)
@@ -72,7 +73,8 @@ class UserProfile(models.Model):
         Many-to-many with Card
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                primary_key=True)
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card)
 
@@ -97,7 +99,8 @@ class Challenge(models.Model):
     end = models.DateTimeField()
     #new 
     # add questions later!
-    Card = models.OneToOneField(Card, on_delete=models.CASCADE, primary_key=False)
+    Card = models.OneToOneField(Card, on_delete=models.CASCADE,
+                                primary_key=False)
 
 
 class Question(models.Model):
@@ -112,7 +115,8 @@ class Question(models.Model):
     """
 
     text = models.CharField(max_length=400)
-    challenge = models.ForeignKey(Challenge, models.SET_NULL, null=True, blank=True)
+    challenge = models.ForeignKey(Challenge, models.SET_NULL,
+                                  null=True, blank=True)
 
 
 class Answer(models.Model):
@@ -127,6 +131,7 @@ class Answer(models.Model):
         Many-to-one with Question
     """
 
-    question = models.ForeignKey(Question, models.SET_NULL, null=True, blank=True)
+    question = models.ForeignKey(Question, models.SET_NULL,
+                                 null=True, blank=True)
     text = models.CharField(max_length=400)
     correct = models.BooleanField()
