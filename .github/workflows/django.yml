@@ -30,7 +30,7 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8
+        flake8 /cardgame
     - name: Run Tests'
       run: |
         source .venv/bin/activate
