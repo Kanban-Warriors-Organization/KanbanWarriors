@@ -16,8 +16,10 @@ from django.http import JsonResponse
 def index(request):
     return HttpResponse("index page test")
 
+
 def home(request):
     return render(request, "cardgame/home.html")
+
 
 def card_col(request, user_name):
     # gets the cards from a user's collection and inserts them into the template as context
@@ -57,8 +59,30 @@ def signup(request):
         return HttpResponse(render(request, "cardgame/signup.html", {"form": form}))
 
 
-@staff_member_required
+@staff_member_required  # Makes sure only system admins can execute this code
 def create_card(request):
+    """
+    Handles the creation of a new card.
+
+    This view function processes POST requests to create a new card with the provided
+    details such as name, subtitle, description, set, and image. It also handles GET
+    requests to render the card creation UI.
+
+    Author: Samuel
+
+    Args:
+        request (HttpRequest): The HTTP request object containing POST data for card creation.
+
+    Returns:
+        HttpResponse: A response indicating the success or failure of the card creation process.
+                    On success, returns a message "Card created successfully!".
+                    On failure, returns an error message with the appropriate status code.
+
+    Error Handling:
+        - Returns a 400 status code if required parameters (name, subtitle, description) are missing.
+        - Returns a 400 status code if the specified CardSet does not exist.
+        - Catches IntegrityError and returns an error message if there is a database integrity issue.
+    """
     if request.method == "POST":  # Create a card
         # Get info from request
         card_name = request.POST.get("card_name")
@@ -84,7 +108,7 @@ def create_card(request):
                 card_name=card_name,
                 card_subtitle=card_subtitle,
                 card_description=card_description,
-                #TODO: add image parameter!!!!
+                # TODO: add image parameter!!!!
                 card_set=card_set_instance,
                 card_image_link=card_image,
             )
@@ -135,11 +159,12 @@ def profile(request, user_name):
     except ObjectDoesNotExist:
         pass
 
-    return HttpResponse("failure!")##do something more verbose
+    return HttpResponse("failure!")  ##do something more verbose
+
 
 def challenge(request, challenge_id):
 
-#we need to get the challenge, the questions, and the answers.
+    # we need to get the challenge, the questions, and the answers.
     try:
         pass
 
