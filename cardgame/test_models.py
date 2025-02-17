@@ -30,7 +30,7 @@ class CardModelTests(TestCase):
                                 card_set_description = test_card_set_description)
         test_card_set.save()
 
-        #Create the test Card
+        # Create the test Card
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
