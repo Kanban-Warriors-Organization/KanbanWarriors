@@ -58,6 +58,18 @@ def card_col(request, user_name):
         pass
     return HttpResponse("fail")  # change this later!
 
+def recent_card_data(request):
+    """
+    Finds the most recently created card and returns its 
+    """
+    recent_card = Card.objects.order_by('-created_at').first()
+    data = {
+            "name": recent_card.card_name,
+            "description": recent_card.card_description,
+            "image": recent_card.card_image.url
+        }
+    
+    return JsonResponse(data)
 
 def login(LoginView):
     """
