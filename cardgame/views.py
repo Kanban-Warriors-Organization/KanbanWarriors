@@ -60,15 +60,15 @@ def card_col(request, user_name):
 
 def recent_card_data(request):
     """
-    Finds the most recently created card and returns its 
+    Finds the most recently created card and returns its
     """
     recent_card = Card.objects.order_by('-card_created_at').first()
     data = {
             "name": recent_card.card_name,
             "description": recent_card.card_description,
-            "image": recent_card.card_image_link.url[len("cardgame/"):]
+            "image": recent_card.card_image_link.url
         }
-    
+
     return JsonResponse(data)
 
 def login(LoginView):
