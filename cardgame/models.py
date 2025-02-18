@@ -49,6 +49,7 @@ class Card(models.Model):
     card_name = models.CharField(max_length=50, primary_key=True)
     card_subtitle = models.CharField(max_length=50)
     card_description = models.CharField(max_length=400)
+    card_creation_date = models.DateTimeField("date created")
     card_image_link = models.ImageField(
         upload_to="cardgame/static/card_images",
         default="static/card_images/do_not_remove.png",
