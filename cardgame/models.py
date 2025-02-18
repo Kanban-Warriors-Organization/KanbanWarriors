@@ -33,10 +33,7 @@ class Card(models.Model):
     card_name = models.CharField(max_length=50, primary_key=True)
     card_subtitle = models.CharField(max_length=50)
     card_description = models.CharField(max_length=400)
-    card_image_link = models.ImageField(
-        upload_to="cardgame/static/card_images",
-        default="cardgame/static/card_images/do_not_remove.png",
-    )
+    #card_image_link = models.FieldFile() TODO Figure out how to store images
     card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True, blank=True)
     def __str__(self):
         return str(self.card_name)
