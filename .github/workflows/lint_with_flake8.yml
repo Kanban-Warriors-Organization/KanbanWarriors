@@ -1,0 +1,34 @@
+name: Django CI - Linting
+run-name: ${{ github.actor }} is running linting
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.13.2]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r .github/requirements_lint.txt
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 cardgame/*.py
+        flake8 cardgame/tests/

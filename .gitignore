@@ -1,0 +1,7 @@
+/.venv
+*.pyc
+*.sqlite3
+cardgame/migrations/
+manage.py
+cardgame/__pycache__/
+cards/__pycache__/
