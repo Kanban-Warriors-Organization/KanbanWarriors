@@ -1,139 +1,166 @@
 """
-Core data models for the application.
-Defines database structure and relationships for cards, collections,
-user profiles, challenges, and quiz components.
-
-Author: BLANK
+Module storing the models for the WebApp\n
+Contains Card, CardSet, and UserProfile
 """
 
-from django.contrib.auth.models import User
 from django.db import models
-import datetime;
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 
 # Create your models here.
 
-
 class CardSet(models.Model):
     """
-    Represents a collection of related cards.
-
-    Attributes:
-        card_set_name (str): Unique identifier for the set
-        card_set_description (str): Detailed description of the set's theme
-
-    Relationships:
-        One-to-many with Card model
+    Identifies a set of cards, foreign key is held in Card
+    one->many relationship with cards
     """
-
     card_set_name = models.CharField(max_length=40, primary_key=True)
     card_set_description = models.CharField(max_length=200)
-
     def __str__(self):
         return str(self.card_set_name)
 
-
 class Card(models.Model):
     """
-    Represents an individual collectible card.
-
-    Attributes:
-        card_name (str): Unique identifier for the card
-        card_subtitle (str): Secondary descriptive text
-        card_description (str): Detailed card information
-        card_image_link (ImageField): Visual representation
-
-    Relationships:
-        Many-to-one with CardSet
-        Many-to-many with UserProfile
+    CharField: card_name\n
+    CharField: card_subtitle\n
+    CharField: card_description\n
+    FK: card_set\n
+    Holds the details of a card, can be a member of a CardSet\n
+    many->one relationship with CardSet\n
+    many->many relationship with UserProfile
     """
-
     card_name = models.CharField(max_length=50, primary_key=True)
     card_subtitle = models.CharField(max_length=50)
     card_description = models.CharField(max_length=400)
-    card_created_at = models.DateTimeField(auto_now_add=True)
-    card_image_link = models.ImageField(
-        upload_to="static/card_images",
-        default="static/card_images/do_not_remove.png",
-    )
-    card_set = models.ForeignKey(CardSet, models.SET_NULL,
-                                 null=True, blank=True)
-
+    #card_image_link = models.FieldFile() TODO Figure out how to store images
+    card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True, blank=True)
     def __str__(self):
         return str(self.card_name)
 
-
 class UserProfile(models.Model):
     """
-    Extends the built-in User model with additional functionality.
-
-    Attributes:
-        user_profile_points (int): Achievement score
-        user_profile_collected_cards (ManyToManyField): Collection of cards
-
-    Relationships:
-        One-to-one with Django User model
-        Many-to-many with Card
+    Extends the fields of the in-built User relation
+    many->many relationship with Card
+    one->one relationship with User
     """
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE,
-                                primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card)
 
+class Question(models.Model):
+    """
+    Faciliates the multiple-choice questions associated with a challenge
+    """
+
+    # Links to challenge
+    challenge = models.ForeignKey('Challenge', on_delete=models.CASCADE, related_name='questions')
+
+    # Question text
+    text = models.CharField(max_length=255)
+
+    # Multiple-choice options
+    option_a = models.CharField(max_length=255)
+    option_b = models.CharField(max_length=255)
+    option_c = models.CharField(max_length=255)
+    option_d = models.CharField(max_length=255)
+
+    # Correct answer should match one of the options above
+    correct_answer = models.CharField(max_length=255)
+
+    def clean(self):
+        """Ensures that the correct answer is one of the options presented
+        to the user"""
+
+        valid_options = {self.option_a, self.option_b, self.option_c, self.option_d}
+        if self.correct_answer not in valid_options:
+            raise ValidationError("Correct answer must match one of the options presented")
+
+    def __str__(self):
+        """Debugging purposes"""
+        return f"{self.text} for challenge: {self.challenge.challenge_name}"
 
 class Challenge(models.Model):
     """
-    Represents a location-based interactive challenge.
-
-    Attributes:
-        long (float): Longitude coordinate
-        lat (float): Latitude coordinate
-        start (DateTime): Challenge start time
-        end (DateTime): Challenge end time
-
-    Relationships:
-        One-to-one with Card
+    This represents the challenge events that occur on campus that
+    users can attend to earn cards and points
     """
 
-    long = models.FloatField(default=0)
-    lat = models.FloatField(default=0)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
-    # new
-    # add questions later!
-    Card = models.OneToOneField(Card, on_delete=models.CASCADE,
-                                primary_key=False)
+    # Event details
+    challenge_name = models.CharField(max_length=100)
+    description = models.TextField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
+    # This is the physical location for the challenge
+    longitude = models.FloatField(default=0.0)
+    latitude = models.FloatField(default=0.0)
 
-class Question(models.Model):
-    """
-    Represents a quiz question within a challenge.
+    # Card association
+    card = models.OneToOneField('Card', on_delete=models.CASCADE, related_name='challenge')
 
-    Attributes:
-        text (str): Question content
+    # The points awarded to a player upon attendance/completion of the challenge
+    points_reward = models.IntegerField(default=10)
 
-    Relationships:
-        Many-to-one with Challenge
-    """
+    # Event status
+    STATUS_CHOICES = [
+        ('upcoming', 'Upcoming'),
+        ('ongoing', 'ongoing'),
+        ('completed', 'completed')
+    ]
 
-    text = models.CharField(max_length=400)
-    challenge = models.ForeignKey(Challenge, models.SET_NULL,
-                                  null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='upcoming')
 
+    def __str__(self):
+        """Debugging purposes"""
+        return (
+            f"{self.challenge_name} at ({self.latitude}, {self.longitude}) "
+            f"with card: {self.card.card_name}"
+        )
 
-class Answer(models.Model):
-    """
-    Represents a possible answer to a quiz question.
+    def clean(self):
+        """Ensures that the end time is after the start time"""
+        if self.start_time >= self.end_time:
+            raise ValidationError("End time must be after the start time")
 
-    Attributes:
-        text (str): Answer content
-        correct (bool): Indicates if this is the correct answer
+    def validate_answers(self, user_answers):
+        """
+        Validates the user's answers against the correct answers
+        """
+        questions = self.questions.all()
+        if not questions.exists():
+            raise ValidationError("No questions defined for this challenge")
 
-    Relationships:
-        Many-to-one with Question
-    """
+        # Ensures all questions are answered
+        if len(user_answers) != questions.count():
+            raise ValidationError("All questions must be answered")
 
-    question = models.ForeignKey(Question, models.SET_NULL,
-                                 null=True, blank=True)
-    text = models.CharField(max_length=400)
-    correct = models.BooleanField()
+        # Validates each answer
+        for question in questions:
+
+            # Gets the user's answer for this question
+            user_answer = user_answers.get(str(question.id))
+
+            # Checks if the question ID exists in user_answers
+            if user_answer is None:
+                raise ValidationError(f"Missing answer for question ID: {question.id}")
+
+            # Checks if the answer is correct
+            if user_answer != question.correct_answer:
+                return False
+
+        # If all the answers are right, return True
+        return True
+
+    def update_status(self):
+        """Updates and saves the event status based on the current time"""
+        current_time = now()
+
+        if current_time < self.start_time:
+            self.status = 'upcoming'
+        elif self.start_time <= current_time <= self.end_time:
+            self.status = 'ongoing'
+        else:
+            self.status = 'completed'
+
+        self.save()
