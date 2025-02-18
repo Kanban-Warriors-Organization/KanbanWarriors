@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Card, CardSet, UserProfile, Challenge, Question, Answer
+from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
