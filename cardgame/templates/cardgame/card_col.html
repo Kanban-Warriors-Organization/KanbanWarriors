@@ -26,12 +26,11 @@
                 <a href="home.html">Sign Out</a>
             </nav>
         </header>
-        
-        {% for image in images %}
-        <img src="{{image.url}}">
-        {% endfor %}
-
-
+        <div class="image-grid">
+            {% for image in images %}
+                <img src="{{ image.url }}" alt="Image">
+            {% endfor %}
+        </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>

@@ -47,6 +47,7 @@ html, body {
 .main-container {
     display: flex;
     height: 100%;
+    flex: 1;
 }
 
 /*Left Portion Controller*/
@@ -93,7 +94,7 @@ html, body {
     width: 300px;
     border-radius: 0 0 20px 20px;
     background-color: #08546B;
-    box-sizing: border-box;  
+    box-sizing: border-box;
 }
 
 .leaderboard-links a {
@@ -154,7 +155,7 @@ html, body {
     background-color: #fff;
     margin-left: 60px;
     margin-top: 50px;
-    text-align: center;  
+    text-align: center;
 }
 
 .recent-card h1 {
@@ -172,24 +173,25 @@ html, body {
 
 .recent-card-body h2 {
     font-family: kanit;
-    font-size: 26px;
     font-weight: bold;
     margin: 10px 0;
 }
 
 .recent-card-body img {
-    max-width: 100%;
-    height: auto;
+    width: 100px;
     border-radius: 8px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.recent-card-body img:hover {
+    transform: scale(1.2)
 }
 
 .recent-card-body p {
     font-family: kanit;
     color: #666;
-    margin: 0;
-
 }
 
 
