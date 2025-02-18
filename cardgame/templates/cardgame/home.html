@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
 <!--
-    Author: BLANK
+    Author: Jake Klar
     Description: This is the homepage of the card game, featuring:
-    a dynamic map, leaderboards, and navigation.
+    a dynamic map, leaderboards, information about the latest card and navigation.
 -->
 
 <html lang="en">
@@ -33,41 +33,50 @@
             </nav>
         </header>
         <div class="main-container">
-            <div class="leaderboard">
-                <div class="leaderboard-header">
-                    <img src="{% static 'img\trophy.svg' %}">
-                    <h1>
-                        Top Players
-                    </h1>
+            <div class="left">
+                <div class="leaderboard">
+                    <div class="leaderboard-header">
+                        <img src="{% static 'img\trophy.svg' %}">
+                        <h1>
+                            Top Players
+                        </h1>
+                    </div>
+                    <div class="leaderboard-links">
+                        <div class="leaderboard-one">
+                            <img src="{% static 'img/one.svg' %}">
+                            <a href="">User 1</a>
+                            <p>000</p>
+                        </div>
+                        <div class="leaderboard-two">
+                            <img src="{% static 'img/two.svg' %}">
+                            <a href="">User 2</a>
+                            <p>000</p>
+                        </div>
+                        <div class="leaderboard-three">
+                            <img src="{% static 'img/three.svg' %}">
+                            <a href="">User 3</a>
+                            <p>000</p>
+                        </div>
+                        <div class="leaderboard-four">
+                            <img src="{% static 'img/four.svg' %}">
+                            <a href="">User 4</a>
+                            <p>000</p>
+                        </div>
+                        <div class="leaderboard-five">
+                            <img src="{% static 'img/five.svg' %}">
+                            <a href="">User 5</a>
+                            <p>000</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="leaderboard-links">
-                    <div class="leaderboard-one">
-                        <img src="{% static 'img/one.svg' %}">
-                        <a href="">User 1</a>
-                        <p>000</p>
-                    </div>
-                    <div class="leaderboard-two">
-                        <img src="{% static 'img/two.svg' %}">
-                        <a href="">User 2</a>
-                        <p>000</p>
-                    </div>
-                    <div class="leaderboard-three">
-                        <img src="{% static 'img/three.svg' %}">
-                        <a href="">User 3</a>
-                        <p>000</p>
-                    </div>
-                    <div class="leaderboard-four">
-                        <img src="{% static 'img/four.svg' %}">
-                        <a href="">User 4</a>
-                        <p>000</p>
-                    </div>
-                    <div class="leaderboard-five">
-                        <img src="{% static 'img/five.svg' %}">
-                        <a href="">User 5</a>
-                        <p>000</p>
+                <div class="recent-card">
+                    <h1>Most Recent Card!</h1>
+                    <div class="recent-card-body">
+                        <h2></h2>
+                        <img>
+                        <p></p>
                     </div>
                 </div>
-                
             </div>
             <div class="map" id="map">
                 <script>
@@ -88,13 +97,56 @@
                             });
                         })
                         .catch(error => console.error('Error loading locations:', error));
-                </script>
+                </script> 
 
             </div>
         </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
-        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                fetchLeaderboard();
+                fetchRecentCard();
+
+                function fetchLeaderboard() {
+                    fetch("http://127.0.0.1:8000/leaderboard-data/")
+                    .then(response => response.json())
+                    .then(data => {
+                        const leaderboardSlots = document.querySelectorAll(".leaderboard-links > div");
+            
+                        data.forEach((player, index) => {
+                            if (leaderboardSlots[index]) {  // Ensure we don’t access out-of-bounds elements
+                                let playerName = leaderboardSlots[index].querySelector("a");
+                                let playerScore = leaderboardSlots[index].querySelector("p");
+            
+                                playerName.textContent = player.username;
+                                playerScore.textContent = player.points;
+                            }
+                        });
+                    })
+                    .catch(error => console.error("Error loading leaderboard:", error));
+                }
+
+                function fetchRecentCard() {
+                    fetch("http://127.0.0.1:8000/recent-card-data")
+                    .then(response => response.json())
+                    .then(data => {
+                        const recentCardBox = document.querySelector(".recent-card");
+                        let cardName = recentCardBox.querySelector("h2");
+                        let cardDesc = recentCardBox.querySelector("p");
+                        let cardImg = recentCardBox.querySelector("img");
+
+                        cardName.textContent = data.name;
+                        cardDesc.textContent = data.description;
+                        cardImg.src = data.image;
+                    })
+                }
+            
+                //Updates every 100 seconds
+                setInterval(fetchLeaderboard, 100000);
+                setInteveral(fetchRecentCard, 100000);
+            });
+            </script>
     </body>
 </html>

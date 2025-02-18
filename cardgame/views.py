@@ -15,6 +15,7 @@ from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
+from django.templatetags.static import static
 
 # Create your views here.
 
@@ -58,6 +59,18 @@ def card_col(request, user_name):
         pass
     return HttpResponse("fail")  # change this later!
 
+def recent_card_data(request):
+    """
+    Finds the most recently created card and returns its 
+    """
+    recent_card = Card.objects.order_by('-card_created_at').first()
+    data = {
+            "name": recent_card.card_name,
+            "description": recent_card.card_description,
+            "image": recent_card.card_image_link.url[len("cardgame/"):]
+        }
+    
+    return JsonResponse(data)
 
 def login(LoginView):
     """
@@ -182,6 +195,13 @@ def get_locations(request):
 
     return JsonResponse({"locations": formatted_locations})
 
+def leaderboard_data(request):
+    top_players = UserProfile.objects.order_by('-user_profile_points')[:5] # Retrives Top 5 Players
+    data = [
+        {"username": player.user.username, "points": player.user_profile_points}
+        for player in top_players
+    ]
+    return JsonResponse(data, safe=False)
 
 def signout(request):
     """
