@@ -2,7 +2,8 @@ name: Django CI - Testing
 run-name: ${{ github.actor }} is running tests
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - **
   pull_request:
     branches: [ main ]
 
