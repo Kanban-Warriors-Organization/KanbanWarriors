@@ -1,3 +1,11 @@
+"""
+URL configuration.
+
+This module defines the URL patterns.
+
+Author: BLANK
+"""
+
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
@@ -15,9 +23,9 @@ urlpatterns = [
     path("signup", views.signup, name="signup"),
     path("create_card", views.create_card, name="create_card"),
     path("logout", views.logout, name="logout"),
-    path("leaderboard-data/", views.leaderboard_data, name="leaderboard_data")
+    path("leaderboard-data/", views.leaderboard_data, name="leaderboard_data"),
+    path("user/<str:user_name>/profile", views.profile, name="profile")
     # uses django's inbuilt login view
 ]
 
 # (template_name="cardgame/login.html")
-
