@@ -52,7 +52,7 @@ class Card(models.Model):
     card_description = models.CharField(max_length=400)
     card_created_at = models.DateTimeField(auto_now_add=True)
     card_image_link = models.ImageField(
-        upload_to="cardgame/static/card_images",
+        upload_to="static/card_images",
         default="static/card_images/do_not_remove.png",
     )
     card_set = models.ForeignKey(CardSet, models.SET_NULL,

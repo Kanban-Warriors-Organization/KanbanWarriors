@@ -1,8 +1,42 @@
 <!--
     Author: BLANK
-    Description: Displays card images.
+    Description: Displays card images in a gallery like fashion
 -->
 
-{% for image in images %}
-<img src="{{image.url}}">
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Contains a dynamic map, leaderboards and navigational menus">
+        <title>Home</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="user.html">Profile</a>
+                <a href="social.html">Social</a>
+                <a href="about.html">About Us</a>
+                <a href="home.html">Sign Out</a>
+            </nav>
+        </header>
+        
+        {% for image in images %}
+        <img src="{{image.url}}">
+        {% endfor %}
+
+
+        <footer class="footer">
+            <p>@Copyirght 2025. All rights reserved.</p>
+        </footer>
+    </body>
+
+
+
+

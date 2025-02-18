@@ -27,7 +27,6 @@ def index(request):
 def home(request):
     return render(request, "cardgame/home.html")
 
-
 def card_col(request, user_name):
     """
     Displays a user's card collection.
