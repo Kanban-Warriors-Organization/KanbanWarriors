@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Card, CardSet, UserProfile, Challenge, Question, Answer
+from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
@@ -247,7 +247,7 @@ def profile(request, user_name):
     return HttpResponse("failure!")  # do something more verbose
 
 
-def challenge(request, challenge_id):
+def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
 
@@ -261,10 +261,20 @@ def challenge(request, challenge_id):
         HttpResponse: Challenge data or failure message
     """
     # we need to get the challenge, the questions, and the answers.
-    try:
-        pass
 
-    except ObjectDoesNotExist:
-        pass
+    if request.method == 'POST':
+        pass #redirect and stuff
+
+    else:
+        try:
+            c = Challenge.objects.get(id = chal_id)
+            #pass context into the template
+            c.update_status()
+            valid = True if c.status == 'ongoing' else False
+
+
+        except ObjectDoesNotExist:
+            pass
+
 
     return HttpResponse("failure!")
