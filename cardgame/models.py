@@ -8,7 +8,7 @@ Author: BLANK
 
 from django.contrib.auth.models import User
 from django.db import models
-import datetime;
+import datetime
 
 # Create your models here.
 
@@ -185,15 +185,3 @@ class Challenge(models.Model):
         # If all the answers are right, return True
         return True
 
-    def update_status(self):
-        """Updates and saves the event status based on the current time"""
-        current_time = now()
-
-        if current_time < self.start_time:
-            self.status = 'upcoming'
-        elif self.start_time <= current_time <= self.end_time:
-            self.status = 'ongoing'
-        else:
-            self.status = 'completed'
-
-        self.save()
