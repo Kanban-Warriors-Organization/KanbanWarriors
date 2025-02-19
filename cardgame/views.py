@@ -16,6 +16,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
+import datetime
 
 # Create your views here.
 
@@ -82,13 +83,6 @@ def recent_card_data(request):
         }
 
     return JsonResponse(data)
-
-
-def login(LoginView):
-    """
-    Presumably login
-    """
-    pass
 
 
 def signup(request):
@@ -275,9 +269,8 @@ def challenges(request):
     """
 
     try:
-        ctime = datetime.datetime.now()
-        # filters all challenges that are ongoing
-        challenges = Challenge.objects.filter(ctime > start).filter(ctime < end)
+        ctime = datetime.now()
+        challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)  #filters all challenges that are ongoing
         chals = []
         for c in challenges:
             # dict with all relevant properties
