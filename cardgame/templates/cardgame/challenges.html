@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<!--
+    Author: Jake Klar
+    Description: This is the challenge page of CardGame Featuring:
+    The collection of all currently running card drops and the links to their specific
+    location verification and collection pages
+-->
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Contains a dynamic map, leaderboards and navigational menus">
+        <title>Home</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/home.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    </head>
+    <body>
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="user.html">Profile</a>
+                <a href="social.html">Social</a>
+                <a href="about.html">About Us</a>
+                <a href="home.html">Sign Out</a>
+            </nav>
+         </header>
+         <div class ="main-container">
+            
+         </div>
+         <footer class="footer">
+            <p>@Copyright 2025. All rights reserved.</p>
+        </footer>
+    </body>
+     <!-- Navigation Bar -->
+

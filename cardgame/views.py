@@ -16,6 +16,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
+import datetime
 
 # Create your views here.
 
@@ -263,8 +264,8 @@ def challenges(request):
 
 
     try:
-        ctime = datetime.datetime.now()
-        challenges = Challenge.objects.filter(ctime > start).filter(ctime < end) #filters all challenges that are ongoing
+        ctime = datetime.now()
+        challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime) #filters all challenges that are ongoing
         chals = []
         for c in challenges:
             d = {'long':c.long, 'lat':c.lat, 'start':c.start, 'end':c.end,
