@@ -26,7 +26,8 @@ urlpatterns = [
     path("leaderboard-data/", views.leaderboard_data, name="leaderboard_data"),
     path("recent-card-data/", views.recent_card_data, name="recent_card_data"),
     path("user/<str:user_name>/profile", views.profile, name="profile"),
-    path("challenge/<int:chal_id>", views.challenge, name="challenge")
+    path("challenge/<int:chal_id>", views.challenge, name="challenge"),
+    path("challenges/", views.challenges, name="challenges")
     # uses django's inbuilt login view
 ]
 
