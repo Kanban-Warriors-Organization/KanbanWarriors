@@ -253,6 +253,33 @@ def profile(request, user_name):
     return HttpResponse("failure!")  # do something more verbose
 
 
+def challenges(request):
+
+    """Renders the "all challenges" page
+    Author: adam
+    Args: request: HTTP request object
+    Returns: renders the template "challenges.html" with the details of all active challenges as context
+    """
+
+
+    try:
+        ctime = datetime.datetime.now()
+        challenges = Challenge.objects.filter(ctime > start).filter(ctime < end) #filters all challenges that are ongoing
+        chals = []
+        for c in challenges:
+            d = {'long':c.long, 'lat':c.lat, 'start':c.start, 'end':c.end,
+                 'card_name':c.card.name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link} #dict with all relevant properties
+            chals.append(c)
+
+        return render(request, "challenges.html", {'challenges':chals}) #renders the template
+
+
+    except ObjectDoesNotExist:
+        return HttpResponse("something went really wrong here!")
+
+
+
 def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
