@@ -16,8 +16,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
-import datetime
-
+from django.utils import timezone
 # Create your views here.
 
 
@@ -302,10 +301,9 @@ def challenge(request, chal_id):
     else:
         try:
             c = Challenge.objects.get(id = chal_id)
+            ctime = timezone.now()
             #pass context into the template
-            c.update_status()
-            valid = True if c.status == 'ongoing' else False
-
+            valid = True if c.start_time < ctime and c.end_time > ctime else False
 
         except ObjectDoesNotExist:
             pass
