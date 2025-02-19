@@ -8,7 +8,8 @@ Author: BLANK
 
 from django.contrib.auth.models import User
 from django.db import models
-import datetime;
+from django.forms import ValidationError
+from django.utils import timezone
 
 # Create your models here.
 
@@ -23,6 +24,8 @@ class CardSet(models.Model):
 
     Relationships:
         One-to-many with Card model
+
+    Author: Timothy Simmons
     """
 
     card_set_name = models.CharField(max_length=40, primary_key=True)
@@ -45,6 +48,8 @@ class Card(models.Model):
     Relationships:
         Many-to-one with CardSet
         Many-to-many with UserProfile
+
+    Author: Timothy Simmons
     """
 
     card_name = models.CharField(max_length=50, primary_key=True)
@@ -73,6 +78,8 @@ class UserProfile(models.Model):
     Relationships:
         One-to-one with Django User model
         Many-to-many with Card
+
+    Author: Timothy Simmons
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE,
@@ -87,7 +94,8 @@ class Question(models.Model):
     """
 
     # Links to challenge
-    challenge = models.ForeignKey('Challenge', on_delete=models.CASCADE, related_name='questions')
+    challenge = models.ForeignKey('Challenge', on_delete=models.CASCADE,
+                                  related_name='questions')
 
     # Question text
     text = models.CharField(max_length=255)
@@ -105,13 +113,16 @@ class Question(models.Model):
         """Ensures that the correct answer is one of the options presented
         to the user"""
 
-        valid_options = {self.option_a, self.option_b, self.option_c, self.option_d}
+        valid_options = {self.option_a, self.option_b,
+                         self.option_c, self.option_d}
         if self.correct_answer not in valid_options:
-            raise ValidationError("Correct answer must match one of the options presented")
+            raise ValidationError("Correct answer must match one of \
+                                   the options presented")
 
     def __str__(self):
         """Debugging purposes"""
         return f"{self.text} for challenge: {self.challenge.challenge_name}"
+
 
 class Challenge(models.Model):
     """
@@ -119,7 +130,7 @@ class Challenge(models.Model):
     users can attend to earn cards and points
     """
 
-    # Event details
+    # Event details
     challenge_name = models.CharField(max_length=100)
     description = models.TextField()
     start_time = models.DateTimeField()
@@ -130,9 +141,11 @@ class Challenge(models.Model):
     latitude = models.FloatField(default=0.0)
 
     # Card association
-    card = models.OneToOneField('Card', on_delete=models.CASCADE, related_name='challenge')
+    card = models.OneToOneField('Card', on_delete=models.CASCADE,
+                                related_name='challenge')
 
-    # The points awarded to a player upon attendance/completion of the challenge
+    # The points awarded to a player upon
+    # attendance/completion of the challenge
     points_reward = models.IntegerField(default=10)
 
     # Event status
@@ -142,7 +155,8 @@ class Challenge(models.Model):
         ('completed', 'completed')
     ]
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='upcoming')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES,
+                              default='upcoming')
 
     def __str__(self):
         """Debugging purposes"""
@@ -176,7 +190,8 @@ class Challenge(models.Model):
 
             # Checks if the question ID exists in user_answers
             if user_answer is None:
-                raise ValidationError(f"Missing answer for question ID: {question.id}")
+                raise ValidationError(f"Missing answer for question ID: \
+                                      {question.id}")
 
             # Checks if the answer is correct
             if user_answer != question.correct_answer:
@@ -186,8 +201,10 @@ class Challenge(models.Model):
         return True
 
     def update_status(self):
-        """Updates and saves the event status based on the current time"""
-        current_time = now()
+        """
+        Updates and saves the event status based on the current time
+        """
+        current_time = timezone.now()
 
         if current_time < self.start_time:
             self.status = 'upcoming'
