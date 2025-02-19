@@ -184,16 +184,16 @@ def get_locations(request):
         JsonResponse: Formatted location data with coordinates
     """
     locations = list(
-        Challenge.objects.select_related("Card").values(
-            "Card__card_name", "lat", "long"
+        Challenge.objects.select_related("card").values(
+            "card__card_name", "latitude", "longitude"
         )
     )
 
     formatted_locations = [
         {
-            "name": loc["Card__card_name"],
-            "latitude": loc["lat"],
-            "longitude": loc["long"],
+            "name": loc["card__card_name"],
+            "latitude": loc["latitude"],
+            "longitude": loc["longitude"],
         }
         for loc in locations
     ]

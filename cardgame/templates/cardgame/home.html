@@ -79,74 +79,13 @@
                 </div>
             </div>
             <div class="map" id="map">
-                <script>
-                    //Centers Map on University Campus
-                    var map = L.map("map").setView([50.7371, -3.5251], 15);
-
-                    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(map);
-
-                    fetch("http://127.0.0.1:8000/locations-data/")
-                        .then(response => response.json())
-                        .then(data => {
-                            data.locations.forEach(location => {
-                                L.marker([location.latitude, location.longitude])
-                                    .addTo(map)
-                                    .bindPopup(`<b>${location.name}</b>`);
-                            });
-                        })
-                        .catch(error => console.error('Error loading locations:', error));
-                </script>
-
+               <script src="{% static 'js/map.js' %}"></script>
             </div>
         </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                fetchLeaderboard();
-                fetchRecentCard();
-
-                function fetchLeaderboard() {
-                    fetch("http://127.0.0.1:8000/leaderboard-data/")
-                    .then(response => response.json())
-                    .then(data => {
-                        const leaderboardSlots = document.querySelectorAll(".leaderboard-links > div");
-
-                        data.forEach((player, index) => {
-                            if (leaderboardSlots[index]) {  // Ensure we don’t access out-of-bounds elements
-                                let playerName = leaderboardSlots[index].querySelector("a");
-                                let playerScore = leaderboardSlots[index].querySelector("p");
-
-                                playerName.textContent = player.username;
-                                playerScore.textContent = player.points;
-                            }
-                        });
-                    })
-                    .catch(error => console.error("Error loading leaderboard:", error));
-                }
-
-                function fetchRecentCard() {
-                    fetch("http://127.0.0.1:8000/recent-card-data")
-                    .then(response => response.json())
-                    .then(data => {
-                        const recentCardBox = document.querySelector(".recent-card");
-                        let cardName = recentCardBox.querySelector("h2");
-                        let cardDesc = recentCardBox.querySelector("p");
-                        let cardImg = recentCardBox.querySelector("img");
-
-                        cardName.textContent = data.name;
-                        cardDesc.textContent = data.description;
-                        cardImg.src = data.image;
-                    })
-                }
-
-                //Updates every 100 seconds
-                setInterval(fetchLeaderboard, 100000);
-                setInteveral(fetchRecentCard, 100000);
-            });
-            </script>
+        <script src="{% static 'js/leaderboard.js' %}"></script>
+        <script src="{% static 'js/recent_card.js' %}"></script>
     </body>
 </html>
