@@ -264,16 +264,16 @@ def challenges(request):
 
 
     try:
-        ctime = datetime.now()
+        ctime = datetime.datetime.now()
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime) #filters all challenges that are ongoing
         chals = []
         for c in challenges:
-            d = {'long':c.long, 'lat':c.lat, 'start':c.start, 'end':c.end,
-                 'card_name':c.card.name, 'points':c.points_reward,
+            d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
                  'desc':c.description, 'image_link':c.card.card_image_link} #dict with all relevant properties
-            chals.append(c)
+            chals.append(d)
 
-        return render(request, "challenges.html", {'challenges':chals}) #renders the template
+        return render(request, "cardgame/challenges.html", {'challenges':chals}) #renders the template
 
 
     except ObjectDoesNotExist:
