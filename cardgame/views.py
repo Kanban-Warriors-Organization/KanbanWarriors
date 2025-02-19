@@ -27,6 +27,7 @@ def index(request):
 def home(request):
     return render(request, "cardgame/home.html")
 
+
 def card_col(request, user_name):
     """
     Displays a user's card collection.
@@ -38,7 +39,8 @@ def card_col(request, user_name):
         user_name: Username whose collection to display
 
     Returns:
-        Rendered template with user's card images or failure message. Seperates cards into either being owned or not
+        Rendered template with user's card images or failure message.
+        Seperates cards into either being owned or not
         owned by the user and sends each cards information to the template.
     """
     try:
@@ -56,13 +58,17 @@ def card_col(request, user_name):
         imgs_not = list(filter(lambda x: x not in imgs_has, imgs_not))
 
         cards_has = [{"image": img, "title": title, "description": description}
-                     for img, title, description in zip(imgs_has, card_titleshas, card_descriptionshas)]
-        return render(request, "cardgame/card_col.html", {"cardshas": cards_has, "imgsnot": imgs_not})
+                     for img, title, description in
+                     zip(imgs_has, card_titleshas,
+                         card_descriptionshas)]
+        return render(request, "cardgame/card_col.html",
+                      {"cardshas": cards_has, "imgsnot": imgs_not})
 
     except ObjectDoesNotExist:
         # if user does not exist
         pass
     return HttpResponse("fail")  # change this later!
+
 
 def recent_card_data(request):
     """
@@ -76,6 +82,7 @@ def recent_card_data(request):
         }
 
     return JsonResponse(data)
+
 
 def login(LoginView):
     """
@@ -162,6 +169,7 @@ def create_card(request):
                 card_set=card_set_instance,
                 card_image_link=card_image,
             )
+            card.save()
             return HttpResponse("Card created successfully!")
 
         # catches errors such as non-unique primary key
@@ -200,13 +208,17 @@ def get_locations(request):
 
     return JsonResponse({"locations": formatted_locations})
 
+
 def leaderboard_data(request):
-    top_players = UserProfile.objects.order_by('-user_profile_points')[:5] # Retrives Top 5 Players
+    top_players = UserProfile.objects.order_by(
+        '-user_profile_points')[:5]  # Retrives Top 5 Players
     data = [
-        {"username": player.user.username, "points": player.user_profile_points}
+        {"username": player.user.username,
+         "points": player.user_profile_points}
         for player in top_players
     ]
     return JsonResponse(data, safe=False)
+
 
 def signout(request):
     """
@@ -258,26 +270,27 @@ def challenges(request):
     """Renders the "all challenges" page
     Author: adam
     Args: request: HTTP request object
-    Returns: renders the template "challenges.html" with the details of all active challenges as context
+    Returns: renders the template "challenges.html" with the
+    details of all active challenges as context
     """
-
 
     try:
         ctime = datetime.datetime.now()
-        challenges = Challenge.objects.filter(ctime > start).filter(ctime < end) #filters all challenges that are ongoing
+        # filters all challenges that are ongoing
+        challenges = Challenge.objects.filter(ctime > start).filter(ctime < end)
         chals = []
         for c in challenges:
-            d = {'long':c.long, 'lat':c.lat, 'start':c.start, 'end':c.end,
-                 'card_name':c.card.name, 'points':c.points_reward,
-                 'desc':c.description, 'image_link':c.card.card_image_link} #dict with all relevant properties
+            # dict with all relevant properties
+            d = {'long': c.long, 'lat': c.lat, 'start': c.start, 'end': c.end,
+                 'card_name': c.card.name, 'points': c.points_reward,
+                 'desc': c.description, 'image_link': c.card.card_image_link}
             chals.append(c)
 
-        return render(request, "challenges.html", {'challenges':chals}) #renders the template
-
+        # renders the template
+        return render(request, "challenges.html", {'challenges': chals})
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
-
 
 
 def challenge(request, chal_id):
@@ -296,18 +309,16 @@ def challenge(request, chal_id):
     # we need to get the challenge, the questions, and the answers.
 
     if request.method == 'POST':
-        pass #redirect and stuff
+        pass  # redirect and stuff
 
     else:
         try:
-            c = Challenge.objects.get(id = chal_id)
-            #pass context into the template
+            c = Challenge.objects.get(id=chal_id)
+            # pass context into the template
             c.update_status()
             valid = True if c.status == 'ongoing' else False
 
-
         except ObjectDoesNotExist:
             pass
-
 
     return HttpResponse("failure!")
