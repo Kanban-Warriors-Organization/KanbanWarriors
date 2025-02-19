@@ -38,20 +38,26 @@ def card_col(request, user_name):
         user_name: Username whose collection to display
 
     Returns:
-        Rendered template with user's card images or failure message
+        Rendered template with user's card images or failure message. Seperates cards into either being owned or not
+        owned by the user and sends each cards information to the template.
     """
-
-    # gets the cards from a user's collection and inserts them into the
-    # template as context
     try:
-        imgs = []
+        imgs_has = []
+        imgs_not = []
+        card_titleshas = []
+        card_descriptionshas = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
-            print(i.card_image_link)
+            imgs_has.append(i.card_image_link)
+            card_titleshas.append(i.card_name)
+            card_descriptionshas.append(i.card_description)
+        for j in Card.objects.all():
+            imgs_not.append(j.card_image_link)
+        imgs_not = list(filter(lambda x: x not in imgs_has, imgs_not))
 
-            # remember, this is an in image field!
-            imgs.append(i.card_image_link)
-        return render(request, "cardgame/card_col.html", {"images": imgs})
+        cards_has = [{"image": img, "title": title, "description": description}
+                     for img, title, description in zip(imgs_has, card_titleshas, card_descriptionshas)]
+        return render(request, "cardgame/card_col.html", {"cardshas": cards_has, "imgsnot": imgs_not})
 
     except ObjectDoesNotExist:
         # if user does not exist
