@@ -275,9 +275,8 @@ def challenges(request):
         for c in challenges:
             d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                  'card_name':c.card.card_name, 'points':c.points_reward,
-                 'desc':c.description, 'image_link':c.card.card_image_link} #dict with all relevant properties
+                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
             chals.append(d)
-
         return render(request, "cardgame/challenges.html", {'challenges':chals}) #renders the template
 
 

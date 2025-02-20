@@ -44,6 +44,8 @@ html, body {
 }
 
 .main-container {
+    display: flex;
+    flex-direction: column;
     flex: 1;
 }
 
@@ -53,8 +55,6 @@ html, body {
     height: 300px;
     border: solid 3px #096079;
     border-radius: 5px;
-    left: 84%;
-    bottom: -40%;
 }
 
 /*Grid Elements*/

@@ -54,7 +54,7 @@ html, body {
 .left {
     display: flex;
     flex-direction: row;
-    flex: 1;
+    min-width: 900px;
 }
 
 /*Leaderboard Elements*/
@@ -205,6 +205,7 @@ html, body {
     margin-top: 45px;
     margin-right: 60px;
     display: flex;
+    flex: 1;
     width: 1000px;
     height: 90%;
     border: solid 3px #096079;
