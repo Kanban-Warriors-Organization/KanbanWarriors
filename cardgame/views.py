@@ -16,8 +16,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.utils import timezone
 import datetime
-
 # Create your views here.
 
 
@@ -269,18 +269,17 @@ def challenges(request):
     """
 
     try:
-        ctime = datetime.now()
-        challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)  #filters all challenges that are ongoing
+        ctime = datetime.datetime.now()
+        challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime) #filters all challenges that are ongoing
         chals = []
         for c in challenges:
-            # dict with all relevant properties
-            d = {'long': c.long, 'lat': c.lat, 'start': c.start, 'end': c.end,
-                 'card_name': c.card.name, 'points': c.points_reward,
-                 'desc': c.description, 'image_link': c.card.card_image_link}
-            chals.append(c)
+            d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link} #dict with all relevant properties
+            chals.append(d)
 
-        # renders the template
-        return render(request, "challenges.html", {'challenges': chals})
+        return render(request, "cardgame/challenges.html", {'challenges':chals}) #renders the template
+
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
@@ -306,10 +305,10 @@ def challenge(request, chal_id):
 
     else:
         try:
-            c = Challenge.objects.get(id=chal_id)
-            # pass context into the template
-            c.update_status()
-            valid = True if c.status == 'ongoing' else False
+            c = Challenge.objects.get(id = chal_id)
+            ctime = timezone.now()
+            #pass context into the template
+            valid = True if c.start_time < ctime and c.end_time > ctime else False
 
         except ObjectDoesNotExist:
             pass

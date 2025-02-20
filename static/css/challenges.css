@@ -43,6 +43,61 @@ html, body {
     background-color: #0fce14;
 }
 
+.main-container {
+    flex: 1;
+}
+
+.map {
+    margin-top: 45px;
+    width: 300px;
+    height: 300px;
+    border: solid 3px #096079;
+    border-radius: 5px;
+    left: 84%;
+    bottom: -40%;
+}
+
+/*Grid Elements*/
+.grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    flex: 1;
+    padding: 10px;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 3px solid #ccc;
+    border-radius: 3px;
+    width: 300px;
+    height: 150px;
+    box-sizing: border-box;
+    background: linear-gradient(0deg, #12c5f8 0%, #096079 75%);
+    border-radius: 20px;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
+
+}
+
+.grid-item h2 {
+    font-family: kanit;
+    color: white;
+    margin: 5px;
+}
+
+.grid-item p {
+    font-family: kanit;
+    color: white;
+}
+
+.btn:hover {
+    cursor:pointer;
+}
+
+.btn:active {
+    transform: scale(0.9);
+}
 
 /*Footer Elements*/
 .footer {

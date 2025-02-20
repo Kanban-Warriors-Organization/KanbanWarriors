@@ -53,7 +53,7 @@ html, body {
 /*Left Portion Controller*/
 .left {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex: 1;
 }
 
@@ -147,22 +147,25 @@ html, body {
 
 /*Most Recent Card Elements*/
 .recent-card {
-    width: 450px;
+    width: 300px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
     padding: 20px;
     background-color: #fff;
     margin-left: 60px;
-    margin-top: 50px;
+    margin-top: 45px;
     text-align: center;
+    max-height: 495px;
+    box-sizing: border-box;
+    background: linear-gradient(0deg, #12c5f8 0%, #096079 75%);
 }
 
 .recent-card h1 {
     font-family: kanit;
-    color: #333;
+    color: white;
+    margin-top: 0px;
     margin-bottom: 15px;
-    text-decoration: underline;
 }
 
 .recent-card-body {
@@ -174,14 +177,16 @@ html, body {
 .recent-card-body h2 {
     font-family: kanit;
     font-weight: bold;
+    color: white;
     margin: 10px 0;
+    padding-bottom: 20px;
 }
 
 .recent-card-body img {
-    width: 100px;
+    width: 150px;
     border-radius: 8px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
+    border: 3px solid #ddd;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
@@ -191,7 +196,7 @@ html, body {
 
 .recent-card-body p {
     font-family: kanit;
-    color: #666;
+    color: white;
 }
 
 
@@ -200,8 +205,8 @@ html, body {
     margin-top: 45px;
     margin-right: 60px;
     display: flex;
-    flex: 2;
-    height: 70%;
+    width: 1000px;
+    height: 90%;
     border: solid 3px #096079;
     border-radius: 5px;
 }
