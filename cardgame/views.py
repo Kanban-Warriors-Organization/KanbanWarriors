@@ -299,8 +299,13 @@ def challenge(request, chal_id):
     """
     # we need to get the challenge, the questions, and the answers.
 
-    if request.method == 'POST':
-        pass  # redirect and stuff
+    if request.method == 'GET':
+        c= Challenge.objects.get(id=chal_id)
+        info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
+        return render(request, 'cardgame/verification.html', {'info':info})
+
 
     else:
         try:
