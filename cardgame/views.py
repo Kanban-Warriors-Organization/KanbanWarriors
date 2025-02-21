@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -100,10 +101,12 @@ def signup(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():  # validation later
             try:
-                User.objects.create_user(
-                    form.cleaned_data["username"], None,
-                    form.cleaned_data["password1"]
-                )
+                username = form.cleaned_data["username"]
+                user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
+                new_user_profile = UserProfile.create(user) # i sure hope this works
+                new_user_profile.save()
+
+
                 return HttpResponse("you did good!")
             except IntegrityError:
                 pass
@@ -212,7 +215,7 @@ def leaderboard_data(request):
     ]
     return JsonResponse(data, safe=False)
 
-
+@login_required
 def signout(request):
     """
     Handles user logout process.
@@ -284,27 +287,10 @@ def challenges(request):
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
-'''
-def get_questions(request, chal_id):
-
-    if request.method == 'POST':
-        try:
-            questions = []
-            quest_set = Questions.objects.filter(challenge__id = chal_id)
-            for question in quest_set:
-                q_details = {'question': r.text, 'ans1': r.option_a, 'ans2': r.option_b,
-                             'ans3': r.option_c, 'ans4': r.option_d, 'right_ans': r.correct_answer}
-                questions.append(q_details)
-        return render(request, "cardgame/questions.html", {'questions':questions})
-
-
-        except ObjectDoesNotExist:
-            return HttpResponse("really bad error")
-'''
 
 
 
-
+@login_required
 def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
@@ -339,3 +325,16 @@ def challenge(request, chal_id):
             return HttpResponse("really bad error")
 
     return HttpResponse("failure!")
+
+def add_card(request, chal_id):
+
+    #gets the card from the challenge
+    c = Challenge.objects.get(id = chal_id).card
+    #gets the user
+    u = request.user
+    #gets the user profile
+    up = User_Profile.objects.get(user = u)
+    #gives the user the card
+    up.user_profile_collected_cards.add(c)
+    return redirect(request, "success.html")    
+
