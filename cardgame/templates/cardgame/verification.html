@@ -33,20 +33,31 @@
             </nav>
         </header>
         <div class="main-content">
-            <p id="result"></p>
-            {% for question in question %}
+            {% for question in questions %}
+            <div id="ans" data-ans="{{question.ans2}}"> </div>
             <div class="question">
                 <h2>{{question.question}}</h2>
-                <button data-ans="{{question.ans1}}">{{quesiton.ans1}}</button>
-                <button data-ans="{{question.ans2}}">{{quesiton.ans2}}</button>
-                <button data-ans="{{question.ans3}}">{{quesiton.ans3}}</button>
-                <button data-ans="{{question.ans4}}">{{quesiton.ans4}}</button>
+                <button class="btn" data-ans="{{question.ans1}}">{{question.ans1}}</button>
+                <button class="btn" data-ans="{{question.ans2}}">{{question.ans2}}</button>
+                <button class="btn" data-ans="{{question.ans3}}">{{question.ans3}}</button>
+                <button class="btn" data-ans="{{question.ans4}}">{{question.ans4}}</button>
             </div>
             {% endfor %}
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-title"></h2>
+                    <p id="modal-description"></p>
+                </div>
+            </div>
         </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
-        <div id="challenge-location" data-lat="{{info.latitude}}"data-lng="{{info.longitude}}"></div>
+        <div id="challenge-location"
+        data-name="{{info.card_name}}"
+        data-lat="{{info.latitude}}"
+        data-lng="{{info.longitude}}" ></div>
         <script src="{% static 'js/location-verification.js' %}"></script>
+        <script src="{% static 'js/question-button.js' %}"></script>
     </body>
