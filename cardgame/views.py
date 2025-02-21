@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -212,7 +213,7 @@ def leaderboard_data(request):
     ]
     return JsonResponse(data, safe=False)
 
-
+@login_required
 def signout(request):
     """
     Handles user logout process.
@@ -230,7 +231,6 @@ def signout(request):
     # when this is deployed in production, you HAVE to modify the htaccess file
     # so that the ".html" at the end of the URL is removed.
     # proceed with caution! -AGP-
-
 
 def profile(request, user_name):
     """
@@ -304,7 +304,6 @@ def get_questions(request, chal_id):
 
 
 
-
 def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
@@ -339,3 +338,15 @@ def challenge(request, chal_id):
             return HttpResponse("really bad error")
 
     return HttpResponse("failure!")
+
+
+def add_card(request, chal_id):
+    #gets the card from the challenge
+    c = Challenge.objects.get(id = chal_id).card
+    #gets the user
+    u = request.user
+    #gets the user profile
+    up = UserProfile.objects.get(user = u)
+    #gives the user the card
+    up.user_profile_collected_cards.add(c)
+    return redirect(request, "success.html")
