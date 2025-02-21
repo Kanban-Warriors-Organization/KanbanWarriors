@@ -266,10 +266,8 @@ def profile(request, user_name):
     """
     try:
         u = UserProfile.objects.get(user__username=user_name)
-        ctx = {"username": user_name}  # puts out the username at the moment
-        # return render(request, "cardgame/profile.html", ctx)
-        # profile.html not implemented yet!
-        return HttpResponse("profile of " + user_name)
+        ctx = {"username": user_name, 'points': u.user_profile_points}
+        return render(request, "cardgame/profile.html", ctx)
 
     except ObjectDoesNotExist:
         pass
