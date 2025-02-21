@@ -22,7 +22,7 @@ import datetime
 
 
 def index(request):
-    return HttpResponse("index page test")
+    return render(request, "cardgame/home.html")
 
 
 def home(request):
@@ -275,11 +275,9 @@ def challenges(request):
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)
         chals = []
         for c in challenges:
-            # dict with all relevant properties
-            d = {'longitude': c.longitude, 'latitude': c.latitude,
-                 'start': c.start_time, 'end': c.end_time,
-                 'card_name': c.card.card_name, 'points': c.points_reward,
-                 'desc': c.description, 'image_link': c.card.card_image_link}
+            d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
             chals.append(d)
 
         # renders the template
@@ -287,6 +285,25 @@ def challenges(request):
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
+'''
+def get_questions(request, chal_id):
+
+    if request.method == 'POST':
+        try:
+            questions = []
+            quest_set = Questions.objects.filter(challenge__id = chal_id)
+            for question in quest_set:
+                q_details = {'question': r.text, 'ans1': r.option_a, 'ans2': r.option_b,
+                             'ans3': r.option_c, 'ans4': r.option_d, 'right_ans': r.correct_answer}
+                questions.append(q_details)
+        return render(request, "cardgame/questions.html", {'questions':questions})
+
+
+        except ObjectDoesNotExist:
+            return HttpResponse("really bad error")
+'''
+
+
 
 
 def challenge(request, chal_id):
@@ -303,20 +320,23 @@ def challenge(request, chal_id):
         HttpResponse: Challenge data or failure message
     """
     # we need to get the challenge, the questions, and the answers.
-
-    if request.method == 'POST':
-        pass  # redirect and stuff
-
-    else:
+    if request.method == 'GET': #for rendering the page initially
         try:
-            c = Challenge.objects.get(id=chal_id)
-            ctime = timezone.now()
+            c= Challenge.objects.get(id=chal_id)
+            info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
 
-            # pass context into the template
-            valid = True if c.start_time < ctime and c.end_time > ctime\
-                         else False
+            questions = []
+            quest_set = Question.objects.filter(challenge__id = chal_id)
+            for question in quest_set:
+                q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
+                        'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
+                questions.append(q_details)
+
+            return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
 
         except ObjectDoesNotExist:
-            pass
+            return HttpResponse("really bad error")
 
     return HttpResponse("failure!")
