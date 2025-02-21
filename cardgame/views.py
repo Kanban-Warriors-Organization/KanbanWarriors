@@ -101,10 +101,12 @@ def signup(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():  # validation later
             try:
-                User.objects.create_user(
-                    form.cleaned_data["username"], None,
-                    form.cleaned_data["password1"]
-                )
+                username = form.cleaned_data["username"]
+                user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
+                new_user_profile = UserProfile.create(user) # i sure hope this works
+                new_user_profile.save()
+
+
                 return HttpResponse("you did good!")
             except IntegrityError:
                 pass
@@ -284,23 +286,20 @@ def challenges(request):
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
-'''
+
 def get_questions(request, chal_id):
 
     if request.method == 'POST':
         try:
             questions = []
-            quest_set = Questions.objects.filter(challenge__id = chal_id)
+            quest_set = Question.objects.filter(challenge__id = chal_id)
             for question in quest_set:
-                q_details = {'question': r.text, 'ans1': r.option_a, 'ans2': r.option_b,
-                             'ans3': r.option_c, 'ans4': r.option_d, 'right_ans': r.correct_answer}
+                q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
+                             'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
                 questions.append(q_details)
-        return render(request, "cardgame/questions.html", {'questions':questions})
-
-
+            return render(request, "cardgame/questions.html", {'questions':questions})
         except ObjectDoesNotExist:
             return HttpResponse("really bad error")
-'''
 
 
 
