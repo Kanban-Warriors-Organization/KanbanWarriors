@@ -19,6 +19,7 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
 import datetime
+from django.db.models import F
 # Create your views here.
 
 
@@ -271,37 +272,22 @@ def challenges(request):
 
     try:
         ctime = datetime.datetime.now()
-
+        upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards
         # filters all challenges that are ongoing
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)
         chals = []
         for c in challenges:
-            d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+            if(c.card not in upc.all()):
+                d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                  'card_name':c.card.card_name, 'points':c.points_reward,
                  'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
-            chals.append(d)
+                chals.append(d)
 
         # renders the template
         return render(request, "cardgame/challenges.html", {'challenges':chals})
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
-
-def get_questions(request, chal_id):
-
-    if request.method == 'POST':
-        try:
-            questions = []
-            quest_set = Question.objects.filter(challenge__id = chal_id)
-            for question in quest_set:
-                q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
-                             'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
-                questions.append(q_details)
-            return render(request, "cardgame/questions.html", {'questions':questions})
-        except ObjectDoesNotExist:
-            return HttpResponse("really bad error")
-
-
 
 def challenge(request, chal_id):
     """
@@ -348,4 +334,6 @@ def add_card(request, chal_id):
     up = UserProfile.objects.get(user = u)
     #gives the user the card
     up.user_profile_collected_cards.add(c)
-    return redirect(request, "success.html")
+    #Gives the user the points for the card
+    UserProfile.objects.filter(user=request.user).update(user_profile_points=F('user_profile_points') + 10)
+    return HttpResponse(request)

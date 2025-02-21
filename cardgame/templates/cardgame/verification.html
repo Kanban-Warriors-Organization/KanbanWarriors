@@ -34,7 +34,7 @@
         </header>
         <div class="main-content">
             {% for question in questions %}
-            <div id="ans" data-ans="{{question.ans2}}"> </div>
+            <div id="ans" data-ans="{{question.right_ans}}"> </div>
             <div class="question">
                 <h2>{{question.question}}</h2>
                 <button class="btn" data-ans="{{question.ans1}}">{{question.ans1}}</button>
@@ -55,6 +55,7 @@
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
         <div id="challenge-location"
+        data-id="{{info.id}}"
         data-name="{{info.card_name}}"
         data-lat="{{info.latitude}}"
         data-lng="{{info.longitude}}" ></div>
