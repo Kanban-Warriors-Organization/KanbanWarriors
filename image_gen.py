@@ -10,24 +10,41 @@ from pathlib import Path
 
 def make_image(background:str, title:str, subtitle:str, font:str, font_bf:str, desc:str, image) -> int:
 
+    """
+        Written by Adam
+        script for generating card images in the backend
+
+        Args:
+        background: a path to the background image for the card, represented as a string
+        title: the name of the card
+        subtitle: the text below the name of the card
+        font: a path to a font used to write text on the card
+        font_bf: a path to a bold font used to write text on the card
+        desc: the description of the card, written to a box below the image
+        image: either a string representing a path to an image, or a django ImageField object
+
+    Returns:
+    a PIL image file representing the card image
+    """
 
     try:
         back = Image.open(background) #opens background image
+        back = back.resize((1200,1600))
         front = Image.open(image) #opens foreground image
     except FileNotFoundError:
         print("help!")
         return 1
     
-    front = front.resize((400,300)) #scales foreground image
-    Image.Image.paste(back,front, (100,170)) #pastes image on
+    front = front.resize((800,600)) #scales foreground image
+    Image.Image.paste(back,front, (200,340)) #pastes image on
     draw = ImageDraw.Draw(back)
     #path:str = str(Path(__file__).parent.absolute())
 
-    bold = ImageFont.truetype(font_bf, 32) #creates font objects that we need 
-    st_font = ImageFont.truetype(font, 32)
-    reg_font = ImageFont.truetype(font, 16)
-    draw.text((80,64), title, font=bold, fill=(16,64,16)) #adds title
-    draw.text((80,108), subtitle, font=st_font, fill=(16,64,16)) #adds subtitle
+    bold = ImageFont.truetype(font_bf, 64) #creates font objects that we need 
+    st_font = ImageFont.truetype(font, 64)
+    reg_font = ImageFont.truetype(font, 32)
+    draw.text((160,128), title, font=bold, fill=(16,64,16)) #adds title
+    draw.text((160,216), subtitle, font=st_font, fill=(16,64,16)) #adds subtitle
 
     #oh no
     #turns out there's no nice way to draw text across multiple lines
@@ -57,7 +74,7 @@ def make_image(background:str, title:str, subtitle:str, font:str, font_bf:str, d
             des_mod += desc[i]
         
                 
-    draw.multiline_text((80,512), des_mod, font=reg_font, fill=(0, 128, 64)) #writes description
+    draw.multiline_text((160,1024), des_mod, font=reg_font, fill=(0, 128, 64)) #writes description
     #output_path = title.replace(" ", "_") + ".png" #sanitises name
     #back.save(output_path) #saves image out
     print("success!")
