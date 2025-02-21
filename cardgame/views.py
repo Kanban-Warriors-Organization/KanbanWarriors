@@ -22,7 +22,7 @@ import datetime
 
 
 def index(request):
-    return HttpResponse("index page test")
+    return render(request, "cardgame/home.html")
 
 
 def home(request):
