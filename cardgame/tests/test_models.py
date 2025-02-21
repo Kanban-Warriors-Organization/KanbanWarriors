@@ -4,10 +4,12 @@ Verifies the correct functionality of data models including creation,
 attribute storage, and relationship management.
 """
 
+from datetime import timedelta
+from django.forms import ValidationError
 from django.test import TestCase
 from django.contrib.auth.models import User
-from cardgame.models import Card, CardSet, UserProfile
-
+from django.utils import timezone
+from cardgame.models import Card, CardSet, UserProfile, Question, Challenge
 
 class CardModelTests(TestCase):
     """
@@ -147,3 +149,270 @@ class CardModelTests(TestCase):
             "user was not set or returned correctly\n\
             expected: " + str(test_user) + "\n\
             actual:   " + str(test_user_profile.user))
+
+    def test_question_set_with_correct_details_and_clean_works(self):
+        """
+        Ensure the Question model set with correct
+        details and links to Challenge
+        
+        Also checks that the clean method works correctly
+        """
+
+        # Create the test Card
+        test_card_name = "Test_Card_Name"
+        test_card_subtitle = "Test_Card_Subtitle"
+        test_card_description = "Test_Card_Description"
+        test_card = Card(card_name=test_card_name,
+                         card_subtitle=test_card_subtitle,
+                         card_description=test_card_description,
+                         card_set=None)
+        test_card.save()
+
+        # Create test challenge
+        test_challenge_name = "Test_Challenge_Name"
+        test_challenge_description = "Test_Challenge_Description"
+        test_challenge_start_time = timezone.now()
+        test_challenge_end_time = timezone.now() + timedelta(days=1)
+        test_challenge_longitude = 1.0
+        test_challenge_latitude = -1.0
+        test_challenge_points_reward = 5
+        test_challenge_status = "ongoing"
+
+        test_challenge = Challenge(
+            challenge_name=test_challenge_name,
+            description=test_challenge_description,
+            start_time=test_challenge_start_time,
+            end_time=test_challenge_end_time,
+            longitude=test_challenge_longitude,
+            latitude=test_challenge_latitude,
+            card=test_card,
+            points_reward=test_challenge_points_reward,
+            status=test_challenge_status
+        )
+        test_challenge.save()
+
+        # Create test question
+        test_question_text = "Test_Question_Text"
+        test_question_option_a = "Test_Question_Option_A"
+        test_question_option_b = "Test_Question_Option_B"
+        test_question_option_c = "Test_Question_Option_C"
+        test_question_option_d = "Test_Question_Option_D"
+        test_question_correct_answer = test_question_option_b
+
+        test_question = Question(
+            challenge=test_challenge,
+            text=test_question_text,
+            option_a=test_question_option_a,
+            option_b=test_question_option_b,
+            option_c=test_question_option_c,
+            option_d=test_question_option_d,
+            correct_answer=test_question_correct_answer,
+        )
+        test_question.save()
+
+        # Test that text is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].text,
+            test_question_text,
+            "text was not set or returned correctly\n\
+            expected: " + str(test_question_text) + "\n\
+            actual:   " + str(Question.objects.all()[0].text)
+        )
+
+        # Test that option_a is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].option_a,
+            test_question_option_a,
+            "option_a was not set or returned correctly\n\
+            expected: " + str(test_question_option_a) + "\n\
+            actual:   " + str(Question.objects.all()[0].option_a)
+        )
+
+        # Test that option_b is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].option_b,
+            test_question_option_b,
+            "option_b was not set or returned correctly\n\
+            expected: " + str(test_question_option_b) + "\n\
+            actual:   " + str(Question.objects.all()[0].option_b)
+        )
+
+        # Test that option_c is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].option_c,
+            test_question_option_c,
+            "option_c was not set or returned correctly\n\
+            expected: " + str(test_question_option_c) + "\n\
+            actual:   " + str(Question.objects.all()[0].option_c)
+        )
+
+        # Test that option_d is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].option_d,
+            test_question_option_d,
+            "option_d was not set or returned correctly\n\
+            expected: " + str(test_question_option_d) + "\n\
+            actual:   " + str(Question.objects.all()[0].option_d)
+        )
+
+        # Test that correct_answer is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].correct_answer,
+            test_question_correct_answer,
+            "correct_anwser was not set or returned correctly\n\
+            expected: " + str(test_question_correct_answer) + "\n\
+            actual:   " + str(Question.objects.all()[0].correct_answer)
+        )
+
+        # Test that challenge is set correctly
+        self.assertEqual(
+            Question.objects.all()[0].challenge,
+            test_challenge,
+            "challenge was not set or returned correctly\n\
+            expected: " + str(test_challenge) + "\n\
+            actual:   " + str(Question.objects.all()[0].challenge)
+        )
+
+        # Test that .clean() doesn't fail
+        Question.objects.all()[0].clean()
+
+        # Change question correct answer so .clean() will fail
+        q = Question.objects.all()[0]
+        q.correct_answer = "Incorrect_Answer"
+        q.save()
+
+        with self.assertRaises(ValidationError):
+            Question.objects.all()[0].clean()
+        
+
+    def test_challenge_set_with_correct_details_and_clean_works(self):
+        """
+        Ensures the Challenge model set with the correct
+        details
+
+        Also checks that the clean method works correctly
+        """
+
+        # Create the test Card
+        test_card_name = "Test_Card_Name"
+        test_card_subtitle = "Test_Card_Subtitle"
+        test_card_description = "Test_Card_Description"
+        test_card = Card(card_name=test_card_name,
+                         card_subtitle=test_card_subtitle,
+                         card_description=test_card_description,
+                         card_set=None)
+        test_card.save()
+
+        # Create test challenge
+        test_challenge_name = "Test_Challenge_Name"
+        test_challenge_description = "Test_Challenge_Description"
+        test_challenge_start_time = timezone.now()
+        test_challenge_end_time = timezone.now() + timedelta(days=1)
+        test_challenge_longitude = 1.0
+        test_challenge_latitude = -1.0
+        test_challenge_points_reward = 5
+        test_challenge_status = "ongoing"
+
+        test_challenge = Challenge(
+            challenge_name=test_challenge_name,
+            description=test_challenge_description,
+            start_time=test_challenge_start_time,
+            end_time=test_challenge_end_time,
+            longitude=test_challenge_longitude,
+            latitude=test_challenge_latitude,
+            card=test_card,
+            points_reward=test_challenge_points_reward,
+            status=test_challenge_status
+        )
+        test_challenge.save()
+
+        # Test that challenge_name is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].challenge_name,
+            test_challenge_name,
+            "challenge_name was not set or returned correctly\n\
+            expected: " + str(test_challenge_name) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].challenge_name)
+        )
+
+        # Test that description is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].description,
+            test_challenge_description,
+            "description was not set or returned correctly\n\
+            expected: " + str(test_challenge_description) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].description)
+        )
+
+        # Test that start_time is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].start_time,
+            test_challenge_start_time,
+            "start_time was not set or returned correctly\n\
+            expected: " + str(test_challenge_start_time) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].start_time)
+        )
+
+        # Test that end_time is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].end_time,
+            test_challenge_end_time,
+            "end_time was not set or returned correctly\n\
+            expected: " + str(test_challenge_end_time) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].end_time)
+        )
+
+        # Test that longitude is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].longitude,
+            test_challenge_longitude,
+            "longitude was not set or returned correctly\n\
+            expected: " + str(test_challenge_longitude) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].longitude)
+        )
+
+        # Test that latitude is set correctly
+        self.assertEqual(
+            Challenge.objects.all()[0].latitude,
+            test_challenge_latitude,
+            "latitude was not set or returned correctly\n\
+            expected: " + str(test_challenge_latitude) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].latitude)
+        )
+
+        # Test that card is the expected value
+        self.assertEqual(
+            Challenge.objects.all()[0].card.card_name,
+            test_card.card_name,
+            "card was not set or returned correctly\n\
+            expected: " + str(test_card.card_name) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].card.card_name))
+        
+        self.assertEqual(
+            Challenge.objects.all()[0].points_reward,
+            test_challenge_points_reward,
+            "points_reward was not set or returned correctly\n\
+            expected: " + str(test_challenge_points_reward) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].points_reward)
+        )
+
+        self.assertEqual(
+            Challenge.objects.all()[0].status,
+            test_challenge_status,
+            "status was not set or returned correctly\n\
+            expected: " + str(test_challenge_status) + "\n\
+            actual:   " + str(Challenge.objects.all()[0].status)
+        )
+
+        # Test that .clean() doesn't fail
+        Challenge.objects.all()[0].clean()
+
+        # Change question correct answer so .clean() will fail
+        c = Challenge.objects.all()[0]
+        c.end_time = timezone.now() - timedelta(days=2)
+        c.save()
+
+        with self.assertRaises(ValidationError):
+            Challenge.objects.all()[0].clean()
+
+        # TODO implement tests for validate answers
