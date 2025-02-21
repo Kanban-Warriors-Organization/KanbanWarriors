@@ -3,7 +3,7 @@ Core functionality for user interactions, authentication, and data management.
 Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
-
+import sys
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template import loader
@@ -19,7 +19,11 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
 import datetime
-from django.db.models import F
+from django.core.files.images import ImageFile
+from image_gen import make_image
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 # Create your views here.
 
 
@@ -81,7 +85,7 @@ def recent_card_data(request):
             "name": recent_card.card_name,
             "description": recent_card.card_description,
             "image": recent_card.card_image_link.url
-        }
+            }
 
     return JsonResponse(data)
 
@@ -152,21 +156,33 @@ def create_card(request):
         if card_set_name:
             try:
                 card_set_instance = CardSet.objects.get(
-                    card_set_name=card_set_name)
+                        card_set_name=card_set_name)
             except CardSet.DoesNotExist:
                 return HttpResponse("Specified CardSet does not exist",
                                     status=400)
 
         try:
+
+            #this is disgusting but it works
+            c = make_image("static/card_gen/back.png", card_name, card_subtitle, "static/card_gen/normal.ttf",
+                       "static/card_gen/bold.ttf", card_description, card_image)
+
+            c_io = BytesIO()
+            c.save(c_io, format="PNG")
+            django_file = InMemoryUploadedFile(c_io, None, str(card_name).replace(" ","_")+".png", 'image/png',
+                                  sys.getsizeof(c_io), None) #we have to convert from a PIL image to a django image
+            #absolutely miserable
+            #now we create the user object!
             card = Card.objects.create(
-                card_name=card_name,
-                card_subtitle=card_subtitle,
-                card_description=card_description,
-                # TODO: add image parameter!!!!
-                card_set=card_set_instance,
-                card_image_link=card_image,
-            )
+                    card_name=card_name,
+                    card_subtitle=card_subtitle,
+                    card_description=card_description,
+                    card_set=card_set_instance,
+                    card_image_link=django_file,
+                    )
             card.save()
+
+
             return HttpResponse("Card created successfully!")
 
         # catches errors such as non-unique primary key
@@ -189,31 +205,31 @@ def get_locations(request):
         JsonResponse: Formatted location data with coordinates
     """
     locations = list(
-        Challenge.objects.select_related("card").values(
-            "card__card_name", "latitude", "longitude"
-        )
-    )
+            Challenge.objects.select_related("card").values(
+                "card__card_name", "latitude", "longitude"
+                )
+            )
 
     formatted_locations = [
-        {
-            "name": loc["card__card_name"],
-            "latitude": loc["latitude"],
-            "longitude": loc["longitude"],
-        }
-        for loc in locations
-    ]
+            {
+                "name": loc["card__card_name"],
+                "latitude": loc["latitude"],
+                "longitude": loc["longitude"],
+                }
+            for loc in locations
+            ]
 
     return JsonResponse({"locations": formatted_locations})
 
 
 def leaderboard_data(request):
     top_players = UserProfile.objects.order_by(
-        '-user_profile_points')[:5]  # Retrives Top 5 Players
+            '-user_profile_points')[:5]  # Retrives Top 5 Players
     data = [
-        {"username": player.user.username,
-         "points": player.user_profile_points}
-        for player in top_players
-    ]
+            {"username": player.user.username,
+             "points": player.user_profile_points}
+            for player in top_players
+            ]
     return JsonResponse(data, safe=False)
 
 @login_required
@@ -279,8 +295,8 @@ def challenges(request):
         for c in challenges:
             if(c.card not in upc.all()):
                 d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
-                 'card_name':c.card.card_name, 'points':c.points_reward,
-                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
+                     'card_name':c.card.card_name, 'points':c.points_reward,
+                     'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
                 chals.append(d)
 
         # renders the template
@@ -307,14 +323,14 @@ def challenge(request, chal_id):
         try:
             c= Challenge.objects.get(id=chal_id)
             info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
-                 'card_name':c.card.card_name, 'points':c.points_reward,
-                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
+                     'card_name':c.card.card_name, 'points':c.points_reward,
+                     'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
 
             questions = []
             quest_set = Question.objects.filter(challenge__id = chal_id)
             for question in quest_set:
                 q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
-                        'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
+                             'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
                 questions.append(q_details)
 
             return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
