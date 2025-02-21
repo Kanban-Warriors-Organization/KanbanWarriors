@@ -34,6 +34,15 @@
         </header>
         <div class="main-content">
             <p id="result"></p>
+            {% for question in question %}
+            <div class="question">
+                <h2>{{question.question}}</h2>
+                <button data-ans="{{question.ans1}}">{{quesiton.ans1}}</button>
+                <button data-ans="{{question.ans2}}">{{quesiton.ans2}}</button>
+                <button data-ans="{{question.ans3}}">{{quesiton.ans3}}</button>
+                <button data-ans="{{question.ans4}}">{{quesiton.ans4}}</button>
+            </div>
+            {% endfor %}
         </div>
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>

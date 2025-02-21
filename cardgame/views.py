@@ -321,10 +321,19 @@ def challenge(request, chal_id):
     # we need to get the challenge, the questions, and the answers.
     if request.method == 'GET': #for rendering the page initially
         try:
-            c = Challenge.objects.get(id = chal_id)
-            ctime = timezone.now()
-            #pass context into the template
-            valid = True if c.start_time < ctime and c.end_time > ctime else False
+            c= Challenge.objects.get(id=chal_id)
+            info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                 'card_name':c.card.card_name, 'points':c.points_reward,
+                 'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
+
+            questions = []
+            quest_set = Question.objects.filter(challenge__id = chal_id)
+            for question in quest_set:
+                q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
+                        'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
+                questions.append(q_details)
+
+            return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
 
         except ObjectDoesNotExist:
             return HttpResponse("really bad error")
