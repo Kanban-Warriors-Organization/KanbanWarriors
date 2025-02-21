@@ -325,10 +325,10 @@ def challenge(request, chal_id):
                  'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
 
             questions = []
-            quest_set = Questions.objects.filter(challenge__id = chal_id)
+            quest_set = Question.objects.filter(challenge__id = chal_id)
             for question in quest_set:
-                q_details = {'question': r.text, 'ans1': r.option_a, 'ans2': r.option_b,
-                        'ans3': r.option_c, 'ans4': r.option_d, 'right_ans': r.correct_answer}
+                q_details = {'question': question.text, 'ans1': question.option_a, 'ans2': question.option_b,
+                        'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
                 questions.append(q_details)
 
             return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
