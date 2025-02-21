@@ -88,6 +88,10 @@ class UserProfile(models.Model):
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card)
 
+    @classmethod
+    def create(cls,User):
+        up = cls(user=User)
+        return up
 
 class Question(models.Model):
     """

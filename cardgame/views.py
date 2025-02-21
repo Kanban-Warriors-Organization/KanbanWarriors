@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -18,12 +19,12 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
 import datetime
+from django.db.models import F
 # Create your views here.
 
 
 def index(request):
     return render(request, "cardgame/home.html")
-
 
 def home(request):
     return render(request, "cardgame/home.html")
@@ -101,10 +102,12 @@ def signup(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():  # validation later
             try:
-                User.objects.create_user(
-                    form.cleaned_data["username"], None,
-                    form.cleaned_data["password1"]
-                )
+                username = form.cleaned_data["username"]
+                user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
+                new_user_profile = UserProfile.create(user) # i sure hope this works
+                new_user_profile.save()
+
+
                 return HttpResponse("you did good!")
             except IntegrityError:
                 pass
@@ -213,7 +216,7 @@ def leaderboard_data(request):
     ]
     return JsonResponse(data, safe=False)
 
-
+@login_required
 def signout(request):
     """
     Handles user logout process.
@@ -231,7 +234,6 @@ def signout(request):
     # when this is deployed in production, you HAVE to modify the htaccess file
     # so that the ".html" at the end of the URL is removed.
     # proceed with caution! -AGP-
-
 
 def profile(request, user_name):
     """
@@ -270,41 +272,22 @@ def challenges(request):
 
     try:
         ctime = datetime.datetime.now()
-
+        upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards
         # filters all challenges that are ongoing
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)
         chals = []
         for c in challenges:
-            d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+            if(c.card not in upc.all()):
+                d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                  'card_name':c.card.card_name, 'points':c.points_reward,
                  'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
-            chals.append(d)
+                chals.append(d)
 
         # renders the template
         return render(request, "cardgame/challenges.html", {'challenges':chals})
 
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
-'''
-def get_questions(request, chal_id):
-
-    if request.method == 'POST':
-        try:
-            questions = []
-            quest_set = Questions.objects.filter(challenge__id = chal_id)
-            for question in quest_set:
-                q_details = {'question': r.text, 'ans1': r.option_a, 'ans2': r.option_b,
-                             'ans3': r.option_c, 'ans4': r.option_d, 'right_ans': r.correct_answer}
-                questions.append(q_details)
-        return render(request, "cardgame/questions.html", {'questions':questions})
-
-
-        except ObjectDoesNotExist:
-            return HttpResponse("really bad error")
-'''
-
-
-
 
 def challenge(request, chal_id):
     """
@@ -340,3 +323,17 @@ def challenge(request, chal_id):
             return HttpResponse("really bad error")
 
     return HttpResponse("failure!")
+
+
+def add_card(request, chal_id):
+    #gets the card from the challenge
+    c = Challenge.objects.get(id = chal_id).card
+    #gets the user
+    u = request.user
+    #gets the user profile
+    up = UserProfile.objects.get(user = u)
+    #gives the user the card
+    up.user_profile_collected_cards.add(c)
+    #Gives the user the points for the card
+    UserProfile.objects.filter(user=request.user).update(user_profile_points=F('user_profile_points') + 10)
+    return HttpResponse(request)
