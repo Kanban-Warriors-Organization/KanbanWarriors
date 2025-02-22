@@ -4,7 +4,7 @@ Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
 import sys
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
@@ -73,7 +73,7 @@ def card_col(request, user_name):
 
     except ObjectDoesNotExist:
         # if user does not exist
-        pass
+        raise Http404()
     return HttpResponse("fail")  # change this later!
 
 
@@ -290,7 +290,7 @@ def profile(request, user_name):
         return render(request, "cardgame/profile.html", ctx)
 
     except ObjectDoesNotExist:
-        pass
+        raise Http404()
 
     return HttpResponse("failure!")  # do something more verbose
 
@@ -321,7 +321,7 @@ def challenges(request):
         return render(request, "cardgame/challenges.html", {'challenges':chals})
 
     except ObjectDoesNotExist:
-        return HttpResponse("something went really wrong here!")
+        raise Http404()
 
 @login_required
 def challenge(request, chal_id):
@@ -355,9 +355,8 @@ def challenge(request, chal_id):
             return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
 
         except ObjectDoesNotExist:
-            return HttpResponse("really bad error")
-
-    return HttpResponse("failure!")
+            raise Http404()
+        return HttpResponse("failure!")
 
 
 def add_card(request, chal_id):
