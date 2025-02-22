@@ -19,14 +19,14 @@ EcoSplore is designed to achieve the following goals:
 
 ## 🔥 Key Features
 
-- 🗺️ **Interactive Map Integration:** Utilizes Leaflet to display card locations and real-time user positioning, enhancing the location-based gameplay. _(JavaScript: static/js/map.js)_
-- 🃏 **Comprehensive Card Collection System:** Users can collect, view, and manage their digital card collections within their profiles. _(HTML: cardgame/templates/card_col.html)_
-- 🎯 **Location-Based Challenges:** Players can participate in time-sensitive challenges at specific locations to earn exclusive cards and climb the leaderboard. _(HTML: cardgame/templates/cardgame/challenges.html)_
-- 🏆 **Global Leaderboard:** Enables competitive play by allowing users to track their rankings in real-time. _(JavaScript: static/js/leaderboard.js)_
-- 🆕 **Recent Card Updates:** Keeps players informed about the latest card additions. _(JavaScript: static/js/recent_card.js)_
-- 🔒 **Secure User Authentication:** Implements robust authentication mechanisms for user security. _(HTML: cardgame/templates/cardgame/login.html, cardgame/templates/cardgame/signup.html)_
+- 🗺️ **Interactive Map Integration:** Utilizes Leaflet to display card locations and real-time user positioning, enhancing the location-based gameplay.
+- 🃏 **Comprehensive Card Collection System:** Users can collect, view, and manage their digital card collections within their profiles.
+- 🎯 **Location-Based Challenges:** Players can participate in time-sensitive challenges at specific locations to earn exclusive cards and climb the leaderboard.
+- 🏆 **Global Leaderboard:** Enables competitive play by allowing users to track their rankings in real-time.
+- 🆕 **Recent Card Updates:** Keeps players informed about the latest card additions.
+- 🔒 **Secure User Authentication:** Implements robust authentication mechanisms for user security.
 - 🛠️ **Django Admin Panel:** Facilitates efficient management of cards, challenges, user accounts, and game settings.
-- ✅ **Automated Testing and Linting:** Ensures code stability and quality through CI workflows, utilizing GitHub Actions. _(CI: .github/workflows/django.yml, .github/workflows/lint_with_flake8.yml)_
+- ✅ **Automated Testing and Linting:** Ensures code stability and quality through CI workflows, utilizing GitHub Actions.
 
 ## 🚀 Getting Started
 
