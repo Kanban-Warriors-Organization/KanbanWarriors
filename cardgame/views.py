@@ -268,9 +268,9 @@ def profile(request, user_name):
     try:
         u = UserProfile.objects.get(user__username=user_name)
         #get number of cards in total
-        card_num = Card.objects.all.count()
+        card_num = Card.objects.all().count()
         user_card_num = u.user_profile_collected_cards.all()
-        card_id = u.most_recent_card
+        card_id = u.user_most_recent_card
         if card_id == -1:
             recent_card_name = None
             recent_card_image = None
@@ -281,7 +281,7 @@ def profile(request, user_name):
             recent_card_image = rec_card.card_image_link
             recent_card_date = u.most_recent_card_date
 
-        ctx = {'name':user_name, 'card_num': card_num, 'user_card_num': user_card_num,
+        ctx = {'username':user_name, 'card_num': card_num, 'user_card_num': user_card_num,
                'recent_card_date': recent_card_date, 'user_reg_date': u.user_signup_date,
                'recent_card_name': recent_card_name, 'recent_card_image': recent_card_image,
                'points': u.user_profile_points}
