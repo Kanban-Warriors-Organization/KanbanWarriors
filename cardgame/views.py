@@ -303,6 +303,7 @@ def challenges(request):
     except ObjectDoesNotExist:
         return HttpResponse("something went really wrong here!")
 
+@login_required
 def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
@@ -349,5 +350,8 @@ def add_card(request, chal_id):
     #gives the user the card
     up.user_profile_collected_cards.add(c)
     #Gives the user the points for the card
-    UserProfile.objects.filter(user=request.user).update(user_profile_points=F('user_profile_points') + 10)
+    points = up.user_profile_points
+    up.user_profile_profile_points = points + c.pointsreward()
+    up.save()
+
     return HttpResponse(request)
