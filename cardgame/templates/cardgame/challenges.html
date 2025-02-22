@@ -22,13 +22,13 @@
     <body>
         <!-- Navigation Bar -->
         <header class="navbar">
-            <a href="home" class="logo">
+            <a href="/home" class="logo">
                 <img src="{% static 'img\logo.png' %}">
             </a>
             <nav class="nav-links">
-                <a href="home.html">Home</a>
+                <a href="/home">Home</a>
                 <a href="user.html">Profile</a>
-                <a href="social.html">Social</a>
+                <a href="/challenges">Challenges</a>
                 <a href="about.html">About Us</a>
                 <a href="home.html">Sign Out</a>
             </nav>
@@ -40,7 +40,7 @@
                     <div class="grid-item">
                         <h2>{{challenge.card_name}}</h2>
                         <p>End Time: {{challenge.end}}</p>
-                        <button class="btn">Collect</button>
+                        <button class="btn" data-url="{% url 'challenge' chal_id=challenge.id %}">Collect</button>
                     </div>
                 {% endfor %}
             </div>
@@ -53,4 +53,5 @@
          <footer class="footer">
             <p>@Copyright 2025. All rights reserved.</p>
         </footer>
+        <script src="{% static 'js/challenge-button.js' %}"></script>
     </body>

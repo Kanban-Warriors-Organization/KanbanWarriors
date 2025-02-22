@@ -88,6 +88,10 @@ class UserProfile(models.Model):
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card)
 
+    @classmethod
+    def create(cls,User):
+        up = cls(user=User)
+        return up
 
 class Question(models.Model):
     """
@@ -111,8 +115,10 @@ class Question(models.Model):
     correct_answer = models.CharField(max_length=255)
 
     def clean(self):
-        """Ensures that the correct answer is one of the options presented
-        to the user"""
+        """
+        Ensures that the correct answer is one of the options presented
+        to the user
+        """
 
         valid_options = {self.option_a, self.option_b,
                          self.option_c, self.option_d}
@@ -121,7 +127,9 @@ class Question(models.Model):
                                    the options presented")
 
     def __str__(self):
-        """Debugging purposes"""
+        """
+        Debugging purposes
+        """
         return f"{self.text} for challenge: {self.challenge.challenge_name}"
 
 
@@ -160,14 +168,18 @@ class Challenge(models.Model):
                               default='upcoming')
 
     def __str__(self):
-        """Debugging purposes"""
+        """
+        Debugging purposes
+        """
         return (
             f"{self.challenge_name} at ({self.latitude}, {self.longitude}) "
             f"with card: {self.card.card_name}"
         )
 
     def clean(self):
-        """Ensures that the end time is after the start time"""
+        """
+        Ensures that the end time is after the start time
+        """
         if self.start_time >= self.end_time:
             raise ValidationError("End time must be after the start time")
 

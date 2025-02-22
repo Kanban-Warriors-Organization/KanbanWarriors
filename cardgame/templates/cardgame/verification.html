@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<!--
+    Author: Jake Klar
+    Description: This is the homepage of the card game, featuring:
+    a dynamic map, leaderboards, information about the latest card and navigation.
+-->
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Contains a dynamic map, leaderboards and navigational menus">
+        <title>Home</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/verification.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        {% load static %}
+    </head>
+    <body>
+        <header class="navbar">
+            <a href="/home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="/home">Home</a>
+                <a href="user">Profile</a>
+                <a href="/challenges">Challenges</a>
+                <a href="about">About Us</a>
+                <a href="home">Sign Out</a>
+            </nav>
+        </header>
+        <div class="main-content">
+            {% for question in questions %}
+            <div id="ans" data-ans="{{question.right_ans}}"> </div>
+            <div class="question">
+                <h2>{{question.question}}</h2>
+                <button class="btn" data-ans="{{question.ans1}}">{{question.ans1}}</button>
+                <button class="btn" data-ans="{{question.ans2}}">{{question.ans2}}</button>
+                <button class="btn" data-ans="{{question.ans3}}">{{question.ans3}}</button>
+                <button class="btn" data-ans="{{question.ans4}}">{{question.ans4}}</button>
+            </div>
+            {% endfor %}
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-title"></h2>
+                    <p id="modal-description"></p>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <p>@Copyirght 2025. All rights reserved.</p>
+        </footer>
+        <div id="challenge-location"
+        data-id="{{info.id}}"
+        data-name="{{info.card_name}}"
+        data-lat="{{info.latitude}}"
+        data-lng="{{info.longitude}}" ></div>
+        <script src="{% static 'js/location-verification.js' %}"></script>
+        <script src="{% static 'js/question-button.js' %}"></script>
+    </body>
