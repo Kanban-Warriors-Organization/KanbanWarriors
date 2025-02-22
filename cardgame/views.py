@@ -19,6 +19,7 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
 import datetime
+from django.db.models import F
 from django.core.files.images import ImageFile
 from image_gen import make_image
 from PIL import Image
@@ -350,8 +351,6 @@ def add_card(request, chal_id):
     #gives the user the card
     up.user_profile_collected_cards.add(c)
     #Gives the user the points for the card
-    points = up.user_profile_points
-    up.user_profile_profile_points = points + c.pointsreward()
-    up.save()
+    up.update(user_profile_points=F('user_profile_points') + 10)
 
     return HttpResponse(request)
