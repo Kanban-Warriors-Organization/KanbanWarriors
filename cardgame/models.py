@@ -86,7 +86,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 primary_key=True)
     user_profile_points = models.IntegerField(default=0)
-    user_profile_collected_cards = models.ManyToManyField(Card)
+    user_profile_collected_cards = models.ManyToManyField(Card,blank=True)
 
     @classmethod
     def create(cls,User):
