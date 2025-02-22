@@ -36,9 +36,9 @@ Follow the instructions below to set up the project locally.
 
 Ensure the following dependencies are installed:
 
-- 🐍 **Python (3.13.2 recommended):** Download from [python.org](https://www.python.org/downloads/).
-- 📦 **pip:** Verify installation by running `pip --version`.
-- 🌐 **virtualenv:** Install via:
+- **Python (3.13.2 recommended):** Download from [python.org](https://www.python.org/downloads/).
+- **pip:** Verify installation by running `pip --version`.
+- **virtualenv:** Install via:
   ```bash
   pip install virtualenv
   ```
@@ -110,14 +110,20 @@ pytest cardgame
 
 ## 🎯 Features
 
-- 🃏 **Card Collection:** Discover and collect unique digital cards.
-- 📍 **GPS Integration:** Locate cards and challenges in real-world locations.
-- 📖 **Detailed Card Descriptions:** Rich information and visuals for each card.
-- 👤 **User Profiles:** Track game progress and manage collections.
-- 🏆 **Leaderboard:** Compete with other players globally.
-- 🎯 **Challenges:** Engage in location-based tasks to earn rewards.
-- 🔔 **Recent Card Updates:** Stay informed about new card releases.
-- 🗂️ **Set Completion:** Cards are categorized into sets to encourage collection. _(Lines 64-65, cardgame/models.py)_
+EcoSplore is packed with features to provide an engaging gameplay experience:
+
+- [x] **Collect Cards:** Discover and collect a variety of unique digital cards.
+- [x] **GPS Location Integration:** Utilize your device's GPS to find cards and challenges at real-world locations.
+- [x] **Detailed Card Information:** Learn about each card with rich descriptions, subtitles, and vibrant images.
+- [x] **User Profiles:** Create and customize your player profile to track your card collection and game progress.
+- [x] **Leaderboard:** Compete with friends and other players for the top spot on the global leaderboard.
+- [x] **Challenges:** Participate in location-based challenges to earn exclusive rewards and cards.
+- [x] **Card Sets:** Cards are organized into sets, encouraging collection completion. (lines: 64-65, cardgame/models.py)
+- [x] **Recent Card Display:** Stay updated with the latest card releases directly on the homepage. (lines: 72-79, html:cardgame/templates/cardgame/home.html)
+- [ ] **Battles:** Engage in strategic battles with other players or AI opponents using your card collections.
+- [ ] **Trading Cards:** Trade cards with other players to complete your sets and acquire rare cards.
+- [ ] **In-Game Currency:** Earn and use in-game currency for various game enhancements and items.
+- [ ] **Scavenger Hunts:** Participate in complex, multi-location scavenger hunts for valuable rewards.
 
 ## 🔮 Future Enhancements
 
@@ -130,7 +136,6 @@ The following features are under consideration for future development:
 - 🏅 **Badges for Collections:** Unlock achievements based on progress.
 - 📣 **Social Media Integration:** Share progress and achievements.
 - 📆 **Daily/Weekly Challenges:** Recurring events with special rewards.
-- 🕶️ **Augmented Reality (AR) Features:** Enhance gameplay with AR elements.
 
 ## 📜 License
 
