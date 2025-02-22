@@ -111,11 +111,11 @@ def signup(request):
                 user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
                 new_user_profile = UserProfile.create(user) # i sure hope this works
                 new_user_profile.save()
-
+ 
 
                 return redirect("home")
-            except IntegrityError:
-                pass
+            except IntegrityError as e:
+                print(e)
         return HttpResponse("you done goofed!")
 
     else:
@@ -267,7 +267,26 @@ def profile(request, user_name):
     """
     try:
         u = UserProfile.objects.get(user__username=user_name)
-        ctx = {"username": user_name, 'points': u.user_profile_points}
+        #get number of cards in total
+        card_num = Card.objects.all.count()
+        user_card_num = u.user_profile_collected_cards.all()
+        card_id = u.most_recent_card
+        if card_id == -1:
+            recent_card_name = None
+            recent_card_image = None
+            recent_card_date = None
+        else:
+            rec_card = Card.objects.get(id = card_id)
+            recent_card_name = rec_card.card_name
+            recent_card_image = rec_card.card_image_link
+            recent_card_date = u.most_recent_card_date
+
+        ctx = {'name':user_name, 'card_num': card_num, 'user_card_num': user_card_num,
+               'recent_card_date': recent_card_date, 'user_reg_date': u.user_signup_date,
+               'recent_card_name': recent_card_name, 'recent_card_image': recent_card_image,
+               'points': u.user_profile_points}
+
+
         return render(request, "cardgame/profile.html", ctx)
 
     except ObjectDoesNotExist:
@@ -309,11 +328,11 @@ def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
 
-    Author: BLANK
+    Author: Adam
 
     Args:
         request: HTTP request object
-        challenge_id: ID of the challenge to process
+        chal_id: ID of the challenge to process
 
     Returns:
         HttpResponse: Challenge data or failure message
@@ -342,6 +361,18 @@ def challenge(request, chal_id):
 
 
 def add_card(request, chal_id):
+    """
+    Adds a card to a user's profile upon completion of a challenge
+    Written by Adam
+
+    Args:
+        request: a HTTP request object
+        chal_id: the identifier of the challenge that has been completed
+
+    Returns: 
+        a HTTP response object
+    """
+
     #gets the card from the challenge
     c = Challenge.objects.get(id = chal_id).card
     #gets the user
@@ -352,5 +383,7 @@ def add_card(request, chal_id):
     up.user_profile_collected_cards.add(c)
     #Gives the user the points for the card
     up.update(user_profile_points=F('user_profile_points') + 10)
+    up.give_card(c)
+    up.save()
 
     return HttpResponse(request)
