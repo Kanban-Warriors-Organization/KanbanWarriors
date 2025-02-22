@@ -96,7 +96,7 @@ Ensure the following prerequisites are installed on your system:
    ```bash
    python manage.py runserver
    ```
-5. **Access KanbanWarriors:** Open your web browser and navigate to `http://127.0.0.1:8000/` to start playing!
+5. **Access EcoSplore:** Open your web browser and navigate to `http://127.0.0.1:8000/` to start playing!
 
 #### 🧪 Running Tests
 
@@ -121,7 +121,7 @@ Ensure the following prerequisites are installed on your system:
 
 ## ✅ Features
 
-KanbanWarriors is packed with features to provide an engaging gameplay experience:
+EcoSplore is packed with features to provide an engaging gameplay experience:
 
 - [x] **Collect Cards:** Discover and collect a variety of unique digital cards.
 - [x] **GPS Location Integration:** Utilize your device's GPS to find cards and challenges at real-world locations.
@@ -138,7 +138,7 @@ KanbanWarriors is packed with features to provide an engaging gameplay experienc
 
 ## 🔮 Potential Future Features
 
-These are features that could be added to KanbanWarriors in the future:
+These are features that could be added to EcoSplore in the future:
 
 - Badges for Collections
 - Social Media Sharing
