@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
 import datetime
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 from cardgame.models import Card, CardSet, UserProfile, Challenge
 
@@ -131,17 +133,19 @@ class ViewsTestCase(TestCase):
         # Since we are not logged in as staff, we expect a redirection.
         self.assertNotEqual(response.status_code, 200)
 
+    # Python
+
     def test_create_card_post(self):
         # Log in as staff user to access create_card view
         self.client.login(username="staffuser", password="staffpass")
-        with open("static/card_images/do_not_remove.py", "rb") as img:
-            post_data = {
-                "card_name": "NewCard",
-                "card_subtitle": "NewSubtitle",
-                "card_description": "NewDescription",
-                "card_set": self.card_set.card_set_name,
-                "card_image": img,
-            }
-            response = self.client.post(reverse("create_card"), post_data)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("Card created successfully", response.content.decode())
+        test_image = SimpleUploadedFile("test_image.png", b"fake image content", content_type="image/png")
+        post_data = {
+            "card_name": "NewCard",
+            "card_subtitle": "NewSubtitle",
+            "card_description": "NewDescription",
+            "card_set": self.card_set.card_set_name,
+            "card_image": test_image,
+        }
+        response = self.client.post(reverse("create_card"), post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Card created successfully", response.content.decode())
