@@ -97,20 +97,22 @@ Ensure the following prerequisites are installed on your system:
 
 1. **Ensure the virtual environment is activated.**
 2. **Execute the Test Suite:**
-   Run tests to verify application functionality:
+   Run tests to verify application functionality using pytest:
    ```bash
-   python manage.py test cardgame/tests
+   pytest cardgame
    ```
    A successful test run ensures the application is functioning as expected.
 
 ## 🧰 Technologies Used
 
-- **Backend Framework:** [Django](https://www.djangoproject.com/) (5.1.6) - A high-level Python web framework for rapid development and clean, pragmatic design. (lines: 37-44, cards/settings.py)
-- **Image Processing:** [Pillow](https://python-pillow.org/) (11.1.0) - Python Imaging Library used for creating and manipulating card images. (lines: 104, 105, README.md)
-- **Frontend Mapping:** [Leaflet](https://leafletjs.com/) - An open-source JavaScript library for mobile-friendly interactive maps, used for location visualization in the game. (lines: 2, 3, javascript:static/js/map.js)
-- **Database:** SQLite - A lightweight, file-based database used for development and suitable for smaller deployments. (lines: 80-85, cards/settings.py)
-- **Testing:** [pytest](https://docs.pytest.org/en/stable/) - A testing framework used for writing and running tests. (lines: 2-7, .vscode/settings.json), configured via Django test runner.
-- **Linting:** [flake8](https://flake8.pycqa.org/en/latest/) - A wrapper around PyFlakes, pep8 and McCabe, used for code style checking and quality assurance. (.github/workflows/lint_with_flake8.yml)
+| Library     | Version | Purpose                                                                                                 |
+| :---------- | :------ | :------------------------------------------------------------------------------------------------------ |
+| **Django**  | 5.1.6   | The robust web framework powering the game. Handles backend logic, database interactions, and routing.  |
+| **Pillow**  | 11.1.0  | Image processing library used for card image generation and manipulation.                               |
+| **Leaflet** | N/A     | JavaScript library for creating interactive maps, used for displaying card locations and user position. |
+| **SQLite**  | N/A     | Lightweight, file-based database used for development.                                                  |
+| **pytest**  | N/A     | Testing framework used for writing and running tests.                                                   |
+| **flake8**  | N/A     | Linting tool for code style checking and quality assurance.                                             |
 
 ## ✅ Features
 
@@ -128,13 +130,18 @@ KanbanWarriors is packed with features to provide an engaging gameplay experienc
 - [ ] **Trading Cards:** Trade cards with other players to complete your sets and acquire rare cards.
 - [ ] **In-Game Currency:** Earn and use in-game currency for various game enhancements and items.
 - [ ] **Scavenger Hunts:** Participate in complex, multi-location scavenger hunts for valuable rewards.
-- [ ] **Badges for Collections:** Earn badges and achievements for completing card sets and milestones.
-- [ ] **Social Media Sharing:** Share your card collection and achievements with friends on social media platforms.
-- [ ] **Daily/Weekly Challenges & Combos:** Participate in regularly updated challenges and location combos for ongoing engagement.
-- [ ] **Wagers on Battles:** Increase the stakes by wagering in-game currency on battle outcomes.
-- [ ] **Bot Battles:** Test your skills against AI opponents with varying difficulty levels.
-- [ ] **Staff Challenges:** Participate in special challenges created and managed by game staff.
-- [ ] **Augmented Reality (AR) Features:** Integrate AR elements for enhanced card discovery and interaction in the real world.
+
+## 🔮 Potential Future Features
+
+These are features that could be added to KanbanWarriors in the future:
+
+- Badges for Collections
+- Social Media Sharing
+- Daily/Weekly Challenges & Combos
+- Wagers on Battles
+- Bot Battles
+- Staff Challenges
+- Augmented Reality (AR) Features
 
 ## 📜 License
 
