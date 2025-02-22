@@ -1,18 +1,23 @@
-# ⚔️ KanbanWarriors 🛡️
+# ⚔️ EcoSplore 🛡️
 
 ## Overview
 
-KanbanWarriors is a location-based card collecting game built with Django, designed to encourage exploration and engagement with the real world. Players discover digital cards by visiting real-world locations, building a unique collection, and participating in exciting challenges. Compete on leaderboards, uncover new cards, and become the ultimate KanbanWarrior!
+EcoSplore was developed as part of ECM2434 at the University of Exeter, this is the project for the group: "Kanban Warriors".
 
-## Goals
+EcoSplore is a location-based card collecting game built with Django, designed to encourage exploration and engagement with sustainability topics on campus. Players discover digital cards by visiting real-world locations, building a unique collection while learning about sustainability initiatives and environmental awareness.
 
-The primary goals of KanbanWarriors are to:
+The project aims to gamify sustainability education at the University of Exeter, making environmental awareness both fun and interactive.
 
-- **Gamify Real-World Exploration:** Encourage users to explore their surroundings by linking gameplay to physical locations.
-- **Create a Collectible Card System:** Implement a fun and engaging system for collecting digital cards with rich information and visual appeal.
-- **Develop Location-Based Challenges:** Offer interactive challenges at specific locations to drive user engagement and reward exploration.
-- **Foster Competition and Community:** Incorporate leaderboards and social features to encourage friendly competition and community building (future development).
-- **Provide a User-Friendly Experience:** Design an intuitive and enjoyable game experience across all user interfaces.
+## Goals and Sustainability
+
+The primary goals of EcoSplore are to:
+
+- **Promote Sustainability Awareness:** Educate users about environmental initiatives and sustainable practices through interactive gameplay.
+- **Encourage Campus Exploration:** Guide players to discover sustainable features and locations across the university campus.
+- **Foster Environmental Education:** Provide valuable information about sustainability through collectible cards and challenges.
+- **Create Community Engagement:** Build a community of environmentally conscious students through social gameplay features.
+- **Support University's Sustainability Goals:** Align with and promote the University of Exeter's environmental initiatives and targets.
+- **Gamify Learning:** Transform sustainability education into an engaging and rewarding experience.
 
 ## ✨ Highlights ✨
 
@@ -27,7 +32,7 @@ The primary goals of KanbanWarriors are to:
 
 ## 🚀 Getting Started
 
-Embark on your KanbanWarriors adventure by setting up the project locally!
+Embark on your EcoSplore adventure by setting up the project locally!
 
 ### 🛠️ Requirements
 
