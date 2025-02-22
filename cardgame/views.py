@@ -230,7 +230,7 @@ def signout(request):
         Redirect to home page
     """
     logout(request)
-    return redirect("home")  # this is currently bugged!
+    redirect("home")  # this is currently bugged!
     # when this is deployed in production, you HAVE to modify the htaccess file
     # so that the ".html" at the end of the URL is removed.
     # proceed with caution! -AGP-
