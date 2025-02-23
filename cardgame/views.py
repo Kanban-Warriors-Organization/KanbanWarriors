@@ -343,7 +343,14 @@ def challenge(request, chal_id):
     # we need to get the challenge, the questions, and the answers.
     if request.method == 'GET': #for rendering the page initially
         try:
+            #checks that the user doesn't already have the card
+            user = request.user
+            up = UserProfile.objects.get(user = user)
             c= Challenge.objects.get(id=chal_id)
+            if (c.card in up.user_profile_collected_cards.all()):
+                return HttpResponse("sorry, you already have this card!")
+
+            
             info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                      'card_name':c.card.card_name, 'points':c.points_reward,
                      'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
@@ -374,7 +381,6 @@ def add_card(request, chal_id):
     Returns: 
         a HTTP response object
     """
-
     #gets the card from the challenge
     c = Challenge.objects.get(id = chal_id).card
     #gets the user

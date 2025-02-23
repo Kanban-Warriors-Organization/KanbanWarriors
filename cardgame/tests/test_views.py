@@ -17,8 +17,10 @@ class EmptyTestCase(TestCase):
     """
     def setUp(self):
         self.client = Client()
+        self.user = User.objects.create_user(username='professor y', password='secret')
+        self.user_profile = UserProfile.objects.create(user=self.user, user_profile_points=64)
     
-    def test_profile_when_empty:
+    def test_profile_when_user_nonexistent:
         url = reverse('profile', kwargs={'user_name': 'professor x'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -34,10 +36,16 @@ class EmptyTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_with_no_cards:
-        self.user = User.objects.create_user(username='professor y', password='secret')
-        self.user_profile = UserProfile.objects.create(user=self.user, user_profile_points=64)
         url = reverse('cardcollection', kwargs={'user_name': 'professor y'})
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 200) #we want the page to load even if the user has no cards
+
+    def test_challenges_when_none_available:
+        client.force_login(self.user)
+        url = reverse('challenges')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200) #we want the page to load even if the user has no cards
+    
 
 
 
@@ -228,4 +236,6 @@ class ViewsTestCase(TestCase):
         # Refresh profile
         self.user_profile.refresh_from_db()
         # Check the card collection count increased by one
-        self.assertEqual(self.user_profile.user_profile_collected_cards.count(), initial_cards)
+        self.assertEqual(self.user_profile.user_profile_collected_cards.count(), initial_cards+1)
+
+        
