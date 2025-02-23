@@ -8,6 +8,42 @@ import datetime
 
 from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
 
+class EmptyTestCase(TestCase):
+    """
+    This is for testing on an empty database
+    Namely, that the correct responses are returned if a user attempts to access
+    an object that does not exist
+    Written by -Adam-
+    """
+    def setUp(self):
+        self.client = Client()
+    
+    def test_profile_when_empty:
+        url = reverse('profile', kwargs={'user_name': 'professor x'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_cardcol_when_user_nonexistent:
+        url = reverse('cardcollection', kwargs={'user_name': 'professor x'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_challenge_that_does_not_exist:
+        url = reverse('challenge', kwargs={'chal_id': -9001})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_with_no_cards:
+        self.user = User.objects.create_user(username='professor y', password='secret')
+        self.user_profile = UserProfile.objects.create(user=self.user, user_profile_points=64)
+        url = reverse('cardcollection', kwargs={'user_name': 'professor y'})
+        response = self.client.get(url)
+
+
+
+
+        
+
 class ViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -65,6 +101,12 @@ class ViewsTestCase(TestCase):
         self.assertIn("cardshas", response.context)
         self.assertEqual(response.context["cardshas"][0]["title"], "TestCard")
 
+    def test_card_col_404(self):
+        #checks that accessing a nonexistent card collections returns a 404
+        url = reverse('cardcollection', kwargs={'user_name': 'nonexistent_user'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_recent_card_data(self):
         response = self.client.get(reverse('recent_card_data'))
         self.assertEqual(response.status_code, 200)
@@ -90,6 +132,10 @@ class ViewsTestCase(TestCase):
         # Check that the user is created:
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
+        # Checks that another user is NOT made if the same credentials are used
+        reponse2 = self.client.post(reverse('signup'), data=signup_data)
+        self.assertTrue(User.objects.filter(username="newuser").count == 1)
+
     def test_create_card_get_and_post(self):
         # Create staff user for creating cards
         staff_user = User.objects.create_superuser(username="admin", password="adminpass")
@@ -111,6 +157,10 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response_post.status_code, 200)
         # Verify new card was created
         self.assertTrue(Card.objects.filter(card_name="NewCard").exists())
+
+        #Verifies another card is NOT made if the same details are used
+        response_2 = self.client.post(reverse('create_card'), data=post_data, files=files_data)
+        self.assertTrue(Card.objects.filter(card_name="NewCard").count() == 1)
 
     def test_get_locations(self):
         response = self.client.get(reverse('locations_data'))

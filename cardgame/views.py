@@ -234,7 +234,7 @@ def leaderboard_data(request):
     return JsonResponse(data, safe=False)
 
 @login_required
-def signout(request):
+def log_out(request):
     """
     Handles user logout process.
 
@@ -247,7 +247,7 @@ def signout(request):
         Redirect to home page
     """
     logout(request)
-    redirect("home")  # this is currently bugged!
+    return redirect("home")  # this is currently bugged!
     # when this is deployed in production, you HAVE to modify the htaccess file
     # so that the ".html" at the end of the URL is removed.
     # proceed with caution! -AGP-
@@ -294,7 +294,7 @@ def profile(request, user_name):
 
     return HttpResponse("failure!")  # do something more verbose
 
-
+@login_required
 def challenges(request):
 
     """Renders the "all challenges" page
@@ -310,18 +310,21 @@ def challenges(request):
         # filters all challenges that are ongoing
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)
         chals = []
-        for c in challenges:
-            if(c.card not in upc.all()):
-                d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+        available = False
+        if challenges.count != 0:  
+            available:bool = True
+            for c in challenges:
+                if(c.card not in upc.all()):
+                    d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                      'card_name':c.card.card_name, 'points':c.points_reward,
                      'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
-                chals.append(d)
+                    chals.append(d)
 
-        # renders the template
-        return render(request, "cardgame/challenges.html", {'challenges':chals})
+            # renders the template            
+        return render(request, "cardgame/challenges.html", {'challenges':chals, 'open_chals':available})
 
     except ObjectDoesNotExist:
-        raise Http404()
+        raise Http404() #this should, in theory, never happen!
 
 @login_required
 def challenge(request, chal_id):
@@ -386,3 +389,8 @@ def add_card(request, chal_id):
     up.save()
 
     return HttpResponse(request)
+
+def echo_user(request):
+    u = request.user
+    return HttpResponse(str(u))
+
