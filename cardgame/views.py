@@ -389,14 +389,15 @@ def add_card(request, chal_id):
     #gets the user profile
     up = UserProfile.objects.get(user = u)
     #gives the user the card
-    up.user_profile_collected_cards.add(card)
-    #Gives the user the points for the card
-    up.user_profile_points = up.user_profile_points + c.points_reward
-    up.user_most_recent_card = card.card_name
-    up.user_most_recent_card_date = datetime.datetime.now()
+    if not (up.user_profile_collected_cards.filter(card_name=card.card_name).exists()):
 
-    up.save()
-    print("suces!")
+        up.user_profile_collected_cards.add(card)
+        #Gives the user the points for the card
+        up.user_profile_points = up.user_profile_points + c.points_reward
+        up.user_most_recent_card = card.card_name
+        up.user_most_recent_card_date = datetime.datetime.now()
+
+        up.save()
 
     return HttpResponse(request)
 
