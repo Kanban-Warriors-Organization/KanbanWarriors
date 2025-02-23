@@ -44,174 +44,6 @@ body {
     background-color: #0fce14;
 }
 
-/* Container to hold leaderboard and map */
-.main-container {
-    display: flex;
-    height: 100%;
-    flex: 1;
-}
-
-/*Left Portion Controller*/
-.left {
-    display: flex;
-    flex-direction: row;
-    min-width: 900px;
-}
-
-/*Leaderboard Elements*/
-.leaderboard {
-    display: flex;
-    flex-direction: column;
-    padding: 45px 0px 15px 60px;
-}
-
-.leaderboard-header {
-    display: flex;
-    align-items: center;
-    background-color: #096079;
-    width: 300px;
-    box-sizing: border-box;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
-}
-
-.leaderboard h1 {
-    font-family: kanit;
-    color: white;
-    width: 300px;
-}
-
-.leaderboard img {
-    filter: invert(100%) sepia(0%) saturate(7500%) hue-rotate(70deg) brightness(99%) contrast(107%);
-    height: 40px;
-    padding: 20px;
-}
-
-.leaderboard-links {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
-    width: 300px;
-    border-radius: 0 0 20px 20px;
-    background-color: #08546B;
-    box-sizing: border-box;
-}
-
-.leaderboard-links a {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    width: 300px;
-    text-decoration: none;
-    width: auto;
-    color: white;
-    flex: 1;
-}
-
-.leaderboard-links p {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    color: white;
-    padding-right: 30px;
-}
-
-.leaderboard-one {
-    display: flex;
-    align-items: center;
-    background-color: #12c5f8;
-}
-
-.leaderboard-two {
-    display: flex;
-    align-items: center;
-    background-color: #0fa3ce;
-}
-
-.leaderboard-three {
-    display: flex;
-    align-items: center;
-    background-color: #0c82a3;
-}
-
-.leaderboard-four {
-    display: flex;
-    align-items: center;
-    background-color: #096079;
-}
-
-.leaderboard-five {
-    display: flex;
-    align-items: center;
-    background-color: #08546B;
-    border-radius: 0 0 20px 20px;
-}
-
-/*Most Recent Card Elements*/
-.recent-card {
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
-    padding: 20px;
-    background-color: #fff;
-    margin-left: 60px;
-    margin-top: 45px;
-    text-align: center;
-    max-height: 495px;
-    box-sizing: border-box;
-    background: linear-gradient(0deg, #12c5f8 0%, #096079 75%);
-}
-
-.recent-card h1 {
-    font-family: kanit;
-    color: white;
-    margin-top: 0px;
-    margin-bottom: 15px;
-}
-
-.recent-card-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.recent-card-body h2 {
-    font-family: kanit;
-    font-weight: bold;
-    color: white;
-    margin: 10px 0;
-    padding-bottom: 20px;
-}
-
-.recent-card-body img {
-    width: 150px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 3px solid #ddd;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.recent-card-body img:hover {
-    transform: scale(1.2)
-}
-
-.recent-card-body p {
-    font-family: kanit;
-    color: white;
-}
-
-/*Map Elements */
-.map {
-    margin-top: 45px;
-    margin-right: 60px;
-    display: flex;
-    flex: 1;
-    width: 1000px;
-    height: 90%;
-    border: solid 3px #096079;
-    border-radius: 5px;
-}
-
 /*Footer Elements*/
 .footer {
     display: flex;
@@ -237,7 +69,6 @@ body {
     color: white;
 
     display: inline-block;
-
     background: linear-gradient(90deg, rgba(106, 149, 37, 1) 0%, rgba(9, 121, 12, 1) 35%);
 
     font-family: kanit;
@@ -256,6 +87,7 @@ body {
 
     display: inline-block;
 
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
     background: linear-gradient(90deg, rgba(106, 149, 37, 1) 0%, rgba(9, 121, 12, 1) 35%);
 
     font-family: kanit;
@@ -322,4 +154,44 @@ input[type=password] {
     border-radius: 5px;
     padding: 12px 20px;
     margin: 8px 0;
+}
+
+.alert-box {
+    display: flex;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-box-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: relative;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

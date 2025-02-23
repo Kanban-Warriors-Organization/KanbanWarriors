@@ -18,6 +18,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
+from django.contrib import messages
 import datetime
 from django.db.models import F
 from django.core.files.images import ImageFile
@@ -111,12 +112,13 @@ def signup(request):
                 user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
                 new_user_profile = UserProfile.create(user) # i sure hope this works
                 new_user_profile.save()
-
-
-                return redirect("home")
+                messages.success(request, "Account Created!")
+                return redirect(f"/user/{username}/profile")
             except IntegrityError:
                 pass
-        return HttpResponse("you done goofed!")
+        messages.error(request, "Account with that name already exists!")
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
     else:
         form = UserCreationForm()

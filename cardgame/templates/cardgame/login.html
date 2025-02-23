@@ -23,43 +23,42 @@
         rel="stylesheet">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     </head>
-<body>
+    <body>
 
-    <header class="navbar">
-        <a href="home" class="logo">
-            <img src="{% static 'img\logo.png' %}">
-        </a>
-        <nav class="nav-links">
-            <a href="signup">Sign Up</a>
-        </nav>
-    </header>
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="signup">Sign Up</a>
+            </nav>
+        </header>
 
-    <form action="" method="post" class="signup">
-        <h1>
-            Login
-        </h1>
-        {% csrf_token %}
+        <form action="" method="post" class="signup">
+            <h1>
+                Login
+            </h1>
+            {% csrf_token %}
 
-        <div class="innerform">
-            <div class="field">
-                <h3>Username:</h3>
-                {{ form.username }}
+            <div class="innerform">
+                <div class="field">
+                    <h3>Username:</h3>
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    <h3>Password:</h3>
+                    {{ form.password }}
+                </div>
             </div>
-            <div class="field">
-                <h3>Password:</h3>
-                {{ form.password }}
-            </div>
-        </div>
-        
-        <div class="sign">If you don't have an account, consider <a href="signup">signing up</a></div>
-    
-        <input type="submit" value="Submit" class="btn"><br/>
-        
-    </form>
 
-    <footer class="footer">
-        <p>@Copyirght 2025. All rights reserved.</p>
-    </footer>
-    
-</body>
+            <div class="sign">If you don't have an account, consider <a href="signup">signing up</a></div>
+
+            <input type="submit" value="Submit" class="btn"><br/>
+
+        </form>
+
+        <footer class="footer">
+            <p>@Copyirght 2025. All rights reserved.</p>
+        </footer>
+    </body>
 </html>

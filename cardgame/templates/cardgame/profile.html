@@ -1,6 +1,44 @@
+<!DOCTYPE html>
 <!--
     Author: Jake Klar
     Description: User profile page, complete with user statistics, profile picture and card aqquirement history
 -->
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <a href="/home" class="logo">
+            <img src="{% static 'img\logo.png' %}">
+        </a>
+        <nav class="nav-links">
+            <a href="/home">Home</a>
+            <a href="user">Profile</a>
+            <a href="/challenges">Challenges</a>
+            <a href="about">About Us</a>
+            <a href="home">Sign Out</a>
+        </nav>
+    </header>
+    <div class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div id="alert-box" class="alert-box">
+                    <div class="alert-box-content">
+                        <span class="close">&times;</span>
+                        <h2>Success!</h2>
+                        <p>{{message}}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-{% <{{username}}> %}
+    <footer class="footer">
+        <p>@Copyirght 2025. All rights reserved.</p>
+    </footer>
+    <script src="{% static 'js/close.js' %}"></script>
+</body>

@@ -14,8 +14,6 @@ document.addEventListener("DOMContentLoaded", function() {
             cardDesc.textContent = data.description;
             cardImg.src = data.image;
         })
-        //Updates every 100 seconds
-        setInterval(fetchRecentCard, 100000);
     }
-
+    setInterval(fetchRecentCard, 100000);
 });

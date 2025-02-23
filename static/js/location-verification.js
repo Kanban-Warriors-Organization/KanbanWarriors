@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Compare distances
             let distance = getDistance(userLat, userLng, challengeLat, challengeLng);
 
-            if(distance > 1) {
+            if(distance < 0.1) {
                 console.log(distance);
                 modalTitle.textContent = "You're too far away!!";
                 modal.style.display = 'flex';

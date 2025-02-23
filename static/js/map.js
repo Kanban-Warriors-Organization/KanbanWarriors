@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateCardMarkers();
     updateUserMarker();
-    setInterval(updateCardMarkers, 10000);
-    setInterval(updateUserMarker, 10000);
+    setInterval(updateCardMarkers, 100000);
+    setInterval(updateUserMarker, 100000);
 });
 

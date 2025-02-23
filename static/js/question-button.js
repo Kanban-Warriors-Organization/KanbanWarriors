@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                const cardTitle = document.getElementById('challenge-location').getAttribute('data-name');
                fetch(`http://127.0.0.1:8000/add-card/${id}`);
                modalTitle.textContent = "You've Earned a New Card!";
-               modalDescription.textContent = cardTitle;
+            modalDescription.textContent = cardTitle;
                modal.style.display = 'flex';
             } else {
                 modalTitle.textContent = "Ah! Better Luck Next Time!";
