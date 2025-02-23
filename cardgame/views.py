@@ -276,10 +276,10 @@ def profile(request, user_name):
             recent_card_image = None
             recent_card_date = None
         else:
-            rec_card = Card.objects.get(id = card_id)
+            rec_card = Card.objects.get(card_name = card_id)
             recent_card_name = rec_card.card_name
             recent_card_image = rec_card.card_image_link
-            recent_card_date = u.most_recent_card_date
+            recent_card_date = u.user_most_recent_card_date
 
         ctx = {'username':user_name, 'card_num': card_num, 'user_card_num': user_card_num,
                'recent_card_date': recent_card_date, 'user_reg_date': u.user_signup_date,
