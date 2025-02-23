@@ -269,9 +269,9 @@ def profile(request, user_name):
         u = UserProfile.objects.get(user__username=user_name)
         #get number of cards in total
         card_num = Card.objects.all().count()
-        user_card_num = u.user_profile_collected_cards.all()
+        user_card_num = u.user_profile_collected_cards.all().count()
         card_id = u.user_most_recent_card
-        if card_id == -1:
+        if card_id == "nocards":
             recent_card_name = None
             recent_card_image = None
             recent_card_date = None
@@ -382,17 +382,21 @@ def add_card(request, chal_id):
         a HTTP response object
     """
     #gets the card from the challenge
-    c = Challenge.objects.get(id = chal_id).card
+    c = Challenge.objects.get(id = chal_id)
+    card = c.card
     #gets the user
     u = request.user
     #gets the user profile
     up = UserProfile.objects.get(user = u)
     #gives the user the card
-    up.user_profile_collected_cards.add(c)
+    up.user_profile_collected_cards.add(card)
     #Gives the user the points for the card
-    up.update(user_profile_points=F('user_profile_points') + 10)
-    up.give_card(c)
+    up.user_profile_points = up.user_profile_points + c.points_reward
+    up.user_most_recent_card = card.card_name
+    up.user_most_recent_card_date = datetime.datetime.now()
+
     up.save()
+    print("suces!")
 
     return HttpResponse(request)
 
