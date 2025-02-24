@@ -262,6 +262,7 @@ def leaderboard_data(request):
             ]
     return JsonResponse(data, safe=False)  # Returns JSON response to template
 
+
 @login_required
 def log_out(request):
     """
@@ -278,6 +279,7 @@ def log_out(request):
     """
     logout(request)
     return redirect("home")
+
 
 def profile(request, user_name):
     """
@@ -307,12 +309,13 @@ def profile(request, user_name):
 
         # if there is cards, gets the relevant data
         else:
-            rec_card = Card.objects.get(card_name = card_id)
+            rec_card = Card.objects.get(card_name=card_id)
             recent_card_name = rec_card.card_name
             recent_card_image = rec_card.card_image_link
             recent_card_date = u.user_most_recent_card_date
 
-        ctx = {'username':user_name, 'card_num': card_num,
+        ctx = {'username': user_name,
+               'card_num': card_num,
                'user_card_num': user_card_num,
                'recent_card_date': recent_card_date,
                'user_reg_date': u.user_signup_date,
@@ -350,9 +353,10 @@ def challenges(request):
         if challenges.count != 0:
             available:bool = True
             for c in challenges:
-                # verifies that the user doesn't already have the associated card
-                if(c.card not in upc.all()):
-                    d = { 
+                # verifies that the user doesn't already
+                # have the associated card
+                if (c.card not in upc.all()):
+                    d = {
                         'longitude': c.longitude,
                         'latitude': c.latitude,
                         'start': c.start_time,
@@ -397,7 +401,7 @@ def challenge(request, chal_id):
                 return HttpResponse("sorry, you already have this card!")
 
             # gets challenge information
-            info =  { 
+            info = {
                 'longitude': chal.longitude,
                 'latitude': chal.latitude,
                 'start': chal.start_time,
