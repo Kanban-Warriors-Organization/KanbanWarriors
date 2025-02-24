@@ -53,8 +53,8 @@ class Card(models.Model):
     Author: Timothy Simmons
     """
 
-    card_name = models.CharField(max_length=50, primary_key=True)
-    card_subtitle = models.CharField(max_length=50)
+    card_name = models.CharField(max_length=100, primary_key=True)
+    card_subtitle = models.CharField(max_length=100)
     card_description = models.CharField(max_length=400)
     card_created_at = models.DateTimeField(auto_now_add=True)
     card_image_link = models.ImageField(
@@ -86,10 +86,17 @@ class UserProfile(models.Model):
                                 primary_key=True)
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card,blank=True)
+    user_most_recent_card = models.CharField(default="nocards", max_length=100) #potential problem if card is deleted
+    user_most_recent_card_date = models.DateField(null=True, blank=True)
+    user_signup_date = models.DateField()
 
     @classmethod
     def create(cls,User):
-        up = cls(user=User)
+        try:
+            ctime = datetime.datetime.now()
+            up = cls(user=User, user_signup_date = ctime)
+        except Exception as e:
+            print(e)
         return up
 
 class Question(models.Model):
