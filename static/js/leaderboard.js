@@ -18,8 +18,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         })
         .catch(error => console.error("Error loading leaderboard:", error));
-
-        //Updates every 100 seconds
-        setInterval(fetchLeaderboard, 100000);
     }
+    setInterval(fetchLeaderboard, 100000);
 });

@@ -3,8 +3,62 @@
     Description: User login form.
 -->
 
-<form action="" method="post">
+<!-- <form action="" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">
-</form>
+</form> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Contains a dynamic map, leaderboards and navigational menus">
+        <title>Log In</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/login.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    </head>
+    <body>
+
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="signup">Sign Up</a>
+            </nav>
+        </header>
+
+        <form action="" method="post" class="signup">
+            <h1>
+                Login
+            </h1>
+            {% csrf_token %}
+
+            <div class="innerform">
+                <div class="field">
+                    <h3>Username:</h3>
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    <h3>Password:</h3>
+                    {{ form.password }}
+                </div>
+            </div>
+
+            <div class="sign">If you don't have an account, consider <a href="signup">signing up</a></div>
+
+            <input type="submit" value="Submit" class="btn"><br/>
+
+        </form>
+
+        <footer class="footer">
+            <p>@Copyirght 2025. All rights reserved.</p>
+        </footer>
+    </body>
+</html>

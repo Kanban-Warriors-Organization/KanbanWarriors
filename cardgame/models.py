@@ -67,7 +67,6 @@ class Card(models.Model):
     def __str__(self):
         return str(self.card_name)
 
-
 class UserProfile(models.Model):
     """
     Extends the built-in User model with additional functionality.
@@ -86,12 +85,18 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 primary_key=True)
     user_profile_points = models.IntegerField(default=0)
-    user_profile_collected_cards = models.ManyToManyField(Card)
+    user_profile_collected_cards = models.ManyToManyField(Card,blank=True)
 
+    @classmethod
+    def create(cls,User):
+        up = cls(user=User)
+        return up
 
 class Question(models.Model):
     """
     Faciliates the multiple-choice questions associated with a challenge
+
+    Author: Taha-Cem Bakirhan
     """
 
     # Links to challenge
@@ -128,11 +133,12 @@ class Question(models.Model):
         """
         return f"{self.text} for challenge: {self.challenge.challenge_name}"
 
-
 class Challenge(models.Model):
     """
     This represents the challenge events that occur on campus that
     users can attend to earn cards and points
+
+    Author: Taha-Cem Bakirhan
     """
 
     # Event details
