@@ -4,7 +4,7 @@ Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
 import sys
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
@@ -18,6 +18,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.utils import timezone
+from django.contrib import messages
 import datetime
 from django.db.models import F
 from django.core.files.images import ImageFile
@@ -32,7 +33,6 @@ def index(request):
     return render(request, "cardgame/home.html")
 
 def home(request):
-    """Renders the homepage."""
     return render(request, "cardgame/home.html")
 
 
@@ -74,7 +74,7 @@ def card_col(request, user_name):
 
     except ObjectDoesNotExist:
         # if user does not exist
-        raise Http404()
+        pass
     return HttpResponse("fail")  # change this later!
 
 
@@ -96,7 +96,7 @@ def signup(request):
     """
     Processes new user registration.
 
-    Author: Adam
+    Author: BLANK
 
     Args:
         request: HTTP request object containing form data
@@ -104,26 +104,22 @@ def signup(request):
     Returns:
         HttpResponse: Success/failure message or signup form
     """
-
     if request.method == "POST":
         form = UserCreationForm(request.POST)
-        #Validates the contents of the form.
-        #Since we're using a DJANGO inbuilt form, this is handled automatically.
-        if form.is_valid():
+        if form.is_valid():  # validation later
             try:
                 username = form.cleaned_data["username"]
-                #Creates user and user profile objects
                 user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
-                new_user_profile = UserProfile.create(user)
+                new_user_profile = UserProfile.create(user) # i sure hope this works
                 new_user_profile.save()
- 
-                #Redirects to homepage
-                return redirect("home")
-            except IntegrityError as e:
+                messages.success(request, "Account Created!")
+                return redirect(f"/user/{username}/profile")
+            except IntegrityError:
                 pass
-        return HttpResponse("Registration failed!") #TODO: make this more verbose.
+        messages.error(request, "Account with that name already exists!")
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
-    #GET request: gets and renders the form.
     else:
         form = UserCreationForm()
         return HttpResponse(render(request, "cardgame/signup.html",
@@ -135,7 +131,7 @@ def create_card(request):
     """
     Creates new cards with provided details and images.
 
-    Author: Sam, Adam (for the parts pertaining to image generation)
+    Author: BLANK
 
     Args:
         request: HTTP request with card data or GET for form
@@ -150,7 +146,7 @@ def create_card(request):
         # Get info from request
         card_name = request.POST.get("card_name")
         card_subtitle = request.POST.get("card_subtitle")
-        card_description = request.POST.get("card_description")0
+        card_description = request.POST.get("card_description")
         card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
 
@@ -170,17 +166,16 @@ def create_card(request):
 
         try:
 
-            #Generates card image with given script.
+            #this is disgusting but it works
             c = make_image("static/card_gen/back.png", card_name, card_subtitle, "static/card_gen/normal.ttf",
                        "static/card_gen/bold.ttf", card_description, card_image)
 
             c_io = BytesIO()
             c.save(c_io, format="PNG")
-            #We have to convert from a PIL image to a DJANGO image
             django_file = InMemoryUploadedFile(c_io, None, str(card_name).replace(" ","_")+".png", 'image/png',
-                                  sys.getsizeof(c_io), None)        
-
-            #Creates the card object and saves to database
+                                  sys.getsizeof(c_io), None) #we have to convert from a PIL image to a django image
+            #absolutely miserable
+            #now we create the user object!
             card = Card.objects.create(
                     card_name=card_name,
                     card_subtitle=card_subtitle,
@@ -204,7 +199,7 @@ def get_locations(request):
     """
     Retrieves challenge location data for map display.
 
-    Author: Jake Klar
+    Author: BLANK
 
     Args:
         request: HTTP request object
@@ -231,35 +226,21 @@ def get_locations(request):
 
 
 def leaderboard_data(request):
-    """
-    Returns the data required for the leaderboard,
-    namely the 5 users with the highest score
-    and their respective scores.
-
-    Author: Jake Klar
-
-    Args:
-        request: HTTP request object
-
-    Returns: 
-        The required leaderboard data
-    """
-
     top_players = UserProfile.objects.order_by(
-            '-user_profile_points')[:5]  # Retrieves Top 5 Players
+            '-user_profile_points')[:5]  # Retrives Top 5 Players
     data = [
             {"username": player.user.username,
              "points": player.user_profile_points}
             for player in top_players
             ]
-    return JsonResponse(data, safe=False) #Returns JSON response to template
+    return JsonResponse(data, safe=False)
 
 @login_required
-def log_out(request):
+def signout(request):
     """
-    Handles user logout process by logging out the user and redirecting to the homepage.
+    Handles user logout process.
 
-    Author: Adam
+    Author: BLANK
 
     Args:
         request: HTTP request object
@@ -268,13 +249,16 @@ def log_out(request):
         Redirect to home page
     """
     logout(request)
-    return redirect("home")
+    redirect("home")  # this is currently bugged!
+    # when this is deployed in production, you HAVE to modify the htaccess file
+    # so that the ".html" at the end of the URL is removed.
+    # proceed with caution! -AGP-
 
 def profile(request, user_name):
     """
     Displays user profile information.
 
-    Author: Adam
+    Author: BLANK
 
     Args:
         request: HTTP request object
@@ -285,36 +269,15 @@ def profile(request, user_name):
     """
     try:
         u = UserProfile.objects.get(user__username=user_name)
-        #get number of cards in total
-        card_num = Card.objects.all().count()
-        user_card_num = u.user_profile_collected_cards.all().count()
-        card_id = u.user_most_recent_card
-        
-        #failsafe for if the user has no cards
-        if card_id == "nocards":
-            recent_card_name = None
-            recent_card_image = None
-            recent_card_date = None
-        
-        #if there is cards, gets the relevant data
-        else:
-            rec_card = Card.objects.get(card_name = card_id)
-            recent_card_name = rec_card.card_name
-            recent_card_image = rec_card.card_image_link
-            recent_card_date = u.user_most_recent_card_date
-
-        ctx = {'username':user_name, 'card_num': card_num, 'user_card_num': user_card_num,
-               'recent_card_date': recent_card_date, 'user_reg_date': u.user_signup_date,
-               'recent_card_name': recent_card_name, 'recent_card_image': recent_card_image,
-               'points': u.user_profile_points}
-
-        #renders profile template with context
+        ctx = {"username": user_name, 'points': u.user_profile_points}
         return render(request, "cardgame/profile.html", ctx)
 
     except ObjectDoesNotExist:
-        raise Http404()
+        pass
 
-@login_required
+    return HttpResponse("failure!")  # do something more verbose
+
+
 def challenges(request):
 
     """Renders the "all challenges" page
@@ -330,34 +293,29 @@ def challenges(request):
         # filters all challenges that are ongoing
         challenges = Challenge.objects.filter(start_time__lte=ctime, end_time__gte=ctime)
         chals = []
-        available = False
-        #checks if there are challenges available, needed to prevent fails
-        if challenges.count != 0:  
-            available:bool = True
-            for c in challenges:
-                #verifies that the user doesn't already have the associated card
-                if(c.card not in upc.all()):
-                    d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+        for c in challenges:
+            if(c.card not in upc.all()):
+                d = { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
                      'card_name':c.card.card_name, 'points':c.points_reward,
                      'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id} #dict with all relevant properties
-                    chals.append(d)
+                chals.append(d)
 
-        # renders the template            
-        return render(request, "cardgame/challenges.html", {'challenges':chals, 'open_chals':available})
+        # renders the template
+        return render(request, "cardgame/challenges.html", {'challenges':chals})
 
     except ObjectDoesNotExist:
-        raise Http404()
+        return HttpResponse("something went really wrong here!")
 
 @login_required
 def challenge(request, chal_id):
     """
     Manages challenge interactions and responses.
 
-    Author: Adam
+    Author: BLANK
 
     Args:
         request: HTTP request object
-        chal_id: ID of the challenge to process
+        challenge_id: ID of the challenge to process
 
     Returns:
         HttpResponse: Challenge data or failure message
@@ -365,19 +323,11 @@ def challenge(request, chal_id):
     # we need to get the challenge, the questions, and the answers.
     if request.method == 'GET': #for rendering the page initially
         try:
-            #checks that the user doesn't already have the card
-            user = request.user
-            up = UserProfile.objects.get(user = user)
-            chal = Challenge.objects.get(id=chal_id)
-            if (chal.card in up.user_profile_collected_cards.all()):
-                return HttpResponse("sorry, you already have this card!")
+            c= Challenge.objects.get(id=chal_id)
+            info =  { 'longitude':c.longitude, 'latitude':c.latitude, 'start':c.start_time, 'end':c.end_time,
+                     'card_name':c.card.card_name, 'points':c.points_reward,
+                     'desc':c.description, 'image_link':c.card.card_image_link, 'id':c.id}
 
-            #gets challenge information
-            info =  { 'longitude':chal.longitude, 'latitude':chal.latitude, 'start':chal.start_time, 'end':chal.end_time,
-                     'card_name':chal.card.card_name, 'points':chal.points_reward,
-                     'desc':chal.description, 'image_link':chal.card.card_image_link, 'id':chal.id}
-    
-            #gets challenge questions
             questions = []
             quest_set = Question.objects.filter(challenge__id = chal_id)
             for question in quest_set:
@@ -385,47 +335,24 @@ def challenge(request, chal_id):
                              'ans3': question.option_c, 'ans4': question.option_d, 'right_ans': question.correct_answer}
                 questions.append(q_details)
 
-            #renders challenge template with context
             return render(request, 'cardgame/verification.html', {'info':info, 'questions':questions})
-        #raises a 404 if the user tries to access a challenge that does not exist
+
         except ObjectDoesNotExist:
-            raise Http404()
-        return HttpResponse("failure!")
+            return HttpResponse("really bad error")
+
+    return HttpResponse("failure!")
 
 
 def add_card(request, chal_id):
-    """
-    Adds a card to a user's profile upon completion of a challenge
-    Written by Adam
-
-    Args:
-        request: a HTTP request object
-        chal_id: the identifier of the challenge that has been completed
-
-    Returns: 
-        a HTTP response object
-    """
-    #Gets the card from the challenge.
-    c = Challenge.objects.get(id = chal_id)
-    card = c.card
+    #gets the card from the challenge
+    c = Challenge.objects.get(id = chal_id).card
     #gets the user
     u = request.user
     #gets the user profile
     up = UserProfile.objects.get(user = u)
     #gives the user the card
-    if not (up.user_profile_collected_cards.filter(card_name=card.card_name).exists()):
-
-        up.user_profile_collected_cards.add(card)
-        #Gives the user the points for the card
-        up.user_profile_points = up.user_profile_points + c.points_reward
-        up.user_most_recent_card = card.card_name
-        up.user_most_recent_card_date = datetime.datetime.now()
-
-        up.save()
+    up.user_profile_collected_cards.add(c)
+    #Gives the user the points for the card
+    up.update(user_profile_points=F('user_profile_points') + 10)
 
     return HttpResponse(request)
-
-def echo_user(request):
-    u = request.user
-    return HttpResponse(str(u))
-
