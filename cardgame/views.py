@@ -20,6 +20,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.contrib import messages
 import datetime
+from django.urls import reverse
 from django.db.models import F
 from django.core.files.images import ImageFile
 from image_gen import make_image
@@ -30,11 +31,17 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 def index(request):
-    return render(request, "cardgame/home.html")
+        form = UserCreationForm()
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
 def home(request):
     """Renders the homepage."""
     return render(request, "cardgame/home.html")
+
+def collection_redirect(request):
+    return redirect(reverse('cardcollection', kwargs={'user_name': request.user.username}))
+
 
 
 def card_col(request, user_name):
@@ -117,6 +124,7 @@ def signup(request):
                 user = User.objects.create_user(username, None, form.cleaned_data["password1"]) #creates user
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
+                login(request, user)
                 messages.success(request, "Account Created!")
                 return redirect(f"/user/{username}/profile")
             except IntegrityError:
@@ -270,7 +278,11 @@ def log_out(request):
         Redirect to home page
     """
     logout(request)
-    return redirect("home")
+    return redirect("login")
+
+def profile_redirect(request):
+    #Redirects to a user's profile
+    return redirect(reverse('profile', kwargs={'user_name': request.user.username}))
 
 def profile(request, user_name):
     """
