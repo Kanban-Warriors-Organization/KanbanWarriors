@@ -68,6 +68,57 @@ html, body {
     border-radius: 15px;
 }
 
+/*Most Recent Card Elements*/
+.recent-card {
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
+    padding: 20px;
+    background-color: #fff;
+    margin-left: 60px;
+    margin-top: 45px;
+    text-align: center;
+    max-height: 495px;
+    box-sizing: border-box;
+    background: linear-gradient(0deg, #12c5f8 0%, #096079 75%);
+}
+
+.recent-card h1 {
+    font-family: kanit;
+    color: white;
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
+.recent-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recent-card-body h2 {
+    font-family: kanit;
+    font-weight: bold;
+    color: white;
+    margin: 10px 0;
+    padding-bottom: 20px;
+}
+
+.recent-card-body p {
+    font-family: kanit;
+    color: white;
+    font-size: 16px;
+}
+
+.recent-card-body img {
+    width: 150px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 3px solid #ddd;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 .nav-links a {
     display: flex;
     color: white;
