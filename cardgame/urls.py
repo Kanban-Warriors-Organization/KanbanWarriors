@@ -28,7 +28,8 @@ urlpatterns = [
     path("user/<str:user_name>/profile", views.profile, name="profile"),
     path("challenge/<int:chal_id>", views.challenge, name="challenge"),
     path("add-card/<int:chal_id>", views.add_card, name="add-card"),
-    path("challenges/", views.challenges, name="challenges"), #DO NOT REMOVE THE SLASH!
+    # DO NOT REMOVE THE SLASH!
+    path("challenges/", views.challenges, name="challenges"),
     path("echo_user", views.echo_user, name="echo_user")
     # uses django's inbuilt login view
 ]

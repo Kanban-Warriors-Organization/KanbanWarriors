@@ -6,11 +6,10 @@ user profiles, challenges, and quiz components.
 Author: BLANK
 """
 
+import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
-from django.utils import timezone
-import datetime
 
 # Create your models here.
 
@@ -67,6 +66,7 @@ class Card(models.Model):
     def __str__(self):
         return str(self.card_name)
 
+
 class UserProfile(models.Model):
     """
     Extends the built-in User model with additional functionality.
@@ -85,19 +85,24 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 primary_key=True)
     user_profile_points = models.IntegerField(default=0)
-    user_profile_collected_cards = models.ManyToManyField(Card,blank=True)
-    user_most_recent_card = models.CharField(default="nocards", max_length=100) #potential problem if card is deleted
+    user_profile_collected_cards = models.ManyToManyField(Card, blank=True)
+    # potential problem if card is deleted
+    user_most_recent_card = models.CharField(default="nocards", max_length=100)
     user_most_recent_card_date = models.DateField(null=True, blank=True)
     user_signup_date = models.DateField()
 
     @classmethod
-    def create(cls,User):
+    def create(cls, created_user):
+        """
+        Creation method for a new User
+        """
         try:
             ctime = datetime.datetime.now()
-            up = cls(user=User, user_signup_date = ctime)
+            up = cls(user=created_user, user_signup_date=ctime)
         except Exception as e:
             print(e)
         return up
+
 
 class Question(models.Model):
     """
@@ -139,6 +144,7 @@ class Question(models.Model):
         Debugging purposes
         """
         return f"{self.text} for challenge: {self.challenge.challenge_name}"
+
 
 class Challenge(models.Model):
     """
