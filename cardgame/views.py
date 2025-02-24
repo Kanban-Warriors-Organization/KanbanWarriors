@@ -356,7 +356,7 @@ def challenges(request):
         available = False
         # checks if there are challenges available, needed to prevent fails
         if challenges.count != 0:
-            available:bool = True
+            available: bool = True
             for c in challenges:
                 # verifies that the user doesn't already
                 # have the associated card
