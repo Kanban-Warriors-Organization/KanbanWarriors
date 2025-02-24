@@ -4,37 +4,42 @@ Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
 import sys
+import datetime
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
 # from django.template import loader
 from django.contrib.auth import logout  # authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Card, CardSet, UserProfile, Challenge, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
+from django.contrib import messages
+from image_gen import make_image
+from .models import Card, CardSet, UserProfile, Challenge, Question
 # from django.templatetags.static import static
 # from django.utils import timezone
-from django.contrib import messages
-import datetime
 # from django.db.models import F
 # from django.core.files.images import ImageFile
-from image_gen import make_image
 # from PIL import Image
-from io import BytesIO
-from django.core.files.uploadedfile import InMemoryUploadedFile
 # Create your views here.
 
 
 def index(request):
+    """
+    Default index landing page
+    """
     return render(request, "cardgame/home.html")
 
 
 def home(request):
-    """Renders the homepage."""
+    """
+    Renders the homepage.
+    """
     return render(request, "cardgame/home.html")
 
 
