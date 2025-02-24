@@ -150,7 +150,7 @@ def create_card(request):
         # Get info from request
         card_name = request.POST.get("card_name")
         card_subtitle = request.POST.get("card_subtitle")
-        card_description = request.POST.get("card_description")
+        card_description = request.POST.get("card_description")0
         card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
 
