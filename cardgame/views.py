@@ -405,7 +405,7 @@ def add_card(request, chal_id):
     Returns: 
         a HTTP response object
     """
-    #gets the card from the challenge
+    #Gets the card from the challenge.
     c = Challenge.objects.get(id = chal_id)
     card = c.card
     #gets the user
