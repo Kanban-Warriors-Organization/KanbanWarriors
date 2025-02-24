@@ -8,6 +8,7 @@ import datetime
 
 from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
 
+
 class EmptyTestCase(TestCase):
     """
     This is for testing on an empty database
@@ -19,47 +20,47 @@ class EmptyTestCase(TestCase):
         self.client = Client()
         self.user = User.objects.create_user(username='professor y', password='secret')
         self.user_profile = UserProfile.objects.create(user=self.user, user_profile_points=64)
-    
-    def test_profile_when_user_nonexistent:
+
+    def test_profile_when_user_nonexistent(self):
         url = reverse('profile', kwargs={'user_name': 'professor x'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_cardcol_when_user_nonexistent:
+    def test_cardcol_when_user_nonexistent(self):
         url = reverse('cardcollection', kwargs={'user_name': 'professor x'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_challenge_that_does_not_exist:
+    def test_challenge_that_does_not_exist(self):
         url = reverse('challenge', kwargs={'chal_id': -9001})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_user_with_no_cards:
+    def test_user_with_no_cards(self):
         url = reverse('cardcollection', kwargs={'user_name': 'professor y'})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200) #we want the page to load even if the user has no cards
+        # we want the page to load even if the user has no cards
+        self.assertEqual(response.status_code, 200)
 
-    def test_challenges_when_none_available:
-        client.force_login(self.user)
+    def test_challenges_when_none_available(self):
+        self.client.force_login(self.user)
         url = reverse('challenges')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200) #we want the page to load even if the user has no cards
-    
+        # we want the page to load even if the user has no cards
+        self.assertEqual(response.status_code, 200)
 
-
-
-
-        
 
 class ViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         # Create a user and its profile
-        self.user = User.objects.create_user(username='testuser', password='secret')
-        self.user_profile = UserProfile.objects.create(user=self.user, user_profile_points=50)
+        self.user = User.objects.create_user(username='testuser',
+                                             password='secret')
+        self.user_profile = UserProfile.objects.create(user=self.user,
+                                                       user_profile_points=50)
         # Create a card and card set for testing card_col view
-        self.card_set = CardSet.objects.create(card_set_name="Set1", card_set_description="Test set")
+        self.card_set = CardSet.objects.create(card_set_name="Set1",
+                                               card_set_description="Test set")
         self.card = Card.objects.create(
             card_name="TestCard",
             card_subtitle="Subtitle",
@@ -102,7 +103,8 @@ class ViewsTestCase(TestCase):
 
     def test_card_col(self):
         # Test card collection view for existing user
-        url = reverse('cardcollection', kwargs={'user_name': self.user.username})
+        url = reverse('cardcollection',
+                      kwargs={'user_name': self.user.username})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # The context should contain acquired cards
@@ -110,8 +112,9 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.context["cardshas"][0]["title"], "TestCard")
 
     def test_card_col_404(self):
-        #checks that accessing a nonexistent card collections returns a 404
-        url = reverse('cardcollection', kwargs={'user_name': 'nonexistent_user'})
+        # checks that accessing a nonexistent card collections returns a 404
+        url = reverse('cardcollection',
+                      kwargs={'user_name': 'nonexistent_user'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -146,14 +149,16 @@ class ViewsTestCase(TestCase):
 
     def test_create_card_get_and_post(self):
         # Create staff user for creating cards
-        staff_user = User.objects.create_superuser(username="admin", password="adminpass")
+        staff_user = User.objects.create_superuser(username="admin",
+                                                   password="adminpass")
         self.client.login(username="admin", password="adminpass")
         # Test GET request
         response_get = self.client.get(reverse('create_card'))
         self.assertEqual(response_get.status_code, 200)
         self.assertTemplateUsed(response_get, "cardgame/create_card.html")
         # Test POST request with a dummy image file
-        image_data = SimpleUploadedFile("test.png", b"dummydata", content_type="image/png")
+        image_data = SimpleUploadedFile("test.png", b"dummydata",
+                                        content_type="image/png")
         post_data = {
             "card_name": "NewCard",
             "card_subtitle": "NewSubtitle",
@@ -161,13 +166,15 @@ class ViewsTestCase(TestCase):
             "card_set": "Set1"
         }
         files_data = {"card_image": image_data}
-        response_post = self.client.post(reverse('create_card'), data=post_data, files=files_data)
+        response_post = self.client.post(reverse('create_card'),
+                                         data=post_data, files=files_data)
         self.assertEqual(response_post.status_code, 200)
         # Verify new card was created
         self.assertTrue(Card.objects.filter(card_name="NewCard").exists())
 
-        #Verifies another card is NOT made if the same details are used
-        response_2 = self.client.post(reverse('create_card'), data=post_data, files=files_data)
+        # Verifies another card is NOT made if the same details are used
+        response_2 = self.client.post(reverse('create_card'), data=post_data,
+                                      files=files_data)
         self.assertTrue(Card.objects.filter(card_name="NewCard").count() == 1)
 
     def test_get_locations(self):
@@ -176,7 +183,8 @@ class ViewsTestCase(TestCase):
         json_data = response.json()
         self.assertIn("locations", json_data)
         # The challenge's card name should appear in the locations
-        self.assertEqual(json_data["locations"][0]["name"], self.card.card_name)
+        self.assertEqual(json_data["locations"][0]["name"],
+                         self.card.card_name)
 
     def test_leaderboard_data(self):
         # Create additional users with points
@@ -193,14 +201,16 @@ class ViewsTestCase(TestCase):
         # Log in and then sign out
         self.client.login(username=self.user.username, password='secret')
         response = self.client.get(reverse('logout'))
-        # After signout, it should redirect to home or return a status code (our view returns HttpResponse)
+        # After signout, it should redirect to home or return
+        # a status code (our view returns HttpResponse)
         self.assertIn(response.status_code, [200, 302])
 
     def test_profile(self):
         url = reverse('profile', kwargs={'user_name': self.user.username})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        # Since profile.html is not implemented, response may be a simple HttpResponse text.
+        # Since profile.html is not implemented,
+        # response may be a simple HttpResponse text.
         self.assertIn(self.user.username, response.content.decode())
 
     def test_challenges(self):
@@ -228,7 +238,8 @@ class ViewsTestCase(TestCase):
     def test_add_card(self):
         # Log in as normal user
         self.client.login(username=self.user.username, password='secret')
-        # Ensure the card is not already in the user's collection (apart from setUp)
+        # Ensure the card is not already in the user's
+        # collection (apart from setUp)
         initial_cards = self.user_profile.user_profile_collected_cards.count()
         url = reverse('add-card', kwargs={'chal_id': self.challenge.id})
         response = self.client.get(url)
@@ -236,6 +247,8 @@ class ViewsTestCase(TestCase):
         # Refresh profile
         self.user_profile.refresh_from_db()
         # Check the card collection count increased by one
-        self.assertEqual(self.user_profile.user_profile_collected_cards.count(), initial_cards+1)
+        self.assertEqual(
+            self.user_profile.user_profile_collected_cards.count(),
+            initial_cards+1)
 
         

@@ -1,6 +1,6 @@
 """
 Test suite for model validation and data integrity.
-Verifies the correct functionality of data models including creation, 
+Verifies the correct functionality of data models including creation,
 attribute storage, and relationship management.
 """
 
@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 from cardgame.models import Card, CardSet, UserProfile, Question, Challenge
+
 
 class CardModelTests(TestCase):
     """
@@ -23,7 +24,7 @@ class CardModelTests(TestCase):
     def test_card_created_with_correct_details(self):
         """
         Validates that a card stores and returns its creation
-        attributes correctly. 
+        attributes correctly.
         Tests card name, subtitle, description, and card set relationship.
         """
         # Create the test CardSet
@@ -141,7 +142,8 @@ class CardModelTests(TestCase):
             test_user_profile_collected_cards.card_name,
             "user_profile_collected_cards was not set or returned correctly\n\
             expected: " + str(test_user_profile_collected_cards) + "\n\
-            actual:   " + str(test_user_profile.user_profile_collected_cards.all()[0]))
+            actual:   " +
+            str(test_user_profile.user_profile_collected_cards.all()[0]))
 
         # Test that the user is the expected value
         self.assertIs(
@@ -154,7 +156,7 @@ class CardModelTests(TestCase):
         """
         Ensure the Question model set with correct
         details and links to Challenge
-        
+
         Also checks that the clean method works correctly
         """
 
@@ -283,7 +285,6 @@ class CardModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             Question.objects.all()[0].clean()
-        
 
     def test_challenge_set_with_correct_details_and_clean_works(self):
         """
@@ -387,7 +388,7 @@ class CardModelTests(TestCase):
             "card was not set or returned correctly\n\
             expected: " + str(test_card.card_name) + "\n\
             actual:   " + str(Challenge.objects.all()[0].card.card_name))
-        
+
         self.assertEqual(
             Challenge.objects.all()[0].points_reward,
             test_challenge_points_reward,
