@@ -1,5 +1,5 @@
 <!--
-    Author: BLANK
+    Author: Yigit Keles
     Description: User signup form.
 -->
 
@@ -26,75 +26,71 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
-    <body>
-        <header class="navbar">
-            <a href="home" class="logo">
-                <img src="{% static 'img\logo.png' %}">
-            </a>
-            <nav class="nav-links">
-                <a href="login">Login</a>
-            </nav>
-        </header>
-        {% if messages %}
-            {% for message in messages %}
-                <div id="alert-box" class="alert-box">
-                    <div class="alert-box-content">
-                        <span class="close">&times;</span>
-                        <h2>Something went wrong!</h2>
-                        <p>{{message}}</p>
-                    </div>
-                </div>
-            {% endfor %}
+<body>
+
+    <header class="navbar">
+        <a href="home" class="logo">
+            <img src="{% static 'img\logo.png' %}">
+        </a>
+        <nav class="nav-links">
+            <a href="login">Login</a>
+        </nav>
+    </header>
+
+    <form action="" method="post" class="signup">
+        <h1>
+            Sign Up
+        </h1>
+        {% csrf_token %}
+
+        <div class="innerform">
+
+
+        <div class="field">
+            <h3>Username:</h3>
+            {{ form.username }}
+        </div>
+
+        <!-- If you have an email field -->
+        {% if form.email %}
+        <div class="field">
+            <h3>Email:</h3>
+            {{ form.email }}
+        </div>
         {% endif %}
-        <form action="" method="post" class="signup">
-            <h1>
-                Sign Up
-            </h1>
-            {% csrf_token %}
 
-            <div class="innerform">
+        <div class="field">
+            <h3>Password:</h3>
+            {{ form.password1 }}
+        </div>
+
+        <ul class="password-info">
+        <li>Your password can’t be too similar to your other personal information.</li>
+        <li>Your password must contain at least 8 characters.</li>
+        <li>Your password can’t be a commonly used password.</li>
+        <li>Your password can’t be entirely numeric.</li>
+        </ul>
+
+        <div class="field">
+            <h3>Confirm Password:</h3>
+            {{ form.password2 }}
+        </div>
 
 
-            <div class="field">
-                <h3>Username:</h3>
-                {{ form.username }}
-            </div>
+        </div>
 
-            <!-- If you have an email field -->
-            {% if form.email %}
-            <div class="field">
-                <h3>Email:</h3>
-                {{ form.email }}
-            </div>
-            {% endif %}
+        
+        
+        <div class="sign">If you already have an account,  <a href="login">log in</a></div>
+    
+        <input type="submit" value="Submit" class="btn"><br/>
+        
+    </form>
 
-            <div class="field">
-                <h3>Password:</h3>
-                {{ form.password1 }}
-            </div>
+    <footer class="footer">
+        <p>@Copyirght 2025. All rights reserved.</p>
+    </footer>
 
-            <ul class="password-info">
-            <li>Your password can’t be too similar to your other personal information.</li>
-            <li>Your password must contain at least 8 characters.</li>
-            <li>Your password can’t be a commonly used password.</li>
-            <li>Your password can’t be entirely numeric.</li>
-            </ul>
-
-            <div class="field">
-                <h3>Confirm Password:</h3>
-                {{ form.password2 }}
-            </div>
-            </div>
-            <div class="sign">If you already have an account,  <a href="login">log in</a></div>
-
-            <input type="submit" value="Submit" class="btn"><br/>
-
-        </form>
-
-        <footer class="footer">
-            <p>@Copyirght 2025. All rights reserved.</p>
-        </footer>
-        <script src="{% static 'js/close.js' %}"></script>
-    </body>
+</body>
 
 </html>
