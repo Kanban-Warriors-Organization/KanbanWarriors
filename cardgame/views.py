@@ -313,8 +313,7 @@ def challenge(request, chal_id):
             ctime = timezone.now()
 
             # pass context into the template
-            valid = True if c.start_time < ctime and c.end_time > ctime\
-                         else False
+            valid = True if c.start_time < ctime and c.end_time > ctime else False
 
         except ObjectDoesNotExist:
             pass
