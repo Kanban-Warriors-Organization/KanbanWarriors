@@ -30,43 +30,71 @@ class CardModelTests(TestCase):
         # Create the test CardSet
         test_card_set_name = "Test_Card_Set_Name"
         test_card_set_description = "Test_Card_Set_Description"
-        test_card_set = CardSet(card_set_name=test_card_set_name,
-                                card_set_description=test_card_set_description)
+        test_card_set = CardSet(
+            card_set_name=test_card_set_name,
+            card_set_description=test_card_set_description,
+        )
         test_card_set.save()
 
         # Create the test Card
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
-        test_card = Card(card_name=test_card_name,
-                         card_subtitle=test_card_subtitle,
-                         card_description=test_card_description,
-                         card_set=test_card_set)
+        test_card = Card(
+            card_name=test_card_name,
+            card_subtitle=test_card_subtitle,
+            card_description=test_card_description,
+            card_set=test_card_set,
+        )
         test_card.save()
 
         # Test card_name is the expected value
-        self.assertIs(test_card.card_name, test_card_name,
-                      "card_name was not set or returned correctly\n\
-                      expected: " + str(test_card_name) + "\n\
-                      actual:   " + str(test_card.card_name))
+        self.assertIs(
+            test_card.card_name,
+            test_card_name,
+            "card_name was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_name)
+            + "\n\
+                      actual:   "
+            + str(test_card.card_name),
+        )
 
         # Test card_subtitle is the expected value
-        self.assertIs(test_card.card_subtitle, test_card_subtitle,
-                      "card_subtitle was not set or returned correctly\n\
-                      expected: " + str(test_card_subtitle) + "\n\
-                      actual:   " + str(test_card.card_subtitle))
+        self.assertIs(
+            test_card.card_subtitle,
+            test_card_subtitle,
+            "card_subtitle was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_subtitle)
+            + "\n\
+                      actual:   "
+            + str(test_card.card_subtitle),
+        )
 
         # Test card_description is the expected value
-        self.assertIs(test_card.card_description, test_card_description,
-                      "card_description was not set or returned correctly\n\
-                      expected: " + str(test_card_description) + "\n\
-                      actual:   " + str(test_card.card_description))
+        self.assertIs(
+            test_card.card_description,
+            test_card_description,
+            "card_description was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_description)
+            + "\n\
+                      actual:   "
+            + str(test_card.card_description),
+        )
 
         # Test card_set is the expected value
-        self.assertIs(test_card.card_set, test_card_set,
-                      "card_set was not set or returned correctly\n\
-                      expected: " + str(test_card_set) + "\n\
-                      actual:   " + str(test_card.card_set))
+        self.assertIs(
+            test_card.card_set,
+            test_card_set,
+            "card_set was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_set)
+            + "\n\
+                      actual:   "
+            + str(test_card.card_set),
+        )
 
     def test_card_set_with_correct_details(self):
         """
@@ -76,21 +104,34 @@ class CardModelTests(TestCase):
         # Create the test CardSet
         test_card_set_name = "Test_Card_Set_Name"
         test_card_set_description = "Test_Card_Set_Description"
-        test_card_set = CardSet(card_set_name=test_card_set_name,
-                                card_set_description=test_card_set_description)
+        test_card_set = CardSet(
+            card_set_name=test_card_set_name,
+            card_set_description=test_card_set_description,
+        )
 
         # Test card_set_name is the expected value
-        self.assertIs(test_card_set.card_set_name, test_card_set_name,
-                      "card_set_name was not set or returned correctly\n\
-                      expected: " + str(test_card_set_name) + "\n\
-                      actual:   " + str(test_card_set.card_set_name))
+        self.assertIs(
+            test_card_set.card_set_name,
+            test_card_set_name,
+            "card_set_name was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_set_name)
+            + "\n\
+                      actual:   "
+            + str(test_card_set.card_set_name),
+        )
 
         # Test card_set_description is the expected value
-        self.assertIs(test_card_set.card_set_description,
-                      test_card_set_description,
-                      "card_set_name was not set or returned correctly\n\
-                      expected: " + str(test_card_set_description) + "\n\
-                      actual:   " + str(test_card_set.card_set_description))
+        self.assertIs(
+            test_card_set.card_set_description,
+            test_card_set_description,
+            "card_set_name was not set or returned correctly\n\
+                      expected: "
+            + str(test_card_set_description)
+            + "\n\
+                      actual:   "
+            + str(test_card_set.card_set_description),
+        )
 
         # TODO Create tests for image once implemented
 
@@ -104,8 +145,9 @@ class CardModelTests(TestCase):
         # Create test User
         test_user_username = "Test_User"
         test_user_password = "Test_Password"
-        test_user = User.objects.create_user(username=test_user_username,
-                                             password=test_user_password)
+        test_user = User.objects.create_user(
+            username=test_user_username, password=test_user_password
+        )
         test_user.save()
 
         # Create a test Card for the collected_cards field
@@ -116,42 +158,62 @@ class CardModelTests(TestCase):
             card_name=test_card_name,
             card_subtitle=test_card_subtitle,
             card_description=test_card_description,
-            card_set=None)
+            card_set=None,
+        )
         test_user_profile_collected_cards.save()
 
         # Create the actual UserProfile model
         test_user_profile_points = 100
+        # *** FIX: supply user_signup_date using timezone.now() ***
         test_user_profile = UserProfile(
             user=test_user,
             user_profile_points=test_user_profile_points,
+<<<<<<< HEAD
             user_signup_date=timezone.now())
+=======
+            user_signup_date=timezone.now(),
+        )
+>>>>>>> 182597105e18dc4cc975b072dcfe332eea867b00
         test_user_profile.save()
         test_user_profile.user_profile_collected_cards.add(
-            test_user_profile_collected_cards)
+            test_user_profile_collected_cards
+        )
 
         # Test that user_profile_points are the expected value
         self.assertIs(
             test_user_profile.user_profile_points,
             test_user_profile_points,
             "user_profile_points was not set or returned correctly\n\
-            expected: " + str(test_user_profile_points) + "\n\
-            actual:   " + str(test_user_profile.user_profile_points))
+            expected: "
+            + str(test_user_profile_points)
+            + "\n\
+            actual:   "
+            + str(test_user_profile.user_profile_points),
+        )
 
         # Test that user_profile_collected_cards is the expected value
         self.assertEqual(
             test_user_profile.user_profile_collected_cards.all()[0].card_name,
             test_user_profile_collected_cards.card_name,
             "user_profile_collected_cards was not set or returned correctly\n\
-            expected: " + str(test_user_profile_collected_cards) + "\n\
-            actual:   " +
-            str(test_user_profile.user_profile_collected_cards.all()[0]))
+            expected: "
+            + str(test_user_profile_collected_cards)
+            + "\n\
+            actual:   "
+            + str(test_user_profile.user_profile_collected_cards.all()[0]),
+        )
 
         # Test that the user is the expected value
         self.assertIs(
-            test_user_profile.user, test_user,
+            test_user_profile.user,
+            test_user,
             "user was not set or returned correctly\n\
-            expected: " + str(test_user) + "\n\
-            actual:   " + str(test_user_profile.user))
+            expected: "
+            + str(test_user)
+            + "\n\
+            actual:   "
+            + str(test_user_profile.user),
+        )
 
     def test_question_set_with_correct_details_and_clean_works(self):
         """
@@ -165,10 +227,12 @@ class CardModelTests(TestCase):
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
-        test_card = Card(card_name=test_card_name,
-                         card_subtitle=test_card_subtitle,
-                         card_description=test_card_description,
-                         card_set=None)
+        test_card = Card(
+            card_name=test_card_name,
+            card_subtitle=test_card_subtitle,
+            card_description=test_card_description,
+            card_set=None,
+        )
         test_card.save()
 
         # Create test challenge
@@ -190,7 +254,7 @@ class CardModelTests(TestCase):
             latitude=test_challenge_latitude,
             card=test_card,
             points_reward=test_challenge_points_reward,
-            status=test_challenge_status
+            status=test_challenge_status,
         )
         test_challenge.save()
 
@@ -218,8 +282,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].text,
             test_question_text,
             "text was not set or returned correctly\n\
-            expected: " + str(test_question_text) + "\n\
-            actual:   " + str(Question.objects.all()[0].text)
+            expected: "
+            + str(test_question_text)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].text),
         )
 
         # Test that option_a is set correctly
@@ -227,8 +294,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].option_a,
             test_question_option_a,
             "option_a was not set or returned correctly\n\
-            expected: " + str(test_question_option_a) + "\n\
-            actual:   " + str(Question.objects.all()[0].option_a)
+            expected: "
+            + str(test_question_option_a)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].option_a),
         )
 
         # Test that option_b is set correctly
@@ -236,8 +306,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].option_b,
             test_question_option_b,
             "option_b was not set or returned correctly\n\
-            expected: " + str(test_question_option_b) + "\n\
-            actual:   " + str(Question.objects.all()[0].option_b)
+            expected: "
+            + str(test_question_option_b)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].option_b),
         )
 
         # Test that option_c is set correctly
@@ -245,8 +318,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].option_c,
             test_question_option_c,
             "option_c was not set or returned correctly\n\
-            expected: " + str(test_question_option_c) + "\n\
-            actual:   " + str(Question.objects.all()[0].option_c)
+            expected: "
+            + str(test_question_option_c)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].option_c),
         )
 
         # Test that option_d is set correctly
@@ -254,8 +330,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].option_d,
             test_question_option_d,
             "option_d was not set or returned correctly\n\
-            expected: " + str(test_question_option_d) + "\n\
-            actual:   " + str(Question.objects.all()[0].option_d)
+            expected: "
+            + str(test_question_option_d)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].option_d),
         )
 
         # Test that correct_answer is set correctly
@@ -263,8 +342,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].correct_answer,
             test_question_correct_answer,
             "correct_anwser was not set or returned correctly\n\
-            expected: " + str(test_question_correct_answer) + "\n\
-            actual:   " + str(Question.objects.all()[0].correct_answer)
+            expected: "
+            + str(test_question_correct_answer)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].correct_answer),
         )
 
         # Test that challenge is set correctly
@@ -272,8 +354,11 @@ class CardModelTests(TestCase):
             Question.objects.all()[0].challenge,
             test_challenge,
             "challenge was not set or returned correctly\n\
-            expected: " + str(test_challenge) + "\n\
-            actual:   " + str(Question.objects.all()[0].challenge)
+            expected: "
+            + str(test_challenge)
+            + "\n\
+            actual:   "
+            + str(Question.objects.all()[0].challenge),
         )
 
         # Test that .clean() doesn't fail
@@ -299,10 +384,12 @@ class CardModelTests(TestCase):
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
         test_card_description = "Test_Card_Description"
-        test_card = Card(card_name=test_card_name,
-                         card_subtitle=test_card_subtitle,
-                         card_description=test_card_description,
-                         card_set=None)
+        test_card = Card(
+            card_name=test_card_name,
+            card_subtitle=test_card_subtitle,
+            card_description=test_card_description,
+            card_set=None,
+        )
         test_card.save()
 
         # Create test challenge
@@ -324,7 +411,7 @@ class CardModelTests(TestCase):
             latitude=test_challenge_latitude,
             card=test_card,
             points_reward=test_challenge_points_reward,
-            status=test_challenge_status
+            status=test_challenge_status,
         )
         test_challenge.save()
 
@@ -333,8 +420,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].challenge_name,
             test_challenge_name,
             "challenge_name was not set or returned correctly\n\
-            expected: " + str(test_challenge_name) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].challenge_name)
+            expected: "
+            + str(test_challenge_name)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].challenge_name),
         )
 
         # Test that description is set correctly
@@ -342,8 +432,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].description,
             test_challenge_description,
             "description was not set or returned correctly\n\
-            expected: " + str(test_challenge_description) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].description)
+            expected: "
+            + str(test_challenge_description)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].description),
         )
 
         # Test that start_time is set correctly
@@ -351,8 +444,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].start_time,
             test_challenge_start_time,
             "start_time was not set or returned correctly\n\
-            expected: " + str(test_challenge_start_time) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].start_time)
+            expected: "
+            + str(test_challenge_start_time)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].start_time),
         )
 
         # Test that end_time is set correctly
@@ -360,8 +456,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].end_time,
             test_challenge_end_time,
             "end_time was not set or returned correctly\n\
-            expected: " + str(test_challenge_end_time) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].end_time)
+            expected: "
+            + str(test_challenge_end_time)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].end_time),
         )
 
         # Test that longitude is set correctly
@@ -369,8 +468,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].longitude,
             test_challenge_longitude,
             "longitude was not set or returned correctly\n\
-            expected: " + str(test_challenge_longitude) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].longitude)
+            expected: "
+            + str(test_challenge_longitude)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].longitude),
         )
 
         # Test that latitude is set correctly
@@ -378,8 +480,11 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].latitude,
             test_challenge_latitude,
             "latitude was not set or returned correctly\n\
-            expected: " + str(test_challenge_latitude) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].latitude)
+            expected: "
+            + str(test_challenge_latitude)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].latitude),
         )
 
         # Test that card is the expected value
@@ -387,23 +492,33 @@ class CardModelTests(TestCase):
             Challenge.objects.all()[0].card.card_name,
             test_card.card_name,
             "card was not set or returned correctly\n\
-            expected: " + str(test_card.card_name) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].card.card_name))
+            expected: "
+            + str(test_card.card_name)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].card.card_name),
+        )
 
         self.assertEqual(
             Challenge.objects.all()[0].points_reward,
             test_challenge_points_reward,
             "points_reward was not set or returned correctly\n\
-            expected: " + str(test_challenge_points_reward) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].points_reward)
+            expected: "
+            + str(test_challenge_points_reward)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].points_reward),
         )
 
         self.assertEqual(
             Challenge.objects.all()[0].status,
             test_challenge_status,
             "status was not set or returned correctly\n\
-            expected: " + str(test_challenge_status) + "\n\
-            actual:   " + str(Challenge.objects.all()[0].status)
+            expected: "
+            + str(test_challenge_status)
+            + "\n\
+            actual:   "
+            + str(Challenge.objects.all()[0].status),
         )
 
         # Test that .clean() doesn't fail
