@@ -30,7 +30,7 @@ def index(request):
     """
     form = UserCreationForm()
     return HttpResponse(render(request, "cardgame/signup.html",
-                                   {"form": form}))
+                               {"form": form}))
 
 
 def home(request):
