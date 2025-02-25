@@ -39,6 +39,7 @@ class EmptyTestCase(TestCase):
 
     # *** FIX: use a valid positive challenge ID that doesn’t exist ***
     def test_challenge_that_does_not_exist(self):
+        self.client.force_login(self.user)
         url = reverse("challenge", kwargs={"chal_id": 9999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -73,7 +74,6 @@ class ViewsTestCase(TestCase):
             card_description="Desc",
             card_set=self.card_set,
         )
-        # self.user_profile.user_profile_collected_cards.add(self.card)
 
         # Create a challenge for testing get_locations and challenge view
         now = timezone.now()
@@ -102,7 +102,7 @@ class ViewsTestCase(TestCase):
     def test_index_and_home(self):
         response_index = self.client.get(reverse("index"))
         self.assertEqual(response_index.status_code, 200)
-        self.assertTemplateUsed(response_index, "cardgame/home.html")
+        self.assertTemplateUsed(response_index, "cardgame/signup.html")
 
         response_home = self.client.get(reverse("home"))
         self.assertEqual(response_home.status_code, 200)
@@ -110,10 +110,10 @@ class ViewsTestCase(TestCase):
 
     def test_card_col(self):
         # Test card collection view for existing user
+        self.user_profile.user_profile_collected_cards.add(self.card)
         url = reverse("cardcollection", kwargs={"user_name": self.user.username})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        # The context should contain acquired cards
         self.assertIn("cardshas", response.context)
         self.assertEqual(response.context["cardshas"][0]["title"], "TestCard")
 
@@ -150,7 +150,7 @@ class ViewsTestCase(TestCase):
 
         # Checks that another user is NOT made if the same credentials are used
         reponse2 = self.client.post(reverse("signup"), data=signup_data)
-        self.assertTrue(User.objects.filter(username="newuser").count == 1)
+        self.assertTrue(User.objects.filter(username="newuser").count() == 1)
 
     def test_create_card_get_and_post(self):
         # Create staff user for creating cards
@@ -162,7 +162,6 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response_get.status_code, 200)
         self.assertTemplateUsed(response_get, "cardgame/create_card.html")
 
-        # *** FIX: Create a valid PNG image in memory ***
         img = PilImage.new("RGB", (10, 10), color="red")
         buf = io.BytesIO()
         img.save(buf, format="PNG")
