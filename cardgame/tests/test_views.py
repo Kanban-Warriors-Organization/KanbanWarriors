@@ -1,12 +1,11 @@
+import os
+import datetime
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
-from django.db import IntegrityError
-import datetime
-from PIL import Image as PilImage
-import io
+from django.conf import settings
 
 
 from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
@@ -15,16 +14,19 @@ from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
 class EmptyTestCase(TestCase):
     """
     This is for testing on an empty database
-    Namely, that the correct responses are returned if a user attempts to access
-    an object that does not exist
+    Namely, that the correct responses are returned if a user attempts to
+    access an object that does not exist
     Written by -Adam-
     """
 
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username="professor y", password="secret")
+        self.user = User.objects.create_user(username="professor y",
+                                             password="secret")
         UserProfile.objects.create(
-            user=self.user, user_profile_points=64, user_signup_date=timezone.now()
+            user=self.user,
+            user_profile_points=64,
+            user_signup_date=timezone.now()
         )
 
     def test_profile_when_user_nonexistent(self):
@@ -60,9 +62,12 @@ class ViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         # Create a user and its profile
-        self.user = User.objects.create_user(username="testuser", password="secret")
+        self.user = User.objects.create_user(username="testuser",
+                                             password="secret")
         self.user_profile = UserProfile.objects.create(
-            user=self.user, user_profile_points=50, user_signup_date=timezone.now()
+            user=self.user,
+            user_profile_points=50,
+            user_signup_date=timezone.now()
         )
         # Create a card and card set for testing card_col view
         self.card_set = CardSet.objects.create(
@@ -111,7 +116,8 @@ class ViewsTestCase(TestCase):
     def test_card_col(self):
         # Test card collection view for existing user
         self.user_profile.user_profile_collected_cards.add(self.card)
-        url = reverse("cardcollection", kwargs={"user_name": self.user.username})
+        url = reverse("cardcollection",
+                      kwargs={"user_name": self.user.username})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("cardshas", response.context)
@@ -119,7 +125,8 @@ class ViewsTestCase(TestCase):
 
     def test_card_col_404(self):
         # checks that accessing a nonexistent card collections returns a 404
-        url = reverse("cardcollection", kwargs={"user_name": "nonexistent_user"})
+        url = reverse("cardcollection",
+                      kwargs={"user_name": "nonexistent_user"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -149,21 +156,20 @@ class ViewsTestCase(TestCase):
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
         # Checks that another user is NOT made if the same credentials are used
-        reponse2 = self.client.post(reverse("signup"), data=signup_data)
+        self.client.post(reverse("signup"), data=signup_data)
         self.assertTrue(User.objects.filter(username="newuser").count() == 1)
 
     # In test_views.py, modify your test_create_card_get_and_post method:
 
     def test_create_card_get_and_post(self):
         # Create staff user for creating cards
-        staff_user = User.objects.create_superuser(
-            username="admin", password="adminpass"
-        )
+        # staff_user = User.objects.create_superuser(
+        #     username="admin", password="adminpass"
+        # )
         self.client.login(username="admin", password="adminpass")
 
         # Ensure the background image exists in static/card_gen/back.png
-        from django.conf import settings
-        import os
+        # Look at imports
 
         static_dir = os.path.join(settings.BASE_DIR, "static", "card_gen")
         os.makedirs(static_dir, exist_ok=True)
@@ -176,7 +182,8 @@ class ViewsTestCase(TestCase):
 
         # Prepare image for upload using the provided do_not_remove.png
         upload_img_path = os.path.join(
-            settings.BASE_DIR, "cardgame", "media", "card_images", "do_not_remove.png"
+            settings.BASE_DIR, "cardgame", "media",
+            "card_images", "do_not_remove.png"
         )
         with open(upload_img_path, "rb") as f:
             file_data = f.read()
@@ -212,9 +219,11 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response_post.status_code, 200)
         self.assertTrue(Card.objects.filter(card_name="NewCard").exists())
 
-        # Clean up: remove the image file created by the view (if it’s not the default)
+        # Clean up: remove the image file created by the view
+        # (if it’s not the default)
         new_card = Card.objects.get(card_name="NewCard")
-        if new_card.card_image_link and hasattr(new_card.card_image_link, "path"):
+        if new_card.card_image_link and hasattr(new_card.card_image_link,
+                                                "path"):
             file_path = new_card.card_image_link.path
             default_image_path = os.path.join(
                 settings.BASE_DIR, "static", "card_images", "do_not_remove.png"
@@ -231,7 +240,8 @@ class ViewsTestCase(TestCase):
         json_data = response.json()
         self.assertIn("locations", json_data)
         # The challenge's card name should appear in the locations
-        self.assertEqual(json_data["locations"][0]["name"], self.card.card_name)
+        self.assertEqual(json_data["locations"][0]["name"],
+                         self.card.card_name)
 
     def test_leaderboard_data(self):
         # Create additional users with points
@@ -298,5 +308,6 @@ class ViewsTestCase(TestCase):
         self.user_profile.refresh_from_db()
         # Check the card collection count increased by one
         self.assertEqual(
-            self.user_profile.user_profile_collected_cards.count(), initial_cards + 1
+            self.user_profile.user_profile_collected_cards.count(),
+            initial_cards + 1
         )

@@ -169,7 +169,7 @@ class CardModelTests(TestCase):
             user_profile_points=test_user_profile_points,
             user_signup_date=timezone.now()
             )
-        
+
         test_user_profile.save()
         test_user_profile.user_profile_collected_cards.add(
             test_user_profile_collected_cards
