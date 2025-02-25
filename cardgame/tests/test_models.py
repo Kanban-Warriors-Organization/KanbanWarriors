@@ -164,16 +164,12 @@ class CardModelTests(TestCase):
 
         # Create the actual UserProfile model
         test_user_profile_points = 100
-        # *** FIX: supply user_signup_date using timezone.now() ***
         test_user_profile = UserProfile(
             user=test_user,
             user_profile_points=test_user_profile_points,
-<<<<<<< HEAD
-            user_signup_date=timezone.now())
-=======
-            user_signup_date=timezone.now(),
-        )
->>>>>>> 182597105e18dc4cc975b072dcfe332eea867b00
+            user_signup_date=timezone.now()
+            )
+        
         test_user_profile.save()
         test_user_profile.user_profile_collected_cards.add(
             test_user_profile_collected_cards
