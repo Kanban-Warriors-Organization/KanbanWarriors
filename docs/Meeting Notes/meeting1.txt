@@ -1,0 +1,60 @@
+meeting date: 5/2/25
+attendance: all
+
+0. discussion of grading
+
+conclusion: solomon has already been emailed
+
+1. time for drop in
+
+a time has been decided on for next monday.
+
+2. project topic
+
+ideas: trading card game
+
+suggested:
+-cards collected on campus with gps
+-each card has information about the habitat/thing
+-obtaining cards requires answering comprehension questions
+
+-battles with cards as second sprint goal
+-attack cards pollutants, defense cards nature
+-leaderboard (possibly with elo system)
+-mini-challenges (ie watching videos/reading articles to upgrade cards)
+-sharing achievements
+-timed challenges
+-player should be able to look at cards
+-integration with sharing API somehow (eg for social media)
+-scavenger hunts
+-coins to upgrade cards, earned through daily/weekly challenges
+
+-are QR codes mandatory? ASK PROF. OYELERE
+
+
+conclusion: must/should/could have list created
+
+3. important things to ask at meeting
+
+are qr codes mandatory? suspected no.
+
+4. infrastructure
+
+conclusion: trello board has been created, github repo has been created, everyone has been invited
+
+5. assignment of development tasks
+
+-main components: frontend, backend, connector
+-2 people taking web development, might require others to sub onto frontend if necessary
+adam: would prefer to work backend
+jake and tim are taking web dev, so they are to work on the frontend
+other members have no preference  
+
+6. next steps
+
+-bi-weekly general meetings
+-create mockups of ui and models of database - jake
+-teammates to read up on try django so we understand how it works- all
+-design of cardgame deferred until cards are implemented
+-next meeting on sunday for high-level plans
+

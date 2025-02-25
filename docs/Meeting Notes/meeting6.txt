@@ -1,0 +1,49 @@
+meeting 19/02/25
+attendance: all
+
+1. priorities
+need to do:
+-testing
+-design document
+-write the challenge view
+-user profile stuff
+-presentation
+-location verification / card giving
+
+what we have done:
+-card collection
+-databases
+-homepage
+-login/signup
+
+2. specifics of completing a challenge
+
+a number of multiple choice questions
+location verification in fronend, answer processing in backend
+
+3. delegation
+
+tim to work on profile.html
+yigit to work on frontend for login and signup
+anyone idle to work on testing
+sam to write unit tests
+tim to write tests for models
+cem to do documentation / presentation
+jake to write frontend for the challenge view
+
+4. CLEAN UP THE REPOSITORY!
+there are too many branches currently. sam to fix this, as he owns the github repo
+
+5. ENSURE PEP8 CONFIRMITY
+this is critically important - all members must remember to do this!
+
+6. GOALS FOR NEXT SPRINT
+battles and trading to be added
+features are mostly done for this sprint, we just need to add verification and add polish
+
+7. webpage design
+consensus: it looks mostly fine at the moment
+(for a prototype it's passable)
+might need refinement in the second sprint
+
+

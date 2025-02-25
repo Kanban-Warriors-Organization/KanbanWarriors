@@ -1,0 +1,13 @@
+Standup meeting
+Date: 14/2
+Attendance: all
+
+1. image storage
+images will be stored in a /res/ directory and obtained through the filename when needed
+a django ImageField will be used to store this in the database. 
+Adam to research how this works (as he is responsible for the card collection view)
+
+2. any issues?
+Adam - was previously waiting on Card image implementation to be decided
+Thinks he should be able to work now.
+

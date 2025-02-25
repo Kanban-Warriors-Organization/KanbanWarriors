@@ -1,0 +1,18 @@
+client meeting 1: 10/2/25
+notes taken by: adam
+attendance: all except cem
+
+vision: encourage environmental learning
+(through competition with card collecting and battling)
+
+
+takeways from meeting:
+
+we have good communication, confirmed with prof. oyelere
+prof wants meetings every 2 days at least
+standard software development processes required(commenting, standards etc (mentioned in mark scheme))
+DEFINE TEST STRATEGIES
+test driven development MUST be used
+define specific roles for each person(like quality control, github manager, etc
+oyelerewill check kanban tickets
+production instance expected at end

@@ -1,0 +1,14 @@
+2025-02-12
+11:40am (meeting with TA) / 4pm
+
+Code maintainability and readability:
+- Every function/class must have  docstring with a short description and the author(s)
+
+Trello board:
+- Every task must have the person working on it labelled
+- Screenshots must be taken of the trello board after every meeting
+
+Teamwork
+- Must put more effort into making sure people know what they should be doing
+
+

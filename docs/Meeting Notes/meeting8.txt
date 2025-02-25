@@ -1,0 +1,11 @@
+standup meeting date 23/2/25
+attendance: all apart from adam and tim
+
+1. Does anyone need help?
+
+Adam, Jake and Yigit working on profile view. Otherwise, all features earmarked for the first sprint are implemented. Other team members are to focus on testing, compiling the design document, and ensuring that the items required for the submission are ready.
+
+2. general notes
+REMINDER: All members to fill in the peer review form!
+Profile-Changes branch on the repo needs merging into main, Sam to review a pull request made to main.
+2 days left until the submission date- members should avoid trying to implement new features, we have a functioning alpha and need to ensure at this stage that the submission is adequate.

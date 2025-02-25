@@ -1,0 +1,40 @@
+2025-02-12 
+16:03
+Notes taken by: Cem
+
+Status: #Complete 
+Tags: N/A
+# Kanban Warriors Meeting 2
+
+## Item 1: Naming
+Will come up with a name, it is best that it comes to us naturally.
+## Item 2: GitHub Settings
+
+Making sure that everyone has access to the repo
+We will look into allowing everyone merging to the main codebase
+Sam will check github branch protection, as the owner of the repository
+## Item 3: Django Setup
+
+Adam has a minimal Django project running 
+Tim's current ERD structure:
+
+There are three relations, the current being `CardSet` `Cards` and `UserProfile`
+## Item 4: Testing Overview
+
+Everyone is going to work on a view
+Make sure that each view does not have cyclic dependencies
+## Item 5: Who is doing what View
+
+- Player (Yigit)
+- Card / Card Collection (Sam / Adam)
+- On-Site (Tim)
+- Login (Cem)
+- Challenges / Map (Cem / Yigit)
+- Admin Card Creation (Sam)
+- Admin User Management (Emma)
+## Item 5: Code Style
+
+Use Pylint since the MS uses that. We will lose marks if we do not use it!
+## Summary
+
+Overall good talk. Clarified what we needed to do and whose going to do what. Next meeting is going to be on **Friday**. Hopefully we will all have something to show and share with the group then.

@@ -1,0 +1,10 @@
+meeting 21/02/25
+attendance: all, except from jake
+
+1. does anyone need help?
+
+Verification is complete, the profile view is the last significant part of the alpha that needs finishing. Adam to work on backend, Yigit and Jake to work on frontend for this. Other members are to work on fixing bugs, dynamic testing, compiling the design
+ document and ensuring code conforms to the required standards.
+
+2. any other concerns? 
+note: REMEMBER TO UPDATE THE KANBAN BOARD! - tim
