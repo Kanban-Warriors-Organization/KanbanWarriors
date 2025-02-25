@@ -19,18 +19,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.contrib import messages
-import datetime
 from django.urls import reverse
 from django.db.models import F
 from django.core.files.images import ImageFile
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question
-# from django.templatetags.static import static
-# from django.utils import timezone
-# from django.db.models import F
-# from django.core.files.images import ImageFile
-# from PIL import Image
-# Create your views here.
 
 
 def index(request):
