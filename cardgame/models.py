@@ -60,7 +60,8 @@ class Card(models.Model):
         upload_to="static/card_images",
         default="static/card_images/do_not_remove.png",
     )
-    card_set = models.ForeignKey(CardSet, models.SET_NULL, null=True, blank=True)
+    card_set = models.ForeignKey(CardSet, models.SET_NULL,
+                                 null=True, blank=True)
 
     def __str__(self):
         return str(self.card_name)
@@ -81,7 +82,8 @@ class UserProfile(models.Model):
     Author: Timothy Simmons
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                primary_key=True)
     user_profile_points = models.IntegerField(default=0)
     user_profile_collected_cards = models.ManyToManyField(Card, blank=True)
     # potential problem if card is deleted
@@ -132,7 +134,8 @@ class Question(models.Model):
         to the user
         """
 
-        valid_options = {self.option_a, self.option_b, self.option_c, self.option_d}
+        valid_options = {self.option_a, self.option_b,
+                         self.option_c, self.option_d}
         if self.correct_answer not in valid_options:
             raise ValidationError(
                 "Correct answer must match one of \
@@ -180,7 +183,8 @@ class Challenge(models.Model):
         ("completed", "completed"),
     ]
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="upcoming")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES,
+                              default="upcoming")
 
     def __str__(self):
         """

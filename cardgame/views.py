@@ -19,18 +19,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.contrib import messages
-import datetime
 from django.urls import reverse
-from django.db.models import F
-from django.core.files.images import ImageFile
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question
-# from django.templatetags.static import static
-# from django.utils import timezone
-# from django.db.models import F
-# from django.core.files.images import ImageFile
-# from PIL import Image
-# Create your views here.
 
 
 def index(request):
@@ -39,7 +30,7 @@ def index(request):
     """
     form = UserCreationForm()
     return HttpResponse(render(request, "cardgame/signup.html",
-                                   {"form": form}))
+                               {"form": form}))
 
 
 def home(request):
@@ -48,9 +39,10 @@ def home(request):
     """
     return render(request, "cardgame/home.html")
 
-def collection_redirect(request):
-    return redirect(reverse('cardcollection', kwargs={'user_name': request.user.username}))
 
+def collection_redirect(request):
+    return redirect(reverse('cardcollection', kwargs={
+                            'user_name': request.user.username}))
 
 
 def card_col(request, user_name):
@@ -237,7 +229,8 @@ def get_locations(request):
         JsonResponse: Formatted location data with coordinates
     """
 
-    upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards.all()
+    upc = UserProfile.objects.get(user=request.user)\
+        .user_profile_collected_cards.all()
     print(upc)
     challenges = Challenge.objects.exclude(card__in=upc)
     locations = list(
@@ -302,8 +295,11 @@ def log_out(request):
 
 
 def profile_redirect(request):
-    #Redirects to a user's profile
-    return redirect(reverse('profile', kwargs={'user_name': request.user.username}))
+    """
+    Redirects to a user's profile
+    """
+    return redirect(reverse('profile', kwargs={
+        'user_name': request.user.username}))
 
 
 def profile(request, user_name):
