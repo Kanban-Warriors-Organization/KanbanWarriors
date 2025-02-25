@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
 # from django.template import loader
-from django.contrib.auth import logout  # authenticate, login
+from django.contrib.auth import logout, login  # authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,6 +19,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.contrib import messages
+import datetime
+from django.urls import reverse
+from django.db.models import F
+from django.core.files.images import ImageFile
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question
 # from django.templatetags.static import static
@@ -33,7 +37,9 @@ def index(request):
     """
     Default index landing page
     """
-    return render(request, "cardgame/home.html")
+    form = UserCreationForm()
+    return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
 
 def home(request):
@@ -41,6 +47,10 @@ def home(request):
     Renders the homepage.
     """
     return render(request, "cardgame/home.html")
+
+def collection_redirect(request):
+    return redirect(reverse('cardcollection', kwargs={'user_name': request.user.username}))
+
 
 
 def card_col(request, user_name):
@@ -125,6 +135,7 @@ def signup(request):
                                                 form.cleaned_data["password1"])
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
+                login(request, user)
                 messages.success(request, "Account Created!")
                 return redirect(f"/user/{username}/profile")
             except IntegrityError:
@@ -225,8 +236,12 @@ def get_locations(request):
     Returns:
         JsonResponse: Formatted location data with coordinates
     """
+
+    upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards.all()
+    print(upc)
+    challenges = Challenge.objects.exclude(card__in=upc)
     locations = list(
-            Challenge.objects.select_related("card").values(
+            challenges.select_related("card").values(
                 "card__card_name", "latitude", "longitude"
                 )
             )
@@ -283,7 +298,12 @@ def log_out(request):
         Redirect to home page
     """
     logout(request)
-    return redirect("home")
+    return redirect("login")
+
+
+def profile_redirect(request):
+    #Redirects to a user's profile
+    return redirect(reverse('profile', kwargs={'user_name': request.user.username}))
 
 
 def profile(request, user_name):
