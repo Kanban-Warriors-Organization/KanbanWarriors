@@ -236,8 +236,12 @@ def get_locations(request):
     Returns:
         JsonResponse: Formatted location data with coordinates
     """
+
+    upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards.all()
+    print(upc)
+    challenges = Challenge.objects.exclude(card__in=upc)
     locations = list(
-            Challenge.objects.select_related("card").values(
+            challenges.select_related("card").values(
                 "card__card_name", "latitude", "longitude"
                 )
             )
