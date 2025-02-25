@@ -29,10 +29,11 @@ urlpatterns = [
     path("challenge/<int:chal_id>", views.challenge, name="challenge"),
     path("add-card/<int:chal_id>", views.add_card, name="add-card"),
     path("profile-redirect/", views.profile_redirect, name="profile-redirect"),
-    path("collection-redirect/", views.collection_redirect, name="collection-redirect"),
-    path("challenges/", views.challenges, name="challenges"), #DO NOT REMOVE THE SLASH!
+    path("collection-redirect/", views.collection_redirect,
+         name="collection-redirect"),
+    path("challenges/", views.challenges, name="challenges"),  # [1]
     path("echo_user", views.echo_user, name="echo_user")
     # uses django's inbuilt login view
-]
+]   # [1] DO NOT REMOVE THE SLASH!
 
 # (template_name="cardgame/login.html")
