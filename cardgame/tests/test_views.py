@@ -1,11 +1,9 @@
-import os
 import datetime
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
-from django.conf import settings
 
 
 from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
@@ -163,13 +161,14 @@ class ViewsTestCase(TestCase):
 
     def test_create_card_get_and_post(self):
         # Create staff user for creating cards
-        # staff_user = User.objects.create_superuser(
-        #     username="admin", password="adminpass"
-        # )
+        User.objects.create_superuser(
+            username="admin", password="adminpass"
+        )
         self.client.login(username="admin", password="adminpass")
 
         # Ensure the background image exists in static/card_gen/back.png
-        # Look at imports
+        from django.conf import settings
+        import os
 
         static_dir = os.path.join(settings.BASE_DIR, "static", "card_gen")
         os.makedirs(static_dir, exist_ok=True)
@@ -199,7 +198,6 @@ class ViewsTestCase(TestCase):
         }
         files_data = {"card_image": image_data}
 
-        from io import BytesIO
         from PIL import Image as PilImage
         from unittest.mock import patch
 
