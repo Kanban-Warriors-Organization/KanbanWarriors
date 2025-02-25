@@ -72,7 +72,7 @@ Ensure the following dependencies are installed:
 4. **Install Project Dependencies:**
    ```bash
    pip install --upgrade pip
-   pip install -r .github/requirements.txt
+   pip install -r requirements.txt
    ```
 
 ### 🎮 Running the Application
@@ -95,6 +95,12 @@ To verify the application’s functionality, execute the test suite:
 
 ```bash
 pytest cardgame
+```
+
+or via Django
+
+```bash
+python manage.py test
 ```
 
 ## 🛠️ Technologies Used
