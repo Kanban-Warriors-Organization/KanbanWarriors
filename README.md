@@ -70,10 +70,54 @@ Ensure the following dependencies are installed:
      ```
 
 4. **Install Project Dependencies:**
+
    ```bash
    pip install --upgrade pip
    pip install -r requirements.txt
    ```
+
+5. **Set Up PostgreSQL as the database:**
+
+Our project uses PostgreSQL as the database. To configure it, follow these steps:
+
+- **Install PostgreSQL:**
+  - **Windows**: [Download PostgreSQL](https://www.postgresql.org/download/windows/)
+  - **MAC (Homebrew):**
+
+```sh
+brew install postgresql
+```
+
+**Important:** You may need to add PostgreSQL to your PATH. Look up "how to add to PATH" for your operating system.
+
+- **Set Up the Database:** When installing PostgreSQL, remember the **password** you set during installation. During installation, check all additional tools except "stack builder." After installation, use the "pgAdmin 4" GUI to create a new database instance and manage settings. Note that this database is local to your machine.
+
+- **Migrate the Database:**
+
+```bash
+py manage.py makemigrations
+py manage.py migrate
+```
+
+If `makemigrations` doesn’t detect changes or tables are missing, force creation with:
+
+```bash
+py manage.py migrate --run-syncdb
+```
+
+Then rerun `makemigrations` and `migrate` to ensure proper setup
+
+- **Load Initial Data:** Use the provided `data.json` file in the root directory to populate the database:
+
+```bash
+py manage.py loaddata data.json
+```
+
+You should see and output like:
+
+```text
+Installed 96 object(s) from 1 fixture(s)
+```
 
 ### 🎮 Running the Application
 
@@ -105,14 +149,14 @@ python manage.py test
 
 ## 🛠️ Technologies Used
 
-| 🚀 Technology | 📌 Version | 🔍 Purpose                                             |
-| ------------- | ---------- | ------------------------------------------------------ |
-| **Django**    | 5.1.6      | Web framework for backend logic and database handling. |
-| **Pillow**    | 11.1.0     | Image processing for card generation.                  |
-| **Leaflet**   | N/A        | Interactive map rendering.                             |
-| **SQLite**    | N/A        | Lightweight database for development.                  |
-| **pytest**    | N/A        | Automated testing framework.                           |
-| **flake8**    | N/A        | Code quality and linting tool.                         |
+| 🚀 Technology  | 📌 Version | 🔍 Purpose                                             |
+| -------------- | ---------- | ------------------------------------------------------ |
+| **Django**     | 5.1.6      | Web framework for backend logic and database handling. |
+| **Pillow**     | 11.1.0     | Image processing for card generation.                  |
+| **Leaflet**    | N/A        | Interactive map rendering.                             |
+| **PostgreSQL** | N/A        | Lightweight database for development.                  |
+| **pytest**     | N/A        | Automated testing framework.                           |
+| **flake8**     | N/A        | Code quality and linting tool.                         |
 
 ## 🎯 Features
 
