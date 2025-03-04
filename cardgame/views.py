@@ -494,3 +494,69 @@ def add_card(request, chal_id):
 def echo_user(request):
     u = request.user
     return HttpResponse(str(u))
+
+@login_required
+def get_incoming_trades(request):
+    u = request.user;
+    trades = Trade.objects.get(recipient = user)
+    t = []
+    for tr in trades:
+        data = {}
+        data['sender'] = tr.sender.username
+        data['date'] = tr.created_date
+        data['incoming_card'] = tr.offered_card.name
+        data['incoming_card_image'] = tr.offered_card.card_image_link
+        data['requested_card'] = tr.requested_card.name
+        data['requested_card_image'] = tr.requested_card.card_image_link
+        t.append(data)
+    return render(request, "incoming_trades.html", data)
+
+@login_required
+def trade_page(request, t_id):
+
+    if request.method == 'POST':
+        #this is for if a trade gets accepted
+
+        #validate that the trade is still available
+        #validate that the user can access the trade
+        user = request.user
+        trade = Trade.objects.get(id = t_id)
+        if trade.STATUS == "ACCEPTED":
+            return HttpResponse("this trade has already been completed! sorry!")
+        if (trade.sender != trade.recipient and trade.recipient != user):
+            return HttpResponse("watch out! you can't make this trade!")
+        #now we verify that both players have the cards they need
+        sender_profile = UserProfile.objects.get(user=trade.sender)
+        recipient_profile = UserProfile.objects.get(user=user)
+        requested_card = trade.requested_card
+        offered_card = trade.offered_card
+        if !(sender_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name).exists
+             and recipient_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists):
+            return HttpResponse("oh no, this trade is no longer available!")
+        #now we can proceed with the trade
+        sender_profile.user_profile_collected_cards.add(requested_card)
+        recipient_profile.user_profile.collected_cards.add(offered_card)
+        sender_profile.user_profile_collected_cards.remove(offered_card)
+        recipient_profile.user_profile_collected_cards.remove(requested_card)
+        return HttpResponse("trade completed successfully!")
+    #there is no way this works but that's life
+
+
+
+
+    else:
+        try:
+            #check that the user can access the trade
+            user = request.user
+            trade = Trade.objects.get(id = t_id)
+            if (trade.sender != trade.recipient and trade.recipient != user):
+                return HttpResponseNotFound("no!")
+            #if the user can access the trade:
+            return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
+                                                  'incoming_card':tr.offered_card.card_image_link,
+                                                  'incoming_card_image':tr.offered_card.card_image_link,
+                                                  'requested_card':tr.requested_card.name, 'requested_card_image':tr.requested_card.card_image_link}
+
+        except ObjectDoesNotExist():
+            raise Http404()
+

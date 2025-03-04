@@ -90,6 +90,7 @@ class UserProfile(models.Model):
     user_most_recent_card = models.CharField(default="nocards", max_length=100)
     user_most_recent_card_date = models.DateField(null=True, blank=True)
     user_signup_date = models.DateField()
+    user_outgoing_trades = models.IntegerField(default=0)
 
     @classmethod
     def create(cls, created_user):
@@ -233,3 +234,25 @@ class Challenge(models.Model):
 
         # If all the answers are right, return True
         return True
+
+class Trade(models.Model):
+
+    offered_card = models.ForeignKey("Card", on_delete=models.CASCADE)
+    requested_card = models.ForeignKey("Card", on_delete=models.CASCADE)
+    STATUS = [("PENDING", "PENDING"),("ACCEPTED", "ACCEPTED"),("DENIED", "DENIED")]
+    #global if the records below are set to the same user
+    recipient = models.ForeignKey("User", on_delete=models.CASCADE)
+    sender = models.ForeignKey("User", on_delete=models.CASCADE)
+    created_date = models.DateField()
+    actioned_date = models.DateField()
+
+#things we need to with trades:
+#get all treades that a user has active
+#get all trades that a user has incoming
+#get all trades, just in general
+#make a trade
+
+    
+ 
+
+
