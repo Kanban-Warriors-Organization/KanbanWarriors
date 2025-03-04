@@ -509,7 +509,7 @@ def get_incoming_trades(request):
         data['requested_card'] = tr.requested_card.name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
-    return render(request, "incoming_trades.html", data)
+    return render(request, "incoming_trades.html", {'data':t})
 
 @login_required
 def trade_page(request, t_id):
