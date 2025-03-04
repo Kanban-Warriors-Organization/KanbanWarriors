@@ -555,8 +555,41 @@ def trade_page(request, t_id):
             return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
                                                   'incoming_card':tr.offered_card.card_image_link,
                                                   'incoming_card_image':tr.offered_card.card_image_link,
-                                                  'requested_card':tr.requested_card.name, 'requested_card_image':tr.requested_card.card_image_link}
+                                                  'requested_card':tr.requested_card.name, 'requested_card_image':tr.requested_card.card_image_link})
 
         except ObjectDoesNotExist():
             raise Http404()
+
+
+@require_login
+def make_trade_page:
+    user = user.request
+    up = UserProfile.objects.get(user=user)
+    #page for creating a trade
+    if method == 'POST':
+        wanted_card = Card.objects.get(card_name = request.POST.get(wanted_card))
+        offered_card = Card.objects.get(card_name = request.POST.get(offered_card))
+        recipient = User.objects.get(username = request.POST.get(recipient)) #specifically the username of the user
+        
+        #validate that the user can make a trade
+        if (recipient != user.username):
+            #gets number of outgoing trades to that user
+            if Trade.objects.filter(recipient=recipient).filter(sender=user).count() > 2:
+                return HttpResponse("the invisible hand smiteth thee")
+
+     
+        elif (recipient == user.username):
+            if Trade.objects.filter(recipient=user).count() > 2:
+                return HttpResponse("the invisible hand striketh thee down")
+        #adds the trade
+        new_trade = Trade.objects.create(offered_card=offered_card, requested_card = requested_card,
+                                         STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
+        return HttpResponse("trade created successfully!")
+
+
+    
+    else:
+        return render(request, "make_trade.html") #renders the form page or something
+
+
 

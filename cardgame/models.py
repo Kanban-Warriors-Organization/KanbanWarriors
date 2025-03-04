@@ -90,7 +90,6 @@ class UserProfile(models.Model):
     user_most_recent_card = models.CharField(default="nocards", max_length=100)
     user_most_recent_card_date = models.DateField(null=True, blank=True)
     user_signup_date = models.DateField()
-    user_outgoing_trades = models.IntegerField(default=0)
 
     @classmethod
     def create(cls, created_user):
