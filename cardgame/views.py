@@ -495,10 +495,15 @@ def echo_user(request):
     u = request.user
     return HttpResponse(str(u))
 
+
+def global_trade_page():
+    pass
+    #this is currently unimplemented, if you see this tell lizard to write this view!
+
 @login_required
 def get_incoming_trades(request):
     u = request.user;
-    trades = Trade.objects.get(recipient = user)
+    trades = Trade.objects.filter(recipient = user)
     t = []
     for tr in trades:
         data = {}
@@ -511,20 +516,28 @@ def get_incoming_trades(request):
         t.append(data)
     return render(request, "incoming_trades.html", {'data':t})
 
+    for tr in trades:
+        data = {}
+        data['sender'] = tr.sender.username
+        data['date'] = tr.created_date
+        data['incoming_card'] = tr.offered_card.name
+        data['incoming_card_image'] = tr.offered_card.card_image_link
+        data['requested_card'] = tr.requested_card.name
+        data['requested_card_image'] = tr.requested_card.card_image_link
+        t.append(data)
+    return render(request, "incoming_trades.html", {'data':t})
+
+
 @login_required
-def trade_page(request, t_id):
-
-    if request.method == 'POST':
-        #this is for if a trade gets accepted
-
-        #validate that the trade is still available
+def accept_trade(request, t_id):
+            #validate that the trade is still available
         #validate that the user can access the trade
         user = request.user
         trade = Trade.objects.get(id = t_id)
-        if trade.STATUS == "ACCEPTED":
-            return HttpResponse("this trade has already been completed! sorry!")
         if (trade.sender != trade.recipient and trade.recipient != user):
             return HttpResponse("watch out! you can't make this trade!")
+        if trade.STATUS == "ACCEPTED":
+            return HttpResponse("this trade has already been completed! sorry!")
         #now we verify that both players have the cards they need
         sender_profile = UserProfile.objects.get(user=trade.sender)
         recipient_profile = UserProfile.objects.get(user=user)
@@ -538,12 +551,32 @@ def trade_page(request, t_id):
         recipient_profile.user_profile.collected_cards.add(offered_card)
         sender_profile.user_profile_collected_cards.remove(offered_card)
         recipient_profile.user_profile_collected_cards.remove(requested_card)
+        Trade.objects.get(id=t_id).delete()
         return HttpResponse("trade completed successfully!")
     #there is no way this works but that's life
 
+@login_required
+def cancel_trade(request, t_id):
+    try:
+        user = request.user
+        trade = Trade.objects.get(id=t_id)
+        if (trade.sender != user):
+            return HttpResponse("watch out! you can't cancel this trade!")
+        #actually cancels the trade
+        Trade.objects.get(id=t_id).delete()
+
+    except ObjectDoesNotExist():
+        return HttpResponse("critical system error")
 
 
 
+
+@login_required
+def trade_page(request, t_id):
+
+    if request.method == 'POST':
+        pass
+        #this is for if a trade gets accepted
     else:
         try:
             #check that the user can access the trade
@@ -584,6 +617,7 @@ def make_trade_page:
         #adds the trade
         new_trade = Trade.objects.create(offered_card=offered_card, requested_card = requested_card,
                                          STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
+        new_trade.save()
         return HttpResponse("trade created successfully!")
 
 
