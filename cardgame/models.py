@@ -243,7 +243,7 @@ class Trade(models.Model):
     recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE)
     sender = models.ForeignKey(User, related_name="sender", on_delete=models.CASCADE)
     created_date = models.DateField()
-    actioned_date = models.DateField()
+    actioned_date = models.DateField(blank=True, null=True)
 
 #things we need to with trades:
 #get all treades that a user has active
