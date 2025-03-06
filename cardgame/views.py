@@ -519,7 +519,7 @@ def get_trades_matching_query(request):
             data['requested_card'] = tr.requested_card.card_name
             data['requested_card_image'] = tr.requested_card.card_image_link
             t.append(data)
-        return render(request, "search_results.html", {'data':t})
+        return render(request, "cardgame/search_results.html", {'data':t})
 
 
 
@@ -541,7 +541,7 @@ def get_incoming_trades(request):
         data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
-    return render(request, "incoming_trades.html", {'data':t})
+    return render(request, "cardgame/incoming_trades.html", {'data':t})
 
 @login_required
 def accept_trade(request, t_id):
@@ -600,7 +600,7 @@ def trade_page(request, t_id):
             if (tr.sender != tr.recipient and tr.recipient != user):
                 return HttpResponse("no!")
             #if the user can access the trade:
-            return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
+            return render(request, "cardgame/trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
                                                   'incoming_card':tr.offered_card.card_name,
                                                   'incoming_card_image':tr.offered_card.card_image_link,
                                                   'requested_card':tr.requested_card.card_name, 'requested_card_image':tr.requested_card.card_image_link})
@@ -638,7 +638,7 @@ def make_trade_page(request):
 
 
     else:
-        return render(request, "make_trade.html") #renders the form page or something
+        return render(request, "cardgame/make_trade.html") #renders the form page or something
 
 
 
