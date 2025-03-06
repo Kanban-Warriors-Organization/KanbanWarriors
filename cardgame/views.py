@@ -514,9 +514,9 @@ def get_trades_matching_query(request):
             data = {}
             data['sender'] = tr.sender.username
             data['date'] = tr.created_date
-            data['offfered_card'] = tr.offered_card.name
+            data['offfered_card'] = tr.offered_card.card_name
             data['offered_card_image'] = tr.offered_card.card_image_link
-            data['requested_card'] = tr.requested_card.name
+            data['requested_card'] = tr.requested_card.card_name
             data['requested_card_image'] = tr.requested_card.card_image_link
             t.append(data)
         return render(request, "search_results.html", {'data':t})
@@ -536,9 +536,9 @@ def get_incoming_trades(request):
         data = {}
         data['sender'] = tr.sender.username
         data['date'] = tr.created_date
-        data['incoming_card'] = tr.offered_card.name
+        data['incoming_card'] = tr.offered_card.card_name
         data['incoming_card_image'] = tr.offered_card.card_image_link
-        data['requested_card'] = tr.requested_card.name
+        data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
     return render(request, "incoming_trades.html", {'data':t})
@@ -601,11 +601,11 @@ def trade_page(request, t_id):
                 return HttpResponse("no!")
             #if the user can access the trade:
             return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
-                                                  'incoming_card':tr.offered_card.card_image_link,
+                                                  'incoming_card':tr.offered_card.card_name,
                                                   'incoming_card_image':tr.offered_card.card_image_link,
-                                                  'requested_card':tr.requested_card.name, 'requested_card_image':tr.requested_card.card_image_link})
+                                                  'requested_card':tr.requested_card.card_name, 'requested_card_image':tr.requested_card.card_image_link})
 
-        except ObjectDoesNotExist():
+        except ObjectDoesNotExist:
             raise Http404()
 
 
