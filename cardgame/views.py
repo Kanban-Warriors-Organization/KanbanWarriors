@@ -496,9 +496,36 @@ def echo_user(request):
     return HttpResponse(str(u))
 
 
-def global_trade_page():
-    pass
+def global_trade_page(request):
     #this is currently unimplemented, if you see this tell lizard to write this view!
+    #idk what to put here, jake message me if you're reading this
+    return render(request, "search.html")
+
+def get_trades_matching_query(request):
+    if request.method == 'GET':
+        #we expect some variety of form here
+        #not sure how the form is going to pass the values so i'm just going to write down this and hope it works
+        query = request.GET.get("query")
+        #this probably doesn't work
+        #basic filter for now, can change later
+        trades = Trade.objects.filter(incoming_card = query[card])
+        t = []
+        for tr in trades:
+            data = {}
+            data['sender'] = tr.sender.username
+            data['date'] = tr.created_date
+            data['offfered_card'] = tr.offered_card.name
+            data['offered_card_image'] = tr.offered_card.card_image_link
+            data['requested_card'] = tr.requested_card.name
+            data['requested_card_image'] = tr.requested_card.card_image_link
+            t.append(data)
+        return render(request, "search_results.html", {'data':t})
+
+
+
+
+
+
 
 @login_required
 def get_incoming_trades(request):
