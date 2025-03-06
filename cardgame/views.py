@@ -21,7 +21,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
-from .models import Card, CardSet, UserProfile, Challenge, Question
+from .models import Card, CardSet, UserProfile, Challenge, Question, Trade
 
 
 def index(request):
@@ -516,18 +516,6 @@ def get_incoming_trades(request):
         t.append(data)
     return render(request, "incoming_trades.html", {'data':t})
 
-    for tr in trades:
-        data = {}
-        data['sender'] = tr.sender.username
-        data['date'] = tr.created_date
-        data['incoming_card'] = tr.offered_card.name
-        data['incoming_card_image'] = tr.offered_card.card_image_link
-        data['requested_card'] = tr.requested_card.name
-        data['requested_card_image'] = tr.requested_card.card_image_link
-        t.append(data)
-    return render(request, "incoming_trades.html", {'data':t})
-
-
 @login_required
 def accept_trade(request, t_id):
             #validate that the trade is still available
@@ -581,8 +569,8 @@ def trade_page(request, t_id):
         try:
             #check that the user can access the trade
             user = request.user
-            trade = Trade.objects.get(id = t_id)
-            if (trade.sender != trade.recipient and trade.recipient != user):
+            tr = Trade.objects.get(id = t_id)
+            if (tr.sender != tr.recipient and tr.recipient != user):
                 return HttpResponseNotFound("no!")
             #if the user can access the trade:
             return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
