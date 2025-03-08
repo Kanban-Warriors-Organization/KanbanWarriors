@@ -240,7 +240,7 @@ class Trade(models.Model):
     requested_card = models.ForeignKey("Card", related_name="requested_card", on_delete=models.CASCADE)
     STATUS = [("PENDING", "PENDING"),("ACCEPTED", "ACCEPTED"),("DENIED", "DENIED")]
     #global if the records below are set to the same user
-    recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE, blank=True, null=True)
     sender = models.ForeignKey(User, related_name="sender", on_delete=models.CASCADE)
     created_date = models.DateField()
     actioned_date = models.DateField(blank=True, null=True)

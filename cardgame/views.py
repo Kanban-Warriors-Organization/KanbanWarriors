@@ -503,27 +503,39 @@ def echo_user(request):
 def global_trade_page(request):
     #this is currently unimplemented, if you see this tell lizard to write this view!
     #idk what to put here, jake message me if you're reading this
-    return render(request, "search.html")
+    return render(request, "cardgame/search.html")
 
 def get_trades_matching_query(request):
     if request.method == 'GET':
-        #we expect some variety of form here
-        #not sure how the form is going to pass the values so i'm just going to write down this and hope it works
-        query = request.GET.get("query")
-        #this probably doesn't work
-        #basic filter for now, can change later
-        trades = Trade.objects.filter(incoming_card = query[card])
-        t = []
-        for tr in trades:
-            data = {}
-            data['sender'] = tr.sender.username
-            data['date'] = tr.created_date
-            data['offered_card'] = tr.offered_card.card_name
-            data['offered_card_image'] = tr.offered_card.card_image_link
-            data['requested_card'] = tr.requested_card.card_name
-            data['requested_card_image'] = tr.requested_card.card_image_link
-            t.append(data)
-        return render(request, "cardgame/search_results.html", {'data':t})
+        try:
+            #we expect some variety of form here
+            #not sure how the form is going to pass the values so i'm just going to write down this and hope it works
+            #this probably doesn't work
+            #basic filter for now, can change later
+            out_card = request.GET.get("out_card")
+            in_card = request.GET.get("in_card")
+            print("out card is " + out_card + " in card is " + in_card)
+            trades = Trade.objects.all().filter(recipient=None)
+            print(trades)
+            if (request.GET.get("out_card") != ''):
+                trades = trades.filter(requested_card__card_name = out_card)
+            if (request.GET.get("in_card") != ''):
+                trades = trades.filter(offered_card__card_name = in_card)
+            if trades.count() == 0:
+                return HttpResponse("no trades!")
+            t = []
+            for tr in trades:
+                data = {}
+                data['sender'] = tr.sender.username
+                data['date'] = tr.created_date
+                data['offered_card'] = tr.offered_card.card_name
+                data['offered_card_image'] = tr.offered_card.card_image_link
+                data['requested_card'] = tr.requested_card.card_name
+                data['requested_card_image'] = tr.requested_card.card_image_link
+                t.append(data)
+            return render(request, "cardgame/search_results.html", {'data':t})
+        except ObjectDoesNotExist:
+             return HttpResponse("why don't you try hard?")
 
 
 @login_required
@@ -568,7 +580,7 @@ def accept_trade(request, t_id):
         #validate that the user can access the trade
         user = request.user
         trade = Trade.objects.get(id = t_id)
-        if (trade.sender != trade.recipient and trade.recipient != user):
+        if (trade.sender != None and trade.recipient != user):
             return HttpResponse("watch out! you can't make this trade!")
         if trade.STATUS == "ACCEPTED":
             return HttpResponse("this trade has already been completed! sorry!")
