@@ -28,8 +28,11 @@ def index(request):
     """
     Default index landing page
     """
-    form = UserCreationForm()
-    return HttpResponse(render(request, "cardgame/signup.html",
+    if request.user.is_authenticated:
+        return render(request, "cardgame/home.html")
+    else:
+        form = UserCreationForm()
+        return HttpResponse(render(request, "cardgame/signup.html",
                                {"form": form}))
 
 
@@ -545,6 +548,7 @@ def get_outgoing_trades(request):
     t = []
     for tr in trades:
         data = {}
+        data['id'] = tr.id;
         data['recipient'] = tr.sender.username
         data['date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
@@ -565,6 +569,7 @@ def get_incoming_trades(request):
     t = []
     for tr in trades:
         data = {}
+        data['id'] = tr.id
         data['sender'] = tr.sender.username
         data['date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
@@ -580,7 +585,7 @@ def accept_trade(request, t_id):
         #validate that the user can access the trade
         user = request.user
         trade = Trade.objects.get(id = t_id)
-        if (trade.sender != None and trade.recipient != user):
+        if (trade.recipient != None and trade.recipient != user):
             return HttpResponse("watch out! you can't make this trade!")
         if trade.STATUS == "ACCEPTED":
             return HttpResponse("this trade has already been completed! sorry!")
@@ -593,8 +598,9 @@ def accept_trade(request, t_id):
                 and recipient_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists()):
             return HttpResponse("oh no, this trade is no longer available!")
         #now we can proceed with the trade
+        #TODO: make this atomic or something
         sender_profile.user_profile_collected_cards.add(requested_card)
-        recipient_profile.user_profile.collected_cards.add(offered_card)
+        recipient_profile.user_profile_collected_cards.add(offered_card)
         sender_profile.user_profile_collected_cards.remove(offered_card)
         recipient_profile.user_profile_collected_cards.remove(requested_card)
         Trade.objects.get(id=t_id).delete()
@@ -610,8 +616,9 @@ def cancel_trade(request, t_id):
             return HttpResponse("watch out! you can't cancel this trade!")
         #actually cancels the trade
         Trade.objects.get(id=t_id).delete()
+        return HttpResponse("success!")
 
-    except ObjectDoesNotExist():
+    except ObjectDoesNotExist:
         return HttpResponse("critical system error")
 
 
@@ -628,10 +635,10 @@ def trade_page(request, t_id):
             #check that the user can access the trade
             user = request.user
             tr = Trade.objects.get(id = t_id)
-            if (tr.sender != tr.recipient and tr.recipient != user):
+            if (tr.recipient != None and tr.recipient != user):
                 return HttpResponse("no!")
             #if the user can access the trade:
-            return render(request, "cardgame/trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
+            return render(request, "cardgame/trade.html", {'id': t_id, 'sender':tr.sender.username, 'date':tr.created_date,
                                                   'incoming_card':tr.offered_card.card_name,
                                                   'incoming_card_image':tr.offered_card.card_image_link,
                                                   'requested_card':tr.requested_card.card_name, 'requested_card_image':tr.requested_card.card_image_link})
