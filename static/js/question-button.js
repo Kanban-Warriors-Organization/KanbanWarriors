@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalDescription = document.getElementById('modal-description');
     const closeButton = document.querySelector('.close');
     const corrAns = ansDiv.getAttribute('data-ans');
+    
     document.querySelectorAll(".btn").forEach(button => {
         button.addEventListener("click", function() {
             const ans = button.getAttribute('data-ans');

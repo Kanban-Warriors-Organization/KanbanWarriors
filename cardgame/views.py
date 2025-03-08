@@ -64,6 +64,7 @@ def card_col(request, user_name):
         imgs_has = []
         imgs_not = []
         card_titleshas = []
+        card_titlenot = []
         card_descriptionshas = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
@@ -72,14 +73,17 @@ def card_col(request, user_name):
             card_descriptionshas.append(i.card_description)
         for j in Card.objects.all():
             imgs_not.append(j.card_image_link)
+            card_titlenot.append(j.card_name)
         imgs_not = list(filter(lambda x: x not in imgs_has, imgs_not))
 
         cards_has = [{"image": img, "title": title, "description": description}
                      for img, title, description in
                      zip(imgs_has, card_titleshas,
                          card_descriptionshas)]
+        cards_not = [{"image": img, "title": title}
+                     for img, title in zip(imgs_not, card_titlenot)]
         return render(request, "cardgame/card_col.html",
-                      {"cardshas": cards_has, "imgsnot": imgs_not})
+                      {"cardshas": cards_has, "cardsnot": cards_not})
 
     except ObjectDoesNotExist:
         # if user does not exist
@@ -502,7 +506,7 @@ def global_trade_page():
 
 @login_required
 def get_incoming_trades(request):
-    u = request.user;
+    u = request.user
     trades = Trade.objects.filter(recipient = u)
     t = []
     for tr in trades:
@@ -583,35 +587,47 @@ def trade_page(request, t_id):
 
 
 @login_required
-def make_trade_page(request):
-    user = user.request
-    up = UserProfile.objects.get(user=user)
-    #page for creating a trade
-    if request.method == 'POST':
-        wanted_card = Card.objects.get(card_name = request.POST.get(wanted_card))
-        offered_card = Card.objects.get(card_name = request.POST.get(offered_card))
-        recipient = User.objects.get(username = request.POST.get(recipient)) #specifically the username of the user
+def make_trade_page(request, card_name):
+    titles = []
+    names = []
+    user = UserProfile.objects.get(user=request.user)
+    offeredCard = Card.objects.get(card_name=card_name)
+    ownedCards = user.user_profile_collected_cards.all()
+    all_users = User.objects.all()
+    for user in all_users:
+        names.append(user.username)
+    for card in ownedCards:
+        titles.append(card.card_name)
+    return render(request, "cardgame/make_trade.html", {"offeredCard": offeredCard, "ownedCards": titles, "all_users": names})
 
-        #validate that the user can make a trade
-        if (recipient != user.username):
-            #gets number of outgoing trades to that user
-            if Trade.objects.filter(recipient=recipient).filter(sender=user).count() > 2:
-                return HttpResponse("the invisible hand smiteth thee")
+    # user = user.request
+    # up = UserProfile.objects.get(user=user)
+    # #page for creating a trade
+    # if request.method == 'POST':
+    #     print(request.POST.get('card'))
+    #     wanted_card = Card.objects.get(card_name = request.POST.get(wanted_card))
+    #     offered_card = Card.objects.get(card_name = request.POST.get(offered_card))
+    #     recipient = User.objects.get(username = request.POST.get(recipient)) #specifically the username of the user
+
+    #     #validate that the user can make a trade
+    #     if (recipient != user.username):
+    #         #gets number of outgoing trades to that user
+    #         if Trade.objects.filter(recipient=recipient).filter(sender=user).count() > 2:
+    #             return HttpResponse("the invisible hand smiteth thee")
 
 
-        elif (recipient == user.username):
-            if Trade.objects.filter(recipient=user).count() > 2:
-                return HttpResponse("the invisible hand striketh thee down")
-        #adds the trade
-        new_trade = Trade.objects.create(offered_card=offered_card, requested_card = wanted_card,
-                                         STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
-        new_trade.save()
-        return HttpResponse("trade created successfully!")
+    #     elif (recipient == user.username):
+    #         if Trade.objects.filter(recipient=user).count() > 2:
+    #             return HttpResponse("the invisible hand striketh thee down")
+    #     #adds the trade
+    #     new_trade = Trade.objects.create(offered_card=offered_card, requested_card = wanted_card,
+    #                                      STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
+    #     new_trade.save()
+    #     return HttpResponse("trade created successfully!")
 
 
-
-    else:
-        return render(request, "make_trade.html") #renders the form page or something
+   # else:
+       # return render(request, "make_trade.html") #renders the form page or something
 
 
 
