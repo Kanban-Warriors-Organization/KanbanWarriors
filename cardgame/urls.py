@@ -39,7 +39,9 @@ urlpatterns = [
     path("trades/create", views.make_trade_page, name="create"),
     path("trade/<int:t_id>", views.trade_page, name="trade"),
     path("trade/<int:t_id>/accept", views.accept_trade, name="accept"),
-    path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel")
+    path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel"),
+    path("privacy/", views.privacy, name="privacy")
+
     # uses django's inbuilt login view
 ]   # [1] DO NOT REMOVE THE SLASH!
 

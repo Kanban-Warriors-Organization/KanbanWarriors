@@ -655,5 +655,18 @@ def make_trade_page(request):
     else:
         return render(request, "cardgame/make_trade.html") #renders the form page or something
 
+@login_required
+def delete_view(request):
+    if request.method == 'DELETE':
+        #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
+        user = request.user
+        user.delete()
+        return HttpResponse("thanks for playing this game! bye!")
 
+
+    
+    return HttpResponse("why don't you try hard?")
+
+def privacy(request):
+    return render(request, "cardgame/privacy.html")
 
