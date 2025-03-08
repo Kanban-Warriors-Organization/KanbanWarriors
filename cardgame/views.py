@@ -500,9 +500,51 @@ def echo_user(request):
     return HttpResponse(str(u))
 
 
-def global_trade_page():
-    pass
+def global_trade_page(request):
     #this is currently unimplemented, if you see this tell lizard to write this view!
+    #idk what to put here, jake message me if you're reading this
+    return render(request, "search.html")
+
+def get_trades_matching_query(request):
+    if request.method == 'GET':
+        #we expect some variety of form here
+        #not sure how the form is going to pass the values so i'm just going to write down this and hope it works
+        query = request.GET.get("query")
+        #this probably doesn't work
+        #basic filter for now, can change later
+        trades = Trade.objects.filter(incoming_card = query[card])
+        t = []
+        for tr in trades:
+            data = {}
+            data['sender'] = tr.sender.username
+            data['date'] = tr.created_date
+            data['offered_card'] = tr.offered_card.card_name
+            data['offered_card_image'] = tr.offered_card.card_image_link
+            data['requested_card'] = tr.requested_card.card_name
+            data['requested_card_image'] = tr.requested_card.card_image_link
+            t.append(data)
+        return render(request, "cardgame/search_results.html", {'data':t})
+
+
+@login_required
+def get_outgoing_trades(request):
+    u = request.user;
+    trades = Trade.objects.filter(sender = u)
+    t = []
+    for tr in trades:
+        data = {}
+        data['recipient'] = tr.sender.username
+        data['date'] = tr.created_date
+        data['incoming_card'] = tr.offered_card.card_name
+        data['incoming_card_image'] = tr.offered_card.card_image_link
+        data['requested_card'] = tr.requested_card.card_name
+        data['requested_card_image'] = tr.requested_card.card_image_link
+        t.append(data)
+    return render(request, "cardgame/outgoing_trades.html", {'data':t})
+
+
+
+
 
 @login_required
 def get_incoming_trades(request):
@@ -513,12 +555,12 @@ def get_incoming_trades(request):
         data = {}
         data['sender'] = tr.sender.username
         data['date'] = tr.created_date
-        data['incoming_card'] = tr.offered_card.name
+        data['incoming_card'] = tr.offered_card.card_name
         data['incoming_card_image'] = tr.offered_card.card_image_link
-        data['requested_card'] = tr.requested_card.name
+        data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
-    return render(request, "incoming_trades.html", {'data':t})
+    return render(request, "cardgame/incoming_trades.html", {'data':t})
 
 @login_required
 def accept_trade(request, t_id):
@@ -577,12 +619,12 @@ def trade_page(request, t_id):
             if (tr.sender != tr.recipient and tr.recipient != user):
                 return HttpResponse("no!")
             #if the user can access the trade:
-            return render(request, "trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
-                                                  'incoming_card':tr.offered_card.card_image_link,
+            return render(request, "cardgame/trade.html", {'sender':tr.sender.username, 'date':tr.created_date,
+                                                  'incoming_card':tr.offered_card.card_name,
                                                   'incoming_card_image':tr.offered_card.card_image_link,
-                                                  'requested_card':tr.requested_card.name, 'requested_card_image':tr.requested_card.card_image_link})
+                                                  'requested_card':tr.requested_card.card_name, 'requested_card_image':tr.requested_card.card_image_link})
 
-        except ObjectDoesNotExist():
+        except ObjectDoesNotExist:
             raise Http404()
 
 
@@ -629,5 +671,18 @@ def make_trade_page(request, card_name):
    # else:
        # return render(request, "make_trade.html") #renders the form page or something
 
+@login_required
+def delete_view(request):
+    if request.method == 'DELETE':
+        #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
+        user = request.user
+        user.delete()
+        return HttpResponse("thanks for playing this game! bye!")
 
+
+
+    return HttpResponse("why don't you try hard?")
+
+def privacy(request):
+    return render(request, "cardgame/privacy.html")
 

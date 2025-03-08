@@ -34,12 +34,14 @@ urlpatterns = [
     path("challenges/", views.challenges, name="challenges"),  # [1]
     path("echo_user", views.echo_user, name="echo_user"),
     path("trades", views.global_trade_page, name="trades"),
-    #path("trades/outgoing", views.get_outgoing_trades, name="outgoing"),
+    path("trades/outgoing", views.get_outgoing_trades, name="outgoing"),
     path("trades/incoming", views.get_incoming_trades, name="incoming"),
     path("trades/create/<str:card_name>/", views.make_trade_page, name="create"),
     path("trade/<int:t_id>", views.trade_page, name="trade"),
     path("trade/<int:t_id>/accept", views.accept_trade, name="accept"),
-    path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel")
+    path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel"),
+    path("privacy/", views.privacy, name="privacy")
+
     # uses django's inbuilt login view
 ]   # [1] DO NOT REMOVE THE SLASH!
 
