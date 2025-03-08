@@ -153,6 +153,7 @@ Ensure `psycopg2-binary` is installed.
 
 ```sh
 pip install psycopg2-binary
+pip install python-decouple
 ```
 
 ### 📌 Step 3: Setting up PostgreSQL Database
@@ -187,11 +188,11 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 ```
@@ -204,19 +205,26 @@ echo ".env" >> .gitignore
 
 Doing so will not push your database credentials to GitHub. This is important down the line when we eventually need to host the DB securely on a remote server.
 
-## 📌 Step 6: Migrating the Relations
+## 📌 Step 7: Migrating the Relations
 
 I had some issues when migrating the relations initially. Hopefully, following these instructions will avoid all that.
 
-While in the directory of the project, use the terminal to execute the command:
+While in the directory of the project, use the terminal to execute these commands:
 
 ```bash
-manage.py migrate --run-syncdb
+py manage.py makemigrations
+py manage.py migrate
 ```
 
-This should force the initialisation of all relations and models that do not exist currently in PSQL
+Note: If `makemigrations` doesn't detect changes or it is missing tables, you can force their creation using:
 
-## 📌 Step 7: Loading the data into the new DB
+```bash
+py manage.py migrate --run-syncdb
+```
+
+Keep in mind that this is a legacy command. Double check that proper migrations are made by running `makemigrations` and `migrate` again.
+
+## 📌 Step 8: Loading the data into the new DB
 
 I have already extracted and re-encoded the data from our original DB. It is in the root directory of the project called "data.json".
 
@@ -226,7 +234,23 @@ In the working directory's terminal, execute:
 py manage.py loaddata data.json
 ```
 
+You should see something like:
+
+```text
+Installed 96 object(s) from 1 fixture(s)
+```
+
 This will populate the new DB with the data we had in the original DB.
+
+## 📌 Step 9: Test the Setup
+
+Run the Django Server:
+
+```bash
+py manage.py runserver
+```
+
+Access the application and confirm that the data is present and works as intended.
 
 If you have made it this far, congratulations! you have successfully migrated from Sqlite3 to PostgreSQL!
 
