@@ -105,14 +105,14 @@ python manage.py test
 
 ## 🛠️ Technologies Used
 
-| 🚀 Technology | 📌 Version | 🔍 Purpose                                             |
-| ------------- | ---------- | ------------------------------------------------------ |
-| **Django**    | 5.1.6      | Web framework for backend logic and database handling. |
-| **Pillow**    | 11.1.0     | Image processing for card generation.                  |
-| **Leaflet**   | N/A        | Interactive map rendering.                             |
-| **SQLite**    | N/A        | Lightweight database for development.                  |
-| **pytest**    | N/A        | Automated testing framework.                           |
-| **flake8**    | N/A        | Code quality and linting tool.                         |
+| 🚀 Technology  | 📌 Version | 🔍 Purpose                                             |
+| -------------- | ---------- | ------------------------------------------------------ |
+| **Django**     | 5.1.6      | Web framework for backend logic and database handling. |
+| **Pillow**     | 11.1.0     | Image processing for card generation.                  |
+| **Leaflet**    | N/A        | Interactive map rendering.                             |
+| **PostgreSQL** | N/A        | Lightweight database for development.                  |
+| **pytest**     | N/A        | Automated testing framework.                           |
+| **flake8**     | N/A        | Code quality and linting tool.                         |
 
 ## 🎯 Features
 
@@ -130,6 +130,105 @@ EcoSplore is packed with features to provide an engaging gameplay experience:
 - [ ] **Trading Cards:** Trade cards with other players to complete your sets and acquire rare cards.
 - [ ] **In-Game Currency:** Earn and use in-game currency for various game enhancements and items.
 - [ ] **Scavenger Hunts:** Participate in complex, multi-location scavenger hunts for valuable rewards.
+
+## 🚀 Migrating from SQLite3 to PostgreSQL
+
+Our project has migrated from **SQLite3** to **PostgreSQL**. Follow these steps to update your local environment.
+
+### 📌 Step 1: Install PostgreSQL
+
+Make sure PostgreSQL is installed on your system.
+
+- **Windows**: [Download PostgreSQL](https://www.postgresql.org/download/)
+- **Mac (Homebrew)**:
+  ```sh
+  brew install postgresql
+  ```
+
+**Important**: You may need to manually add PostgreSQL to your PATH, to do that look up "how to add to PATH".
+
+### 📌 Step 2: Install Depedencies
+
+Ensure `psycopg2-binary` is installed.
+
+```sh
+pip install psycopg2-binary
+```
+
+### 📌 Step 3: Setting up PostgreSQL Database
+
+When going through setup, make sure you remember the **password** that you set up, this will be required down the line.
+
+For the additional tools download menu, check all the boxes aside from "stack builder".
+
+You may use the shell, however, I found this quite tedious and annoying. Once installation is complete, I recommend you use the GUI named "pgAdmin 4".
+
+From pgAdmin 4, you can create new databases, change user settings etc. Keep in mind that this database, while connected to the codebase, is unique to you. This means all changes you make are local.
+
+## 📌 Step 5: Update settings.py
+
+Assuming all is well at this point, we need to change some settings.
+
+First: Create a new file `.env` in the root directory of the project. This will store your credentials.
+
+```ini
+DB_NAME=your_db_name
+DB_USER=your_db_user
+DB_PASSWORD=your_secure_password # This is the password you have set during intallation
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+Next, update `settings.py`
+
+```python
+import os
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+    }
+}
+```
+
+## 📌 Step 6: Add the .env file to gitignore
+
+```bash
+echo ".env" >> .gitignore
+```
+
+Doing so will not push your database credentials to GitHub. This is important down the line when we eventually need to host the DB securely on a remote server.
+
+## 📌 Step 6: Migrating the Relations
+
+I had some issues when migrating the relations initially. Hopefully, following these instructions will avoid all that.
+
+While in the directory of the project, use the terminal to execute the command:
+
+```bash
+manage.py migrate --run-syncdb
+```
+
+This should force the initialisation of all relations and models that do not exist currently in PSQL
+
+## 📌 Step 7: Loading the data into the new DB
+
+I have already extracted and re-encoded the data from our original DB. It is in the root directory of the project called "data.json".
+
+In the working directory's terminal, execute:
+
+```bash
+py manage.py loaddata data.json
+```
+
+This will populate the new DB with the data we had in the original DB.
+
+If you have made it this far, congratulations! you have successfully migrated from Sqlite3 to PostgreSQL!
 
 ## 🔮 Future Enhancements
 
