@@ -41,7 +41,11 @@ urlpatterns = [
     path("trade/<int:t_id>", views.trade_page, name="trade"),
     path("trade/<int:t_id>/accept", views.accept_trade, name="accept"),
     path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel"),
-    path("privacy/", views.privacy, name="privacy")
+    path("privacy/", views.privacy, name="privacy"),
+    path("account", views.account, name="account"),
+    path("change_username", views.change_username, name="change_username"),
+    path("change_password", auth_views.PasswordChangeView.as_view(template_name="cardgame/change_password.html",success_url="home"),name="change_password"),
+    path("delete_account", views.delete_account, name="delete_account")
 
     # uses django's inbuilt login view
 ]   # [1] DO NOT REMOVE THE SLASH!

@@ -691,8 +691,8 @@ def make_trade_page(request, card_name):
        # return render(request, "make_trade.html") #renders the form page or something
 
 @login_required
-def delete_view(request):
-    if request.method == 'DELETE':
+def delete_account(request):
+    if request.method == 'POST':
         #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
         user = request.user
         user.delete()
@@ -704,4 +704,28 @@ def delete_view(request):
 
 def privacy(request):
     return render(request, "cardgame/privacy.html")
+
+@login_required
+def account(request):
+    return render(request, "cardgame/account_page.html")
+
+
+        #check type of request we want and call appropriate view
+
+    
+
+@login_required
+def change_username(request):
+    user = request.user
+    new_name = request.POST.get("new_name")
+    try:
+        #verify no other user has that userna,e
+        if User.objects.filter(username = new_name):
+            return HttpResponse("that name is taken, sorry")
+        else:
+           user.username = new_name
+           user.save()
+           return redirect("home")
+    except Exception as e:
+        print(e)
 

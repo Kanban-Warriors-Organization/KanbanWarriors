@@ -1,0 +1,15 @@
+<form action="{% url 'change_username' %}" method="post">{% csrf_token %}
+  <input name="new_name" type="text" placeholder="enter your new username">
+  <button action="{%url 'change_password' %}" type="submit"> change username!!!! </button>
+</form>
+
+<form action="{% url 'change_password' %}" method="post">{% csrf_token %}
+ <button action="{%url 'change_password' %}" type="submit"> change password!</button>
+</form>
+
+
+<form action="{% url 'delete_account' %}" method="delete">{% csrf_token %}
+  <input name="pwd" type="text" placeholder="enter your password">
+  <button action="{%url 'delete_account' %}" type="submit"> delete account!!!!:w
+ </button>
+</form>
