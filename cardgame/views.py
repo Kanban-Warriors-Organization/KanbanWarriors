@@ -22,6 +22,7 @@ from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question
+import uuid 
 
 
 def index(request):
@@ -494,3 +495,16 @@ def add_card(request, chal_id):
 def echo_user(request):
     u = request.user
     return HttpResponse(str(u))
+
+@login_required
+def battle_room(request, room_id=None):
+    # Generate a room ID if one wasn't provided
+    if not room_id:
+        room_id = str(uuid.uuid4())[:8]
+    
+    context = {
+        'room_id': room_id,
+        'username': request.user.username if request.user.is_authenticated else "Anonymous"
+    }
+    
+    return render(request, 'cardgame/battle.html', context)

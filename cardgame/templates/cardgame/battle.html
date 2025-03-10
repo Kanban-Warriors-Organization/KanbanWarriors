@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Battle</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .battle-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .player-area, .opponent-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .card {
+            display: inline-block;
+            width: 100px;
+            height: 140px;
+            border: 1px solid #000;
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+            padding: 5px;
+            background-color: #f0f0f0;
+        }
+        #battle-log {
+            height: 150px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Battle Room: {{ room_id }}</h1>
+    <p>Share this room ID with another player to battle!</p>
+    
+    <div class="battle-area">
+        <div class="opponent-area">
+            <h2>Opponent's Cards</h2>
+            <div id="opponent-cards"></div>
+        </div>
+        
+        <div class="player-area">
+            <h2>Your Cards</h2>
+            <div id="player-cards">
+                <!-- Demo cards -->
+                <div class="card" data-id="1" onclick="playCard(1, 'Fire Dragon')">
+                    <h3>Fire Dragon</h3>
+                    <div>ATK: 800</div>
+                    <div>DEF: 600</div>
+                </div>
+                <div class="card" data-id="2" onclick="playCard(2, 'Water Sprite')">
+                    <h3>Water Sprite</h3>
+                    <div>ATK: 600</div>
+                    <div>DEF: 800</div>
+                </div>
+                <div class="card" data-id="3" onclick="playCard(3, 'Earth Golem')">
+                    <h3>Earth Golem</h3>
+                    <div>ATK: 700</div>
+                    <div>DEF: 900</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="battle-log">
+        <div class="log-entry">Battle started. Waiting for players...</div>
+    </div>
+
+    <script>
+        // Get username and room from template context
+        const username = "{{ username }}";
+        const roomId = "{{ room_id }}";
+        let socket;
+        
+        // Connect to WebSocket
+        function connect() {
+            // Create WebSocket connection
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+            socket = new WebSocket(`${protocol}//${host}/ws/battle/${roomId}/`);
+            
+            // Connection opened
+            socket.addEventListener('open', (event) => {
+                logMessage('Connected to battle server!');
+            });
+            
+            // Listen for messages
+            socket.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            });
+            
+            // Connection closed
+            socket.addEventListener('close', (event) => {
+                logMessage('Disconnected from battle server.');
+                // Try to reconnect after a delay
+                setTimeout(connect, 1000);
+            });
+            
+            // Connection error
+            socket.addEventListener('error', (event) => {
+                logMessage('WebSocket error: ' + event);
+            });
+        }
+        
+        // Handle incoming messages
+        function handleMessage(data) {
+            if (data.event === 'user_connected') {
+                logMessage(`${data.user} has joined the battle!`);
+            } 
+            else if (data.event === 'play_card') {
+                logMessage(`${data.username} played ${data.card_name}!`);
+                
+                // If the card was played by opponent, show it in their area
+                if (data.username !== username) {
+                    const cardElement = document.createElement('div');
+                    cardElement.className = 'card';
+                    cardElement.innerHTML = `
+                        <h3>${data.card_name}</h3>
+                        <div>Card ID: ${data.card_id}</div>
+                    `;
+                    document.getElementById('opponent-cards').appendChild(cardElement);
+                }
+            } 
+            else {
+                // For any other event types
+                logMessage('Event: ' + JSON.stringify(data));
+            }
+        }
+        
+        // Play a card
+        function playCard(cardId, cardName) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    event: 'play_card',
+                    username: username,
+                    card_id: cardId,
+                    card_name: cardName
+                };
+                socket.send(JSON.stringify(message));
+                
+                // Remove the card from player's hand
+                const card = document.querySelector(`.card[data-id="${cardId}"]`);
+                if (card) {
+                    card.remove();
+                }
+            } else {
+                logMessage('Not connected to server!');
+            }
+        }
+        
+        // Add message to battle log
+        function logMessage(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            const battleLog = document.getElementById('battle-log');
+            battleLog.appendChild(logEntry);
+            battleLog.scrollTop = battleLog.scrollHeight;
+        }
+        
+        // Connect when page loads
+        document.addEventListener('DOMContentLoaded', connect);
+    </script>
+</body>
+</html>
