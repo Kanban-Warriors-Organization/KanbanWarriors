@@ -83,11 +83,15 @@ Ensure the following dependencies are installed:
    ```bash
    python manage.py migrate
    ```
-4. **Start the Django development server:**
+4. **Prepare static files**
    ```bash
-   python manage.py runserver
+   python manage.py collectstatic
    ```
-5. **Access the application:** Open `http://127.0.0.1:8000/` in a web browser.
+5. **Run the server using uvicorn:**
+   ```bash
+   uvicorn cards.asgi:application
+   ```
+6. **Access the application:** Open `http://127.0.0.1:8000/` in a web browser.
 
 ### 🧪 Running Tests
 
