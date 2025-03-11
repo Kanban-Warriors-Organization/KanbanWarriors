@@ -11,14 +11,19 @@ import os
 
 from django.core.asgi import get_asgi_application
 
+# Set the Django settings module first
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cards.settings')
+
+# Get the ASGI application first
+django_asgi_app = get_asgi_application()
+
+# Then import the channel components after the Django app is loaded
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 import cardgame.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cards.settings')
-
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
             cardgame.routing.websocket_urlpatterns
