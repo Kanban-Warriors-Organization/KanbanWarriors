@@ -3,6 +3,7 @@ Core functionality for user interactions, authentication, and data management.
 Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
+import random
 import sys
 import datetime
 from io import BytesIO
@@ -498,13 +499,58 @@ def echo_user(request):
 
 @login_required
 def battle_room(request, room_id=None):
-    # Generate a room ID if one wasn't provided
-    if not room_id:
+    """
+    Renders the battle room page where users can battle with their cards.
+    
+    Author: Samuel Weisz
+    
+    Args:
+        request: HTTP request object
+        room_id: Optional room ID parameter
+        
+    Returns:
+        Rendered battle room template
+    """
+    if room_id is None:
+        # Generate a new room ID if none is provided
         room_id = str(uuid.uuid4())[:8]
+        return redirect('battle_with_id', room_id=room_id)
     
-    context = {
+    return render(request, 'cardgame/battle.html', {
         'room_id': room_id,
-        'username': request.user.username if request.user.is_authenticated else "Anonymous"
-    }
+        'username': request.user.username
+    })
+
+@login_required
+def get_battle_cards(request):
+    """
+    Retrieves cards available for battle from user's collection.
     
-    return render(request, 'cardgame/battle.html', context)
+    Author: Samuel Weisz
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        JsonResponse: User's collected cards with battle stats
+    """
+    try:
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        cards = user_profile.user_profile_collected_cards.all()
+        
+        card_data = []
+        for card in cards:
+            card_data.append({
+                'name': card.card_name,
+                'subtitle': card.card_subtitle,
+                'description': card.card_description,
+                'image': card.card_image_link.url if card.card_image_link else None,
+                'environmental_friendliness': card.environmental_friendliness if hasattr(card, 'environmental_friendliness') else random.randint(1, 100),
+                'beauty': card.beauty if hasattr(card, 'beauty') else random.randint(1, 100),
+                'cost': card.cost if hasattr(card, 'cost') else random.randint(1, 100)
+            })
+        
+        return JsonResponse({'cards': card_data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

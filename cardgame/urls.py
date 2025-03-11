@@ -34,8 +34,9 @@ urlpatterns = [
     path("challenges/", views.challenges, name="challenges"),  # [1]
     path("echo_user", views.echo_user, name="echo_user"),
     # uses django's inbuilt login view
-    path('battle/', views.battle_room, name='create_battle'), 
-    path('battle/<str:room_id>/', views.battle_room, name='battle_room'),
+    path('battle/', views.battle_room, name='battle'),
+    path('battle/<str:room_id>/', views.battle_room, name='battle_with_id'),
+    path("get-battle-cards/", views.get_battle_cards, name="get_battle_cards"),
 ]   # [1] DO NOT REMOVE THE SLASH!
 
 # (template_name="cardgame/login.html")

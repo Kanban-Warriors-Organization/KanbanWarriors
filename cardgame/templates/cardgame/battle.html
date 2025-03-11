@@ -1,96 +1,443 @@
+.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Battle</title>
+    <title>EcoSplore Battle</title>
     {% load static %}
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Kanit', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: #08546B;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .logo img {
+            height: 50px;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        .nav-links a:hover {
+            background-color: #0fce14;
+        }
+        
+        .battle-container {
+            max-width: 1000px;
+            margin: 30px auto;
             padding: 20px;
         }
+        
+        .battle-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .battle-header h1 {
+            color: #08546B;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .battle-status {
+            color: #0c82a3;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
         .battle-area {
             display: flex;
             flex-direction: column;
+            gap: 30px;
+        }
+        
+        .player-area, .opponent-area {
+            border: 3px solid #12c5f8;
+            border-radius: 10px;
+            padding: 20px;
+            background: linear-gradient(0deg, #ffffff 0%, #f0f0f0 100%);
+        }
+        
+        .area-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #12c5f8;
+            padding-bottom: 10px;
+        }
+        
+        .area-header h2 {
+            color: #08546B;
+            margin: 0;
+        }
+        
+        .score {
+            font-weight: bold;
+            color: #096079;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .card {
+            width: 140px;
+            height: 200px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            border-color: #12c5f8;
+        }
+        
+        .card.selected {
+            border-color: #0fce14;
+            background: linear-gradient(135deg, #f0fff0 0%, #e0ffe0 100%);
+        }
+        
+        .card h3 {
+            margin: 0 0 10px 0;
+            color: #08546B;
+            font-size: 16px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-image {
+            width: 100px;
+            height: 80px;
+            margin: 0 auto 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-stats {
+            text-align: left;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 3px 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .stat-row:hover {
+            background-color: #e8f4f8;
+        }
+        
+        .stat-name {
+            font-weight: bold;
+            color: #096079;
+        }
+        
+        .opponent-card .stat-row {
+            cursor: default;
+        }
+        
+        .opponent-card .stat-value {
+            display: none;
+        }
+        
+        .hidden-card {
+            background: linear-gradient(135deg, #12c5f8 0%, #08546B 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .battle-actions {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
             gap: 20px;
         }
-        .player-area, .opponent-area {
-            border: 1px solid #ccc;
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: #12c5f8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0c82a3;
+        }
+        
+        .btn-success {
+            background-color: #0fce14;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #0ba310;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        #battle-log {
+            height: 200px;
+            border: 2px solid #12c5f8;
+            border-radius: 10px;
+            overflow-y: auto;
             padding: 15px;
+            margin-top: 30px;
+            background-color: #f9f9f9;
+        }
+        
+        .log-entry {
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .log-entry:nth-child(odd) {
+            background-color: #e8f4f8;
+        }
+        
+        .log-entry.highlight {
+            background-color: #dff0d8;
+            border-left: 3px solid #0fce14;
+            font-weight: bold;
+        }
+        
+        .card-selection {
+            margin: 20px 0;
+        }
+        
+        .card-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 5px;
         }
-        .card {
-            display: inline-block;
-            width: 100px;
-            height: 140px;
-            border: 1px solid #000;
-            margin: 5px;
+        
+        .footer {
             text-align: center;
-            cursor: pointer;
-            padding: 5px;
-            background-color: #f0f0f0;
+            padding: 20px;
+            background-color: #08546B;
+            color: white;
+            margin-top: 30px;
         }
-        #battle-log {
-            height: 150px;
-            border: 1px solid #ccc;
-            overflow-y: scroll;
-            padding: 10px;
-            margin-top: 20px;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .log-entry {
-            margin-bottom: 5px;
+        
+        @keyframes highlight {
+            0% { background-color: #ffffff; }
+            50% { background-color: #dff0d8; }
+            100% { background-color: #ffffff; }
+        }
+        
+        .highlight {
+            animation: highlight 1s ease;
+        }
+        
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .result-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .result-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 80%;
+        }
+        
+        .result-title {
+            font-size: 32px;
+            color: #08546B;
+            margin-bottom: 20px;
+        }
+        
+        .result-message {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Battle Room: {{ room_id }}</h1>
-    <p>Share this room ID with another player to battle!</p>
+    <header class="navbar">
+        <a href="/home" class="logo">
+            <img src="{% static 'img\logo.png' %}">
+        </a>
+        <nav class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/profile-redirect">Profile</a>
+            <a href="/challenges">Challenges</a>
+            <a href="/collection-redirect">Collection</a>
+            <a href="/logout">Sign Out</a>
+        </nav>
+    </header>
     
-    <div class="battle-area">
-        <div class="opponent-area">
-            <h2>Opponent's Cards</h2>
-            <div id="opponent-cards"></div>
+    <div class="battle-container">
+        <div class="battle-header">
+            <h1>Card Battle</h1>
+            <div class="battle-status">Room ID: {{ room_id }} - Share this with your opponent!</div>
         </div>
         
-        <div class="player-area">
-            <h2>Your Cards</h2>
-            <div id="player-cards">
-                <!-- Demo cards -->
-                <div class="card" data-id="1" onclick="playCard(1, 'Fire Dragon')">
-                    <h3>Fire Dragon</h3>
-                    <div>ATK: 800</div>
-                    <div>DEF: 600</div>
+        <div id="card-selection" class="card-selection" style="display:none;">
+            <h2>Select 4 cards for your battle deck</h2>
+            <div id="card-selection-grid" class="card-selection-grid">
+                <!-- Cards will be loaded here -->
+            </div>
+            <div class="battle-actions">
+                <button id="confirm-selection" class="btn btn-primary" disabled>Confirm Selection (<span id="selected-count">0</span>/4)</button>
+            </div>
+        </div>
+        
+        <div id="battle-area" class="battle-area" style="display:none;">
+            <div class="opponent-area">
+                <div class="area-header">
+                    <h2>Opponent: <span id="opponent-name">Waiting...</span></h2>
+                    <div class="score">Score: <span id="opponent-score">0</span></div>
                 </div>
-                <div class="card" data-id="2" onclick="playCard(2, 'Water Sprite')">
-                    <h3>Water Sprite</h3>
-                    <div>ATK: 600</div>
-                    <div>DEF: 800</div>
+                <div id="opponent-cards" class="cards-container">
+                    <div class="card hidden-card">?</div>
                 </div>
-                <div class="card" data-id="3" onclick="playCard(3, 'Earth Golem')">
-                    <h3>Earth Golem</h3>
-                    <div>ATK: 700</div>
-                    <div>DEF: 900</div>
+            </div>
+            
+            <div class="player-area">
+                <div class="area-header">
+                    <h2>Your Cards</h2>
+                    <div class="score">Score: <span id="player-score">0</span></div>
                 </div>
+                <div id="player-cards" class="cards-container">
+                    <!-- Cards will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="battle-log">
+            <div class="log-entry">Welcome to EcoSplore Battle! Waiting for opponent...</div>
+        </div>
+    </div>
+    
+    <div id="result-overlay" class="result-overlay">
+        <div class="result-content">
+            <div id="result-title" class="result-title">Victory!</div>
+            <div id="result-message" class="result-message">You won the battle and earned 10 points!</div>
+            <div class="result-actions">
+                <button id="new-battle" class="btn btn-primary">New Battle</button>
+                <a href="/home" class="btn btn-success">Return Home</a>
             </div>
         </div>
     </div>
     
-    <div id="battle-log">
-        <div class="log-entry">Battle started. Waiting for players...</div>
-    </div>
+    <footer class="footer">
+        <p>@Copyright 2025. All rights reserved.</p>
+    </footer>
 
     <script>
         // Get username and room from template context
         const username = "{{ username }}";
         const roomId = "{{ room_id }}";
         let socket;
+        let selectedCards = [];
+        let gameState = "waiting"; // waiting, selecting, playing, completed
+        let isMyTurn = false;
+        let currentRound = 1;
         
         // Connect to WebSocket
         function connect() {
-            // Create WebSocket connection
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const host = window.location.host;
             socket = new WebSocket(`${protocol}//${host}/ws/battle/${roomId}/`);
@@ -109,74 +456,327 @@
             // Connection closed
             socket.addEventListener('close', (event) => {
                 logMessage('Disconnected from battle server.');
-                // Try to reconnect after a delay
                 setTimeout(connect, 1000);
             });
             
             // Connection error
             socket.addEventListener('error', (event) => {
-                logMessage('WebSocket error: ' + event);
+                logMessage('WebSocket error occurred');
             });
         }
         
         // Handle incoming messages
         function handleMessage(data) {
-            if (data.event === 'user_connected') {
-                logMessage(`${data.user} has joined the battle!`);
-            } 
-            else if (data.event === 'play_card') {
-                logMessage(`${data.username} played ${data.card_name}!`);
-                
-                // If the card was played by opponent, show it in their area
-                if (data.username !== username) {
-                    const cardElement = document.createElement('div');
-                    cardElement.className = 'card';
-                    cardElement.innerHTML = `
-                        <h3>${data.card_name}</h3>
-                        <div>Card ID: ${data.card_id}</div>
-                    `;
-                    document.getElementById('opponent-cards').appendChild(cardElement);
-                }
-            } 
-            else {
-                // For any other event types
-                logMessage('Event: ' + JSON.stringify(data));
+            console.log("Received message:", data);
+            
+            switch(data.event) {
+                case 'battle_created':
+                    logMessage('Battle room created. Waiting for an opponent to join...');
+                    gameState = "waiting";
+                    break;
+                    
+                case 'battle_joined':
+                    logMessage('You joined the battle!');
+                    transitionToCardSelection();
+                    break;
+                    
+                case 'battle_rejoined':
+                    logMessage('Reconnected to battle!');
+                    // Handle reconnection based on battle state
+                    break;
+                    
+                case 'user_connected':
+                    logMessage(`${data.username} has joined the battle!`);
+                    document.getElementById('opponent-name').textContent = data.username;
+                    if (gameState === "waiting") {
+                        transitionToCardSelection();
+                    }
+                    break;
+                    
+                case 'cards_selected':
+                    logMessage(`${data.username} has selected their cards`);
+                    if (data.username !== username) {
+                        document.getElementById('opponent-name').textContent = data.username;
+                    }
+                    break;
+                    
+                case 'player_ready':
+                    logMessage(`${data.username} is ready to battle!`);
+                    if (data.both_ready && data.battle_status === 'in_progress') {
+                        logMessage('Both players ready! The battle begins!');
+                        transitionToBattle();
+                    }
+                    break;
+                    
+                case 'round_result':
+                    displayRoundResult(data);
+                    break;
+                    
+                case 'battle_completed':
+                    displayBattleResult(data);
+                    break;
+                    
+                case 'error':
+                    logMessage(`Error: ${data.message}`, true);
+                    break;
+                    
+                default:
+                    logMessage(`Received event: ${data.event}`);
             }
         }
         
-        // Play a card
-        function playCard(cardId, cardName) {
+        // Transition to card selection phase
+        function transitionToCardSelection() {
+            gameState = "selecting";
+            
+            // Show card selection UI
+            document.getElementById('card-selection').style.display = 'block';
+            document.getElementById('battle-area').style.display = 'none';
+            
+            // Load player's available cards
+            fetchAvailableCards();
+        }
+        
+        // Fetch available cards from user's collection
+        function fetchAvailableCards() {
+            fetch(`/get-battle-cards/`)
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('card-selection-grid');
+                    grid.innerHTML = '';
+                    
+                    data.cards.forEach(card => {
+                        const cardElement = createCardElement(card, true);
+                        cardElement.addEventListener('click', () => toggleCardSelection(cardElement, card));
+                        grid.appendChild(cardElement);
+                    });
+                })
+                .catch(error => {
+                    logMessage('Error loading your cards. Please refresh.', true);
+                    console.error('Error:', error);
+                });
+        }
+        
+        // Toggle card selection
+        function toggleCardSelection(cardElement, card) {
+            if (selectedCards.includes(card.name)) {
+                // Deselect card
+                cardElement.classList.remove('selected');
+                selectedCards = selectedCards.filter(name => name !== card.name);
+            } else if (selectedCards.length < 4) {
+                // Select card
+                cardElement.classList.add('selected');
+                selectedCards.push(card.name);
+            }
+            
+            // Update counter and button state
+            document.getElementById('selected-count').textContent = selectedCards.length;
+            document.getElementById('confirm-selection').disabled = selectedCards.length !== 4;
+        }
+        
+        // Confirm card selection
+        function confirmCardSelection() {
+            if (selectedCards.length !== 4) return;
+            
             if (socket && socket.readyState === WebSocket.OPEN) {
                 const message = {
-                    event: 'play_card',
-                    username: username,
-                    card_id: cardId,
-                    card_name: cardName
+                    event: 'select_cards',
+                    card_ids: selectedCards
                 };
                 socket.send(JSON.stringify(message));
                 
-                // Remove the card from player's hand
-                const card = document.querySelector(`.card[data-id="${cardId}"]`);
-                if (card) {
-                    card.remove();
-                }
+                // Signal ready to start
+                socket.send(JSON.stringify({ event: 'ready' }));
+                
+                logMessage("Cards selected and ready to battle!");
+                document.getElementById('confirm-selection').disabled = true;
+            }
+        }
+        
+        // Transition to battle phase
+        function transitionToBattle() {
+            gameState = "playing";
+            
+            // Hide card selection, show battle area
+            document.getElementById('card-selection').style.display = 'none';
+            document.getElementById('battle-area').style.display = 'block';
+            
+            // Initialize the battle UI with player's selected cards
+            renderPlayerCards();
+        }
+        
+        // Render player's cards in battle area
+        function renderPlayerCards() {
+            const playerCardsContainer = document.getElementById('player-cards');
+            playerCardsContainer.innerHTML = '';
+            
+            // We'll show one card at a time during the battle
+            // This will be updated as rounds progress
+        }
+        
+        // Create a card element
+        function createCardElement(card, showStats = false) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.dataset.id = card.name;
+            
+            let cardContent = `
+                <h3>${card.name}</h3>
+                <div class="card-image">
+                    <img src="${card.image || ''}" alt="${card.name}" onerror="this.src='{% static 'card_images/do_not_remove.png' %}'">
+                </div>
+            `;
+            
+            if (showStats) {
+                cardContent += `
+                    <div class="card-stats">
+                        <div class="stat-row" data-stat="environmental_friendliness">
+                            <span class="stat-name">Environment:</span>
+                            <span class="stat-value">${card.environmental_friendliness || '?'}</span>
+                        </div>
+                        <div class="stat-row" data-stat="beauty">
+                            <span class="stat-name">Beauty:</span>
+                            <span class="stat-value">${card.beauty || '?'}</span>
+                        </div>
+                        <div class="stat-row" data-stat="cost">
+                            <span class="stat-name">Cost:</span>
+                            <span class="stat-value">${card.cost || '?'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            cardElement.innerHTML = cardContent;
+            return cardElement;
+        }
+        
+        // Display round result
+        function displayRoundResult(data) {
+            const p1Card = data.p1_card;
+            const p2Card = data.p2_card;
+            const result = data.result;
+            const stat = data.stat;
+            
+            // Update scores
+            document.getElementById('player-score').textContent = 
+                data.player1_score; // This assumes current user is player 1, needs to be adjusted
+            document.getElementById('opponent-score').textContent = 
+                data.player2_score;
+            
+            // Display cards played
+            const playerCard = createCardElement({
+                name: p1Card.name,
+                image: p1Card.image,
+                environmental_friendliness: p1Card.value,
+                beauty: p1Card.value,
+                cost: p1Card.value
+            }, true);
+            
+            const opponentCard = createCardElement({
+                name: p2Card.name,
+                image: p2Card.image,
+                environmental_friendliness: p2Card.value,
+                beauty: p2Card.value,
+                cost: p2Card.value
+            }, true);
+            
+            // Clear and add new cards
+            document.getElementById('player-cards').innerHTML = '';
+            document.getElementById('opponent-cards').innerHTML = '';
+            
+            document.getElementById('player-cards').appendChild(playerCard);
+            document.getElementById('opponent-cards').appendChild(opponentCard);
+            
+            // Highlight the stat that was compared
+            playerCard.querySelector(`.stat-row[data-stat="${stat}"]`).classList.add('highlight');
+            opponentCard.querySelector(`.stat-row[data-stat="${stat}"]`).classList.add('highlight');
+            
+            // Log the result
+            if (result === "tie") {
+                logMessage(`Round ${currentRound}: It's a tie! Both players get 1 point.`);
+            } else if (result === "player1") {
+                logMessage(`Round ${currentRound}: You win this round! You get 3 points.`);
             } else {
-                logMessage('Not connected to server!');
+                logMessage(`Round ${currentRound}: Your opponent wins this round. They get 3 points.`);
+            }
+            
+            currentRound++;
+            
+            // Update turn indicator
+            isMyTurn = data.next_turn === 1; // Adjust based on which player you are
+            
+            // If cards remaining is 0, game will end soon
+            if (data.cards_remaining <= 0) {
+                logMessage("Final round completed! Calculating results...");
+            }
+        }
+        
+        // Display battle result
+        function displayBattleResult(data) {
+            const resultOverlay = document.getElementById('result-overlay');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            
+            if (data.winner === username) {
+                resultTitle.textContent = "Victory!";
+                resultMessage.textContent = `You won the battle and earned ${data.player1_score} points!`;
+            } else {
+                resultTitle.textContent = "Defeat";
+                resultMessage.textContent = `You lost the battle. Better luck next time! You still earned ${data.player2_score} points.`;
+            }
+            
+            resultOverlay.classList.add('active');
+            gameState = "completed";
+        }
+        
+        // Play a card stat
+        function playCardStat(stat) {
+            if (!isMyTurn || gameState !== "playing") return;
+            
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    event: 'select_stat',
+                    stat: stat
+                };
+                socket.send(JSON.stringify(message));
+                logMessage(`You selected the ${stat} stat for comparison.`);
             }
         }
         
         // Add message to battle log
-        function logMessage(message) {
+        function logMessage(message, isError = false) {
             const logEntry = document.createElement('div');
             logEntry.className = 'log-entry';
+            if (isError) logEntry.classList.add('error');
             logEntry.textContent = message;
+            
             const battleLog = document.getElementById('battle-log');
             battleLog.appendChild(logEntry);
             battleLog.scrollTop = battleLog.scrollHeight;
         }
         
-        // Connect when page loads
-        document.addEventListener('DOMContentLoaded', connect);
+        // Set up event listeners when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Connect to WebSocket
+            connect();
+            
+            // Set up confirm selection button
+            document.getElementById('confirm-selection').addEventListener('click', confirmCardSelection);
+            
+            // Set up new battle button on result screen
+            document.getElementById('new-battle').addEventListener('click', () => {
+                window.location.href = '/battle/';
+            });
+            
+            // Set up stat selection event delegation
+            document.getElementById('player-cards').addEventListener('click', (event) => {
+                const statRow = event.target.closest('.stat-row');
+                if (statRow && isMyTurn) {
+                    const stat = statRow.dataset.stat;
+                    playCardStat(stat);
+                }
+            });
+        });
     </script>
 </body>
 </html>
