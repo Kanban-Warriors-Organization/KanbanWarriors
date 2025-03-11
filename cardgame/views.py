@@ -22,6 +22,7 @@ from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question, Trade
+from .forms import UserCreationForm2
 
 
 def index(request):
@@ -122,15 +123,19 @@ def signup(request):
     """
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = UserCreationForm2(request.POST)
         # Validates the contents of the form.
         # Since we're using a DJANGO inbuilt form, this is
         # handled automatically.
         if form.is_valid():
             try:
                 username = form.cleaned_data["username"]
+                print(form.cleaned_data["email"])
+                if (User.objects.filter(email = form.cleaned_data["email"]).count() > 0):
+                    messages.error(request, "This email has already been used. Sorry!")
+                    return HttpResponse(render(request, "cardgame/signup.html", {"form":form}))
                 # Creates user and user profile objects
-                user = User.objects.create_user(username, None,
+                user = User.objects.create_user(username, form.cleaned_data["email"],
                                                 form.cleaned_data["password1"])
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
@@ -138,14 +143,13 @@ def signup(request):
                 messages.success(request, "Account Created!")
                 return redirect(f"/user/{username}/profile")
             except IntegrityError:
-                pass
-        messages.error(request, "Account with that name already exists!")
+                messages.error(request, "This username has already been used. sorry!")
         return HttpResponse(render(request, "cardgame/signup.html",
                                    {"form": form}))
 
     # GET request: gets and renders the form.
     else:
-        form = UserCreationForm()
+        form = UserCreationForm2()
         return HttpResponse(render(request, "cardgame/signup.html",
                                    {"form": form}))
 
@@ -716,16 +720,20 @@ def account(request):
 
 @login_required
 def change_username(request):
-    user = request.user
-    new_name = request.POST.get("new_name")
-    try:
-        #verify no other user has that userna,e
-        if User.objects.filter(username = new_name):
-            return HttpResponse("that name is taken, sorry")
-        else:
-           user.username = new_name
-           user.save()
-           return redirect("home")
-    except Exception as e:
-        print(e)
+
+    if request.method == 'POST':
+        user = request.user
+        new_name = request.POST.get("new_name")
+        try:
+            #verify no other user has that userna,e
+            if User.objects.filter(username = new_name):
+                return HttpResponse("that name is taken, sorry")
+            else:
+                user.username = new_name
+                user.save()
+                return redirect("home")
+        except Exception as e:
+            print(e)
+    return HttpResponse("why don't you try hard?")
+
 
