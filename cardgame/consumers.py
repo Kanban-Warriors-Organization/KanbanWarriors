@@ -21,7 +21,23 @@ class BattleConsumer(AsyncWebsocketConsumer):
         
         # Set up the battle or join existing one
         if self.user.is_authenticated:
-            await self.setup_battle()
+            result = await self.setup_battle()
+            
+            # Send response to the connecting client
+            await self.send(text_data=json.dumps(result))
+            
+            # If this is player 2 joining, notify the room
+            if result.get('notify_room'):
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'battle_message',
+                        'message': {
+                            'event': 'user_connected',
+                            'username': result.get('username')
+                        }
+                    }
+                )
         else:
             await self.send(text_data=json.dumps({
                 'event': 'error',
@@ -57,7 +73,14 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 battle.player2 = user_profile
                 battle.status = 'selecting'
                 battle.save()
-                return {'event': 'battle_joined', 'is_creator': False}
+                
+                # Return event for the joining player along with a flag to notify others
+                return {
+                    'event': 'battle_joined', 
+                    'is_creator': False,
+                    'notify_room': True,
+                    'username': self.user.username
+                }
             elif battle.player1.user == self.user or (battle.player2 and battle.player2.user == self.user):
                 # User is already in this battle
                 return {'event': 'battle_rejoined', 'is_creator': battle.player1.user == self.user}
