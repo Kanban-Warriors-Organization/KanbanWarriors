@@ -47,6 +47,8 @@
             {% endfor %}
         {% endif %}
         <form action="" method="post" class="signup">
+	{% csrf_token %}
+
             <h1>
                 Sign Up
             </h1>
