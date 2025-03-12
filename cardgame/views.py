@@ -8,6 +8,7 @@ import datetime
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse, Http404
+import json
 from django.shortcuts import redirect, render
 # from django.template import loader
 from django.contrib.auth import logout, login  # authenticate, login
@@ -17,6 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
@@ -78,6 +80,8 @@ def card_col(request, user_name):
             imgs_not.append(j.card_image_link)
             card_titlenot.append(j.card_name)
         imgs_not = list(filter(lambda x: x not in imgs_has, imgs_not))
+        card_titlenot = list(filter(lambda x: x not in card_titleshas,
+                                    card_titlenot))
 
         cards_has = [{"image": img, "title": title, "description": description}
                      for img, title, description in
@@ -85,6 +89,8 @@ def card_col(request, user_name):
                          card_descriptionshas)]
         cards_not = [{"image": img, "title": title}
                      for img, title in zip(imgs_not, card_titlenot)]
+        print(cards_has)
+        print(cards_not)
         return render(request, "cardgame/card_col.html",
                       {"cardshas": cards_has, "cardsnot": cards_not})
 
@@ -652,14 +658,15 @@ def make_trade_page(request, card_name):
     titles = []
     names = []
     user = UserProfile.objects.get(user=request.user)
-    offeredCard = Card.objects.get(card_name=card_name)
+    requested_card = Card.objects.get(card_name=card_name)
     ownedCards = user.user_profile_collected_cards.all()
     all_users = User.objects.all()
     for user in all_users:
-        names.append(user.username)
+        if user != request.user:
+            names.append(user.username)
     for card in ownedCards:
         titles.append(card.card_name)
-    return render(request, "cardgame/make_trade.html", {"offeredCard": offeredCard, "ownedCards": titles, "all_users": names})
+    return render(request, "cardgame/make_trade.html", {"requested_card": requested_card, "ownedCards": titles, "all_users": names})
 
     # user = user.request
     # up = UserProfile.objects.get(user=user)
@@ -689,6 +696,38 @@ def make_trade_page(request, card_name):
 
    # else:
        # return render(request, "make_trade.html") #renders the form page or something
+
+@csrf_exempt
+@login_required
+def submit_trade(request):
+    user = request.user
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        offered_card_name = data.get('card_name')
+        requested_card_name = data.get('requested_card')
+        recipient_username = data.get('user_name')
+
+        try:
+            offered_card = Card.objects.get(card_name=offered_card_name)
+            requested_card = Card.objects.get(card_name=requested_card_name)
+            recipient = User.objects.get(username=recipient_username)
+
+            # Create the trade
+            trade = Trade.objects.create(
+                offered_card=offered_card,
+                requested_card=requested_card,
+                sender=user,
+                recipient=recipient,
+                created_date=datetime.datetime.now()
+            )
+            trade.save()
+            return HttpResponse("Trade created successfully!")
+
+        except ObjectDoesNotExist:
+            return HttpResponse("Invalid card or user specified.")
+    else:
+        return HttpResponse("Invalid request method.")
+
 
 @login_required
 def delete_view(request):

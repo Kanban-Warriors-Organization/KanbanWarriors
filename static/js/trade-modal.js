@@ -3,7 +3,6 @@ const tradeModal = document.getElementById('trade');
 const tradeButton = document.querySelector('.trade-btn');
 const tradeClose = document.querySelector('.trade-close');
 
-
 cardsLocked.forEach(card => {
     card.addEventListener('click', function() {
         tradeModal.style.display = 'flex';

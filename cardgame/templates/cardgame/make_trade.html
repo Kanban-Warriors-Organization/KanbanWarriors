@@ -26,16 +26,16 @@
         </header>
             <div class="main-content">
                 <div class="trade-form">
-                    <form>
+                    <form id="trade-form">
                         <div class="form-group">
                             <label for="card-select">Select Card:</label>
-                            <select id="card-select" name="card_name">
+                            <select id="card-select" name="card_name" required>
                                 {% for card in ownedCards %}
                                     <option value="{{ card }}">{{ card }}</option>
                                 {% endfor %}
-                                <!-- Add more options as needed -->
                             </select>
                         </div>
+                        <label for="switch">Toggle to Trade a Specific Player</label>
                         <div class="form-group">
                             <label id="switch" class="switch">
                                 <input type="checkbox">
@@ -43,13 +43,13 @@
                               </label>
                         </div>
                         <div class="user-select">
-                            <label for="user-select">Select User:</label>
-                            <select id="user-select" name="user_name">
-                                {% for user in users %}
+                            <label for="user-select" style="display: none;">Select User:</label>
+                            <select id="user-select" name="user_name" style="display: none;">
+                                {% for user in all_users %}
                                     <option value="{{ user }}">{{ user }}</option>
-                                {% endfor %}
-                                <!-- Add more options as needed -->
+                            {% endfor %}
                             </select>
+                        </div>
                         <button type="submit">Submit Trade</button>
                     </form>
                 </div>
@@ -58,5 +58,7 @@
                 <p>@Copyirght 2025. All rights reserved.</p>
             </footer>
             <script src="{% static 'js/switch.js' %}"></script>
+            <script src="{% static 'js/trade-submit.js' %}"></script>
+            <div id="data" data-requested="{{ requested_card }}"></div>
     </body>
 </html>
