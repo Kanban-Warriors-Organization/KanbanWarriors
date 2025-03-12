@@ -219,6 +219,46 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Add at the end of your style section */
+        .active-turn {
+            border: 3px solid #0fce14;
+            box-shadow: 0 0 15px rgba(15, 206, 20, 0.5);
+        }
+
+        .stat-row.selectable {
+            background-color: rgba(15, 206, 20, 0.1);
+            cursor: pointer;
+        }
+
+        .stat-row.selectable:hover {
+            background-color: rgba(15, 206, 20, 0.3);
+        }
+
+        .stat-row.highlight {
+            background-color: #12c5f8;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .result-title {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #08546B;
+        }
+
+        .result-message {
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
     </style>
 </head>
 <body>
@@ -304,6 +344,9 @@
         let gameState = "waiting"; // waiting, selecting, playing, completed
         let isMyTurn = false;
         let currentRound = 1;
+        // Add this variable to track which player the client is
+        let isPlayer1 = true;
+        let firstCardRendered = false;
         
         // Connect to WebSocket
         function connect() {
@@ -342,11 +385,13 @@
                 case 'battle_created':
                     logMessage('Battle room created. Waiting for an opponent to join...');
                     gameState = "waiting";
+                    isPlayer1 = true; // Creator is player 1
                     break;
                     
                 case 'battle_joined':
                     logMessage('You joined the battle!');
                     transitionToCardSelection();
+                    isPlayer1 = false; // Joiner is player 2
                     break;
                     
                 case 'battle_rejoined':
@@ -373,7 +418,7 @@
                     logMessage(`${data.username} is ready to battle!`);
                     if (data.both_ready && data.battle_status === 'in_progress') {
                         logMessage('Both players ready! The battle begins!');
-                        transitionToBattle();
+                        transitionToBattle(data.first_turn || 1);
                     }
                     break;
                     
@@ -387,6 +432,10 @@
                     
                 case 'error':
                     logMessage(`Error: ${data.message}`, true);
+                    break;
+                    
+                case 'current_cards':
+                    renderInitialCards(data);
                     break;
                     
                 default:
@@ -463,15 +512,27 @@
         }
         
         // Transition to battle phase
-        function transitionToBattle() {
+        function transitionToBattle(firstTurn) {
             gameState = "playing";
             
             // Hide card selection, show battle area
             document.getElementById('card-selection').style.display = 'none';
             document.getElementById('battle-area').style.display = 'block';
             
-            // Initialize the battle UI with player's selected cards
-            renderPlayerCards();
+            // Determine if it's this player's turn based on player identity
+            isMyTurn = (firstTurn === 1 && isPlayer1) || (firstTurn === 2 && !isPlayer1);
+            
+            // Update UI to reflect current turn
+            updateTurnIndicator();
+            
+            // Request the first card to be shown
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    event: 'request_current_cards'
+                }));
+            }
+            
+            logMessage("Battle started! " + (isMyTurn ? "Your turn first." : "Opponent goes first."));
         }
         
         // Render player's cards in battle area
@@ -526,28 +587,44 @@
             const result = data.result;
             const stat = data.stat;
             
-            // Update scores
+            // Update scores based on whether player is p1 or p2
             document.getElementById('player-score').textContent = 
-                data.player1_score; // This assumes current user is player 1, needs to be adjusted
+                isPlayer1 ? data.player1_score : data.player2_score;
             document.getElementById('opponent-score').textContent = 
-                data.player2_score;
+                isPlayer1 ? data.player2_score : data.player1_score;
             
-            // Display cards played
-            const playerCard = createCardElement({
-                name: p1Card.name,
-                image: p1Card.image,
-                environmental_friendliness: p1Card.value,
-                beauty: p1Card.value,
-                cost: p1Card.value
-            }, true);
+            // Display cards played with the correct stat values
+            const playerCard = isPlayer1 ? 
+                createCardElement({
+                    name: p1Card.name,
+                    image: p1Card.image,
+                    environmental_friendliness: p1Card.stat === 'environmental_friendliness' ? p1Card.value : '?',
+                    beauty: p1Card.stat === 'beauty' ? p1Card.value : '?',
+                    cost: p1Card.stat === 'cost' ? p1Card.value : '?'
+                }, true) : 
+                createCardElement({
+                    name: p2Card.name,
+                    image: p2Card.image,
+                    environmental_friendliness: p2Card.stat === 'environmental_friendliness' ? p2Card.value : '?',
+                    beauty: p2Card.stat === 'beauty' ? p2Card.value : '?',
+                    cost: p2Card.stat === 'cost' ? p2Card.value : '?'
+                }, true);
             
-            const opponentCard = createCardElement({
-                name: p2Card.name,
-                image: p2Card.image,
-                environmental_friendliness: p2Card.value,
-                beauty: p2Card.value,
-                cost: p2Card.value
-            }, true);
+            const opponentCard = isPlayer1 ? 
+                createCardElement({
+                    name: p2Card.name,
+                    image: p2Card.image,
+                    environmental_friendliness: p2Card.stat === 'environmental_friendliness' ? p2Card.value : '?',
+                    beauty: p2Card.stat === 'beauty' ? p2Card.value : '?',
+                    cost: p2Card.stat === 'cost' ? p2Card.value : '?'
+                }, true) : 
+                createCardElement({
+                    name: p1Card.name,
+                    image: p1Card.image,
+                    environmental_friendliness: p1Card.stat === 'environmental_friendliness' ? p1Card.value : '?',
+                    beauty: p1Card.stat === 'beauty' ? p1Card.value : '?',
+                    cost: p1Card.stat === 'cost' ? p1Card.value : '?'
+                }, true);
             
             // Clear and add new cards
             document.getElementById('player-cards').innerHTML = '';
@@ -563,7 +640,7 @@
             // Log the result
             if (result === "tie") {
                 logMessage(`Round ${currentRound}: It's a tie! Both players get 1 point.`);
-            } else if (result === "player1") {
+            } else if ((result === "player1" && isPlayer1) || (result === "player2" && !isPlayer1)) {
                 logMessage(`Round ${currentRound}: You win this round! You get 3 points.`);
             } else {
                 logMessage(`Round ${currentRound}: Your opponent wins this round. They get 3 points.`);
@@ -571,12 +648,18 @@
             
             currentRound++;
             
-            // Update turn indicator
-            isMyTurn = data.next_turn === 1; // Adjust based on which player you are
+            // Update turn indicator based on player identity
+            isMyTurn = (data.next_turn === 1 && isPlayer1) || (data.next_turn === 2 && !isPlayer1);
+            updateTurnIndicator();
             
             // If cards remaining is 0, game will end soon
             if (data.cards_remaining <= 0) {
                 logMessage("Final round completed! Calculating results...");
+            } else {
+                // Show the next card for the current player
+                if (isMyTurn) {
+                    highlightSelectableStats();
+                }
             }
         }
         
@@ -586,12 +669,23 @@
             const resultTitle = document.getElementById('result-title');
             const resultMessage = document.getElementById('result-message');
             
-            if (data.winner === username) {
+            let isWinner = false;
+            let playerPoints = 0;
+            
+            if (isPlayer1) {
+                isWinner = data.winner === username;
+                playerPoints = isWinner ? data.player1_score : data.player2_score;
+            } else {
+                isWinner = data.winner === username;
+                playerPoints = isWinner ? data.player2_score : data.player1_score;
+            }
+            
+            if (isWinner) {
                 resultTitle.textContent = "Victory!";
-                resultMessage.textContent = `You won the battle and earned ${data.player1_score} points!`;
+                resultMessage.textContent = `You won the battle and earned ${playerPoints} points!`;
             } else {
                 resultTitle.textContent = "Defeat";
-                resultMessage.textContent = `You lost the battle. Better luck next time! You still earned ${data.player2_score} points.`;
+                resultMessage.textContent = `You lost the battle. Better luck next time! You still earned ${playerPoints} points.`;
             }
             
             resultOverlay.classList.add('active');
@@ -624,6 +718,63 @@
             battleLog.scrollTop = battleLog.scrollHeight;
         }
         
+        // Add this function to update the UI to show whose turn it is
+        function updateTurnIndicator() {
+            const playerArea = document.querySelector('.player-area');
+            const opponentArea = document.querySelector('.opponent-area');
+            
+            playerArea.classList.toggle('active-turn', isMyTurn);
+            opponentArea.classList.toggle('active-turn', !isMyTurn);
+            
+            // Add status message
+            const statusMsg = isMyTurn 
+                ? "Your turn! Select a stat to compare." 
+                : "Opponent's turn. Waiting for them to select a stat...";
+            
+            logMessage(statusMsg);
+            
+            // Make stats selectable if it's the player's turn
+            if (isMyTurn) {
+                highlightSelectableStats();
+            } else {
+                // Remove selectable class if it's not the player's turn
+                const statRows = document.querySelectorAll('#player-cards .stat-row');
+                statRows.forEach(row => {
+                    row.classList.remove('selectable');
+                });
+            }
+        }
+
+        // Helper function to make stats selectable when it's the player's turn
+        function highlightSelectableStats() {
+            if (isMyTurn && gameState === "playing") {
+                const statRows = document.querySelectorAll('#player-cards .stat-row');
+                statRows.forEach(row => {
+                    row.classList.add('selectable');
+                    // Add a specific data attribute to mark this as clickable
+                    row.setAttribute('data-clickable', 'true');
+                });
+            }
+        }
+
+        // Add this function to render the initial cards
+        function renderInitialCards(data) {
+            // Create player card with all stats visible
+            const playerCard = createCardElement(data.player_card, true);
+            document.getElementById('player-cards').innerHTML = '';
+            document.getElementById('player-cards').appendChild(playerCard);
+            
+            // Create opponent card with only name and image
+            const opponentCard = createCardElement(data.opponent_card, false);
+            document.getElementById('opponent-cards').innerHTML = '';
+            document.getElementById('opponent-cards').appendChild(opponentCard);
+            
+            // Highlight selectable stats if it's the player's turn
+            if (isMyTurn) {
+                highlightSelectableStats();
+            }
+        }
+
         // Set up event listeners when page loads
         document.addEventListener('DOMContentLoaded', () => {
             // Connect to WebSocket
@@ -638,9 +789,9 @@
             });
             
             // Set up stat selection event delegation
-            document.getElementById('player-cards').addEventListener('click', (event) => {
-                const statRow = event.target.closest('.stat-row');
-                if (statRow && isMyTurn) {
+            document.querySelector('.battle-area').addEventListener('click', (event) => {
+                const statRow = event.target.closest('.stat-row.selectable');
+                if (statRow && isMyTurn && gameState === "playing") {
                     const stat = statRow.dataset.stat;
                     playCardStat(stat);
                 }

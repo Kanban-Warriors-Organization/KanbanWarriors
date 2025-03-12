@@ -114,26 +114,35 @@ class BattleConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         data = json.loads(text_data)
-        event_type = data.get('event')
-        
-        # Handle different event types
+        event_type = data.get('event', '')
+
         if event_type == 'select_cards':
-            response = await self.handle_select_cards(data)
+            result = await self.handle_select_cards(data)
         elif event_type == 'ready':
-            response = await self.handle_player_ready()
+            result = await self.handle_player_ready()
         elif event_type == 'select_stat':
-            response = await self.handle_select_stat(data)
+            result = await self.handle_select_stat(data)
+        elif event_type == 'request_current_cards':
+            result = await self.handle_request_current_cards()
         else:
-            response = {'event': 'error', 'message': 'Unknown event type'}
+            result = {'event': 'error', 'message': f'Unknown event type: {event_type}'}
+
+        # Send response to the user
+        await self.send(text_data=json.dumps(result))
         
-        # Forward response to group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'battle_message',
-                'message': response
+        # If there's a notification for the room, send it
+        if result.get('notify_room', False):
+            event_to_broadcast = {
+                'event': 'user_connected',
+                'username': self.user.username
             }
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'battle_message',
+                    'message': event_to_broadcast
+                }
+            )
     
     @database_sync_to_async
     def handle_select_cards(self, data):
@@ -201,9 +210,65 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 'event': 'player_ready',
                 'username': self.user.username,
                 'both_ready': battle.player1_ready and battle.player2_ready,
-                'battle_status': battle.status
+                'battle_status': battle.status,
+                'first_turn': battle.current_turn if battle.player1_ready and battle.player2_ready else None
             }
             
+        except Exception as e:
+            return {'event': 'error', 'message': str(e)}
+
+    @database_sync_to_async
+    def handle_request_current_cards(self):
+        try:
+            user_profile = UserProfile.objects.get(user=self.user)
+            battle = Battle.objects.get(room_id=self.room_id)
+            
+            # Get current decks for both players
+            p1_deck = BattleDeck.objects.get(battle=battle, player=battle.player1)
+            p2_deck = BattleDeck.objects.get(battle=battle, player=battle.player2)
+            
+            p1_cards = list(p1_deck.cards.all())
+            p2_cards = list(p2_deck.cards.all())
+            
+            # Get the current card for each player
+            p1_card = p1_cards[p1_deck.current_card_index] if p1_deck.current_card_index < len(p1_cards) else None
+            p2_card = p2_cards[p2_deck.current_card_index] if p2_deck.current_card_index < len(p2_cards) else None
+            
+            # Only include information that should be visible to this player
+            is_player1 = battle.player1.user == self.user
+            
+            result = {
+                'event': 'current_cards',
+                'current_turn': battle.current_turn,
+            }
+            
+            # Include detailed player card info
+            if is_player1:
+                result['player_card'] = {
+                    'name': p1_card.card_name,
+                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None,
+                    'environmental_friendliness': p1_card.environmental_friendliness,
+                    'beauty': p1_card.beauty,
+                    'cost': p1_card.cost
+                }
+                result['opponent_card'] = {
+                    'name': p2_card.card_name,  # Only show name
+                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None
+                }
+            else:
+                result['player_card'] = {
+                    'name': p2_card.card_name,
+                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None,
+                    'environmental_friendliness': p2_card.environmental_friendliness,
+                    'beauty': p2_card.beauty,
+                    'cost': p2_card.cost
+                }
+                result['opponent_card'] = {
+                    'name': p1_card.card_name,  # Only show name 
+                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None
+                }
+            
+            return result
         except Exception as e:
             return {'event': 'error', 'message': str(e)}
     
