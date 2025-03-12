@@ -117,7 +117,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         event_type = data.get('event', '')
 
         if event_type == 'select_cards':
-            result = await self.handle_select_cards(data)
+                        result = await self.handle_select_cards(data)
         elif event_type == 'ready':
             result = await self.handle_player_ready()
         elif event_type == 'select_stat':
@@ -130,19 +130,17 @@ class BattleConsumer(AsyncWebsocketConsumer):
         # Send response to the user
         await self.send(text_data=json.dumps(result))
         
-        # If there's a notification for the room, send it
-        if result.get('notify_room', False):
-            event_to_broadcast = {
-                'event': 'user_connected',
-                'username': self.user.username
-            }
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'battle_message',
-                    'message': event_to_broadcast
-                }
-            )
+        # If this is a message that needs to be broadcast to the room
+        if event_type in ['ready', 'select_stat']:
+            # For round results or battle completion, broadcast to all users in the room
+            if 'result' in result or result.get('event') == 'battle_completed':
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'battle_message',
+                        'message': result
+                    }
+                )
     
     @database_sync_to_async
     def handle_select_cards(self, data):

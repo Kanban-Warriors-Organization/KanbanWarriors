@@ -80,8 +80,8 @@
 
         /* Card Styles */
         .card {
-            width: 140px;
-            height: 200px;
+            width: 180px;
+            height: 300px;
             border: 2px solid #ccc;
             border-radius: 10px;
             padding: 10px;
@@ -258,6 +258,57 @@
         .result-message {
             font-size: 18px;
             margin-bottom: 25px;
+        }
+
+        /* Add this to your style section */
+        .stat-button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 5px 0;
+            padding: 8px 10px;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border: 1px solid #ccc;
+            cursor: default;
+            font-family: 'Kanit', sans-serif;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-button.selectable {
+            background: linear-gradient(135deg, #e8f8e8 0%, #d0f0d0 100%);
+            border: 1px solid #0fce14;
+            cursor: pointer;
+            transform: scale(1.02);
+        }
+
+        .stat-button.selectable:hover {
+            background: linear-gradient(135deg, #d0f0d0 0%, #a0e0a0 100%);
+            transform: scale(1.05);
+        }
+
+        .stat-button.selectable:active {
+            transform: scale(0.98);
+        }
+
+        .stat-button.highlight {
+            background: linear-gradient(135deg, #b3e0ff 0%, #66c2ff 100%);
+            border-color: #12c5f8;
+            color: #08546B;
+            font-weight: bold;
+        }
+
+        .stat-button[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -593,37 +644,38 @@
             document.getElementById('opponent-score').textContent = 
                 isPlayer1 ? data.player2_score : data.player1_score;
             
-            // Display cards played with the correct stat values
+            // For the player's card, show the selected stat value
             const playerCard = isPlayer1 ? 
                 createCardElement({
                     name: p1Card.name,
                     image: p1Card.image,
-                    environmental_friendliness: p1Card.stat === 'environmental_friendliness' ? p1Card.value : '?',
-                    beauty: p1Card.stat === 'beauty' ? p1Card.value : '?',
-                    cost: p1Card.stat === 'cost' ? p1Card.value : '?'
+                    environmental_friendliness: stat === 'environmental_friendliness' ? p1Card.value : p1Card.environmental_friendliness,
+                    beauty: stat === 'beauty' ? p1Card.value : p1Card.beauty,
+                    cost: stat === 'cost' ? p1Card.value : p1Card.cost
                 }, true) : 
                 createCardElement({
                     name: p2Card.name,
                     image: p2Card.image,
-                    environmental_friendliness: p2Card.stat === 'environmental_friendliness' ? p2Card.value : '?',
-                    beauty: p2Card.stat === 'beauty' ? p2Card.value : '?',
-                    cost: p2Card.stat === 'cost' ? p2Card.value : '?'
+                    environmental_friendliness: stat === 'environmental_friendliness' ? p2Card.value : p2Card.environmental_friendliness,
+                    beauty: stat === 'beauty' ? p2Card.value : p2Card.beauty,
+                    cost: stat === 'cost' ? p2Card.value : p2Card.cost
                 }, true);
             
+            // For opponent's card, show only the selected stat
             const opponentCard = isPlayer1 ? 
                 createCardElement({
                     name: p2Card.name,
                     image: p2Card.image,
-                    environmental_friendliness: p2Card.stat === 'environmental_friendliness' ? p2Card.value : '?',
-                    beauty: p2Card.stat === 'beauty' ? p2Card.value : '?',
-                    cost: p2Card.stat === 'cost' ? p2Card.value : '?'
+                    environmental_friendliness: stat === 'environmental_friendliness' ? p2Card.value : '?',
+                    beauty: stat === 'beauty' ? p2Card.value : '?',
+                    cost: stat === 'cost' ? p2Card.value : '?'
                 }, true) : 
                 createCardElement({
                     name: p1Card.name,
                     image: p1Card.image,
-                    environmental_friendliness: p1Card.stat === 'environmental_friendliness' ? p1Card.value : '?',
-                    beauty: p1Card.stat === 'beauty' ? p1Card.value : '?',
-                    cost: p1Card.stat === 'cost' ? p1Card.value : '?'
+                    environmental_friendliness: stat === 'environmental_friendliness' ? p1Card.value : '?',
+                    beauty: stat === 'beauty' ? p1Card.value : '?',
+                    cost: stat === 'cost' ? p1Card.value : '?'
                 }, true);
             
             // Clear and add new cards
@@ -634,33 +686,41 @@
             document.getElementById('opponent-cards').appendChild(opponentCard);
             
             // Highlight the stat that was compared
-            playerCard.querySelector(`.stat-row[data-stat="${stat}"]`).classList.add('highlight');
-            opponentCard.querySelector(`.stat-row[data-stat="${stat}"]`).classList.add('highlight');
+            const playerStatRow = playerCard.querySelector(`.stat-row[data-stat="${stat}"]`);
+            const opponentStatRow = opponentCard.querySelector(`.stat-row[data-stat="${stat}"]`);
+            
+            if (playerStatRow) playerStatRow.classList.add('highlight');
+            if (opponentStatRow) opponentStatRow.classList.add('highlight');
             
             // Log the result
             if (result === "tie") {
-                logMessage(`Round ${currentRound}: It's a tie! Both players get 1 point.`);
+                logMessage(`Round ${currentRound}: It's a tie on ${stat}! Both players get 1 point.`);
             } else if ((result === "player1" && isPlayer1) || (result === "player2" && !isPlayer1)) {
-                logMessage(`Round ${currentRound}: You win this round! You get 3 points.`);
+                logMessage(`Round ${currentRound}: You win this round with ${stat}! You get 3 points.`);
             } else {
-                logMessage(`Round ${currentRound}: Your opponent wins this round. They get 3 points.`);
+                logMessage(`Round ${currentRound}: Your opponent wins this round with ${stat}. They get 3 points.`);
             }
             
             currentRound++;
             
-            // Update turn indicator based on player identity
-            isMyTurn = (data.next_turn === 1 && isPlayer1) || (data.next_turn === 2 && !isPlayer1);
-            updateTurnIndicator();
-            
-            // If cards remaining is 0, game will end soon
-            if (data.cards_remaining <= 0) {
-                logMessage("Final round completed! Calculating results...");
-            } else {
-                // Show the next card for the current player
-                if (isMyTurn) {
-                    highlightSelectableStats();
+            // After a short delay, move to the next card
+            setTimeout(() => {
+                // Update turn indicator based on player identity
+                isMyTurn = (data.next_turn === 1 && isPlayer1) || (data.next_turn === 2 && !isPlayer1);
+                updateTurnIndicator();
+                
+                // If cards remaining is 0, game will end soon
+                if (data.cards_remaining <= 0) {
+                    logMessage("Final round completed! Calculating results...");
+                } else {
+                    // Request the next card
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({
+                            event: 'request_current_cards'
+                        }));
+                    }
                 }
-            }
+            }, 3000); // 3 second delay before moving to next card
         }
         
         // Display battle result
@@ -697,6 +757,13 @@
             if (!isMyTurn || gameState !== "playing") return;
             
             if (socket && socket.readyState === WebSocket.OPEN) {
+                // Disable all stat buttons until next turn
+                const statButtons = document.querySelectorAll('.stat-button');
+                statButtons.forEach(button => {
+                    button.disabled = true;
+                    button.classList.remove('selectable');
+                });
+                
                 const message = {
                     event: 'select_stat',
                     stat: stat
@@ -751,27 +818,88 @@
                 const statRows = document.querySelectorAll('#player-cards .stat-row');
                 statRows.forEach(row => {
                     row.classList.add('selectable');
-                    // Add a specific data attribute to mark this as clickable
-                    row.setAttribute('data-clickable', 'true');
+                    // Make stats clickable
+                    row.addEventListener('click', () => {
+                        if (isMyTurn && gameState === "playing") {
+                            const stat = row.dataset.stat;
+                            playCardStat(stat);
+                        }
+                    });
                 });
             }
         }
 
         // Add this function to render the initial cards
         function renderInitialCards(data) {
-            // Create player card with all stats visible
-            const playerCard = createCardElement(data.player_card, true);
-            document.getElementById('player-cards').innerHTML = '';
-            document.getElementById('player-cards').appendChild(playerCard);
+            // Create player card with all stats visible and interactive buttons
+            const playerCard = document.createElement('div');
+            playerCard.className = 'card';
+            playerCard.innerHTML = `
+                <h3>${data.player_card.name}</h3>
+                <div class="card-image">
+                    <img src="${data.player_card.image || ''}" alt="${data.player_card.name}" onerror="this.src='{% static 'card_images/do_not_remove.png' %}'">
+                </div>
+                <div class="card-stats">
+                    <button class="stat-button ${isMyTurn ? 'selectable' : ''}" data-stat="environmental_friendliness" ${!isMyTurn ? 'disabled' : ''}>
+                        <span class="stat-name">Environment:</span>
+                        <span class="stat-value">${data.player_card.environmental_friendliness}</span>
+                    </button>
+                    <button class="stat-button ${isMyTurn ? 'selectable' : ''}" data-stat="beauty" ${!isMyTurn ? 'disabled' : ''}>
+                        <span class="stat-name">Beauty:</span>
+                        <span class="stat-value">${data.player_card.beauty}</span>
+                    </button>
+                    <button class="stat-button ${isMyTurn ? 'selectable' : ''}" data-stat="cost" ${!isMyTurn ? 'disabled' : ''}>
+                        <span class="stat-name">Cost:</span>
+                        <span class="stat-value">${data.player_card.cost}</span>
+                    </button>
+                </div>
+            `;
             
-            // Create opponent card with only name and image
-            const opponentCard = createCardElement(data.opponent_card, false);
+            // Create opponent card with only name and image (no stats)
+            const opponentCard = document.createElement('div');
+            opponentCard.className = 'card';
+            opponentCard.innerHTML = `
+                <h3>${data.opponent_card.name}</h3>
+                <div class="card-image">
+                    <img src="${data.opponent_card.image || ''}" alt="${data.opponent_card.name}" onerror="this.src='{% static 'card_images/do_not_remove.png' %}'">
+                </div>
+                <div class="card-stats">
+                    <div class="stat-row">
+                        <span class="stat-name">Environment:</span>
+                        <span class="stat-value">?</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Beauty:</span>
+                        <span class="stat-value">?</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Cost:</span>
+                        <span class="stat-value">?</span>
+                    </div>
+                </div>
+            `;
+            
+            // Clear and add new cards
+            document.getElementById('player-cards').innerHTML = '';
             document.getElementById('opponent-cards').innerHTML = '';
+            
+            document.getElementById('player-cards').appendChild(playerCard);
             document.getElementById('opponent-cards').appendChild(opponentCard);
             
-            // Highlight selectable stats if it's the player's turn
+            // Add event listeners to stat buttons
             if (isMyTurn) {
-                highlightSelectableStats();
+                const statButtons = playerCard.querySelectorAll('.stat-button');
+                statButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (isMyTurn && gameState === "playing") {
+                            const stat = button.dataset.stat;
+                            playCardStat(stat);
+                        }
+                    });
+                });
+                logMessage("Your turn! Select one of the stats from your card to compare.");
+            } else {
+                logMessage("Opponent's turn. Wait for them to select a stat.");
             }
         }
 
