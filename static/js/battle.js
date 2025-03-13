@@ -9,14 +9,37 @@ let isPlayer1 = true;
 function connect() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    socket = new WebSocket(`${protocol}//${host}/ws/battle/${roomId}/`);
     
-    socket.addEventListener('open', () => logMessage('Connected to battle server!'));
-    socket.addEventListener('message', (event) => handleMessage(JSON.parse(event.data)));
-    socket.addEventListener('close', () => {
-        logMessage('Disconnected from battle server.');
+    try {
+        socket = new WebSocket(`${protocol}//${host}/ws/battle/${roomId}/`);
+        
+        socket.addEventListener('open', () => {
+            logMessage('Connected to battle server!');
+            // Request current game state on connect/reconnect
+            socket.send(JSON.stringify({ event: 'request_state' }));
+        });
+        
+        socket.addEventListener('message', (event) => {
+            try {
+                handleMessage(JSON.parse(event.data));
+            } catch (e) {
+                logMessage('Error processing message: ' + e.message, true);
+            }
+        });
+        
+        socket.addEventListener('close', () => {
+            logMessage('Disconnected from battle server. Attempting to reconnect...', true);
+            setTimeout(connect, 1000);
+        });
+        
+        socket.addEventListener('error', (error) => {
+            logMessage('Connection error occurred. Retrying...', true);
+            console.error('WebSocket error:', error);
+        });
+    } catch (e) {
+        logMessage('Failed to connect: ' + e.message, true);
         setTimeout(connect, 1000);
-    });
+    }
 }
 
 // Handle incoming messages
@@ -24,14 +47,56 @@ function handleMessage(data) {
     switch(data.event) {
         case 'battle_created':
             logMessage('Battle room created. Waiting for opponent...');
-            gameState = "waiting";
+            gameState = data.status || "waiting";
             isPlayer1 = true;
+            document.getElementById('opponent-name').textContent = 'Waiting for opponent...';
+            
+            // If status is 'selecting', transition to card selection immediately
+            if (data.status === 'selecting') {
+                logMessage('Select your cards while waiting for an opponent...');
+                transitionToCardSelection();
+            }
             break;
             
         case 'battle_joined':
-            logMessage('You joined the battle!');
+            // Update both players when player 2 joins
+            gameState = "selecting";
+            
+            // Set player role based on data or keep existing
+            if (data.is_player1 !== undefined) {
+                isPlayer1 = data.is_player1;
+            }
+            
+            // For player 1, the opponent is the joining player (username)
+            // For player 2, the opponent is the battle creator (opponent_name)
+            const opponentName = isPlayer1 ? data.username : data.opponent_name;
+            document.getElementById('opponent-name').textContent = opponentName;
+            
+            if (isPlayer1) {
+                logMessage(`${opponentName} has joined the battle! Select your cards.`);
+            } else {
+                logMessage('You joined the battle! Select your cards.');
+            }
+            
+            // Both players transition to card selection
             transitionToCardSelection();
-            isPlayer1 = false;
+            break;
+            
+        case 'battle_state':
+            // Handle reconnection or state updates
+            isPlayer1 = data.is_player1;
+            gameState = data.status;
+            document.getElementById('opponent-name').textContent = 
+                data.opponent_name || 'Waiting for opponent...';
+            
+            if (data.status === 'selecting') {
+                gameState = "selecting";
+                logMessage('Select your cards for battle!');
+                transitionToCardSelection();
+            } else if (data.status === 'in_progress') {
+                gameState = "playing";
+                transitionToBattle(data.current_turn);
+            }
             break;
             
         case 'cards_selected':
@@ -39,10 +104,14 @@ function handleMessage(data) {
             break;
             
         case 'player_ready':
-            logMessage(`${data.username} is ready to battle!`);
+            const readyMessage = data.username === username ? 
+                'You are ready!' : 
+                `${data.username} is ready!`;
+            logMessage(readyMessage);
+            
             if (data.both_ready && data.battle_status === 'in_progress') {
                 logMessage('Both players ready! Battle begins!');
-                transitionToBattle(data.first_turn || 1);
+                transitionToBattle(data.first_turn);
             }
             break;
             
@@ -62,20 +131,50 @@ function handleMessage(data) {
 
 // Card selection phase
 function transitionToCardSelection() {
-    gameState = "selecting";
+    if (gameState !== "selecting") {
+        logMessage(`Cannot transition to card selection in game state: ${gameState}`, true);
+        return;
+    }
+    
+    logMessage('Loading your cards for selection...');
     document.getElementById('card-selection').style.display = 'block';
     document.getElementById('battle-area').style.display = 'none';
     
+    // Clear any existing selections
+    selectedCards = [];
+    document.getElementById('selected-count').textContent = '0';
+    document.getElementById('confirm-selection').disabled = true;
+    
     fetch('/get-battle-cards/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
             const grid = document.getElementById('card-selection-grid');
             grid.innerHTML = '';
+            
+            if (!data.cards || data.cards.length === 0) {
+                logMessage('No cards available for selection. Please collect some cards first!', true);
+                return;
+            }
+            
+            logMessage(`${data.cards.length} cards available for selection`);
             data.cards.forEach(card => {
                 const cardElement = createCardElement(card);
                 cardElement.addEventListener('click', () => toggleCardSelection(cardElement, card));
                 grid.appendChild(cardElement);
             });
+        })
+        .catch(error => {
+            logMessage('Error loading cards: ' + error.message, true);
+            console.error('Card loading error:', error);
         });
 }
 

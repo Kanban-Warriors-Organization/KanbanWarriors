@@ -58,36 +58,79 @@ class BattleConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def setup_battle(self):
-        user_profile = UserProfile.objects.get(user=self.user)
-        battle, created = Battle.objects.get_or_create(
-            room_id=self.room_id,
-            defaults={'player1': user_profile, 'status': 'waiting'}
-        )
-        
-        if created:
-            # This user created the battle
-            return {'event': 'battle_created', 'is_creator': True}
-        else:
-            # Battle exists, check if can join as player 2
-            if battle.player2 is None and battle.player1.user != self.user:
-                battle.player2 = user_profile
-                battle.status = 'selecting'
-                battle.save()
+        try:
+            user_profile = UserProfile.objects.get(user=self.user)
+            
+            try:
+                battle = Battle.objects.get(room_id=self.room_id)
                 
-                # Return event for the joining player along with a flag to notify others
+                # If battle exists, try to join it
+                if battle.status == 'completed':
+                    return {'event': 'error', 'message': 'This battle has ended'}
+                    
+                if battle.player1.user == self.user:
+                    # Reconnecting as player 1
+                    if battle.player2:
+                        # If player 2 exists, return battle state
+                        return {
+                            'event': 'battle_state',
+                            'is_player1': True,
+                            'opponent_name': battle.player2.user.username,
+                            'status': battle.status,
+                            'both_ready': battle.both_ready(),
+                            'current_turn': battle.current_turn if battle.status == 'in_progress' else None
+                        }
+                    else:
+                        # Still waiting for player 2
+                        return {
+                            'event': 'battle_created',
+                            'is_player1': True,
+                            'status': 'waiting'
+                        }
+                elif battle.player2 and battle.player2.user == self.user:
+                    # Reconnecting as player 2
+                    return {
+                        'event': 'battle_state',
+                        'is_player1': False,
+                        'opponent_name': battle.player1.user.username,
+                        'status': battle.status,
+                        'both_ready': battle.both_ready(),
+                        'current_turn': battle.current_turn if battle.status == 'in_progress' else None
+                    }
+                elif not battle.player2:
+                    # Join as player 2
+                    battle.player2 = user_profile
+                    battle.status = 'selecting'
+                    battle.save()
+                    
+                    # Notify both players with the same event
+                    return {
+                        'event': 'battle_joined',
+                        'notify_room': True,  # This will send to both players
+                        'username': self.user.username,
+                        'is_player1': False,  # This player is player 2
+                        'opponent_name': battle.player1.user.username,
+                        'status': 'selecting'
+                    }
+                else:
+                    return {'event': 'error', 'message': 'Battle room is full'}
+                    
+            except Battle.DoesNotExist:
+                # Create new battle if it doesn't exist
+                battle = Battle.objects.create(
+                    room_id=self.room_id,
+                    player1=user_profile,
+                    status='selecting'  # Changed from 'waiting' to 'selecting'
+                )
                 return {
-                    'event': 'battle_joined', 
-                    'is_creator': False,
-                    'notify_room': True,
-                    'username': self.user.username
+                    'event': 'battle_created',
+                    'is_player1': True,
+                    'status': 'selecting'  # Add status to signal the creator should select cards
                 }
-            elif battle.player1.user == self.user or (battle.player2 and battle.player2.user == self.user):
-                # User is already in this battle
-                return {'event': 'battle_rejoined', 'is_creator': battle.player1.user == self.user}
-            else:
-                # Battle is full
-                return {'event': 'error', 'message': 'Battle room is full'}
-    
+                
+        except Exception as e:
+            return {'event': 'error', 'message': str(e)}
+
     @database_sync_to_async
     def handle_disconnect(self):
         try:
@@ -114,33 +157,33 @@ class BattleConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         data = json.loads(text_data)
-        event_type = data.get('event', '')
-
-        if event_type == 'select_cards':
-                        result = await self.handle_select_cards(data)
-        elif event_type == 'ready':
+        event = data.get('event', '')
+        
+        if event == 'request_state':
+            result = await self.get_current_state()
+        elif event == 'select_cards':
+            result = await self.handle_select_cards(data)
+        elif event == 'ready':
             result = await self.handle_player_ready()
-        elif event_type == 'select_stat':
+        elif event == 'select_stat':
             result = await self.handle_select_stat(data)
-        elif event_type == 'request_current_cards':
+        elif event == 'request_current_cards':
             result = await self.handle_request_current_cards()
         else:
-            result = {'event': 'error', 'message': f'Unknown event type: {event_type}'}
+            result = {'event': 'error', 'message': f'Unknown event type: {event}'}
 
-        # Send response to the user
+        # Send response to the requesting client
         await self.send(text_data=json.dumps(result))
         
-        # If this is a message that needs to be broadcast to the room
-        if event_type in ['ready', 'select_stat']:
-            # For round results or battle completion, broadcast to all users in the room
-            if 'result' in result or result.get('event') == 'battle_completed':
-                await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'battle_message',
-                        'message': result
-                    }
-                )
+        # If the event should be broadcast, send to the room
+        if result.get('notify_room'):
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'battle_message',
+                    'message': {k: v for k, v in result.items() if k != 'notify_room'}
+                }
+            )
     
     @database_sync_to_async
     def handle_select_cards(self, data):
@@ -187,6 +230,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def handle_player_ready(self):
+        """
+        Handles a player indicating they are ready to battle.
+        Broadcasts the state change to all players.
+        """
         try:
             user_profile = UserProfile.objects.get(user=self.user)
             battle = Battle.objects.get(room_id=self.room_id)
@@ -197,21 +244,24 @@ class BattleConsumer(AsyncWebsocketConsumer):
             elif battle.player2 and battle.player2.user == self.user:
                 battle.player2_ready = True
             
-            # If both players are ready, start the battle
-            if battle.player1_ready and battle.player2_ready and battle.status == 'selecting':
-                battle.status = 'in_progress'
-                battle.current_turn = 1  # Player 1 goes first
+            both_ready = battle.player1_ready and battle.player2_ready
             
+            # Start battle if both players are ready
+            if both_ready and battle.status == 'selecting':
+                battle.status = 'in_progress'
+                battle.current_turn = 1
+                
             battle.save()
             
             return {
                 'event': 'player_ready',
+                'notify_room': True,
                 'username': self.user.username,
-                'both_ready': battle.player1_ready and battle.player2_ready,
+                'both_ready': both_ready,
                 'battle_status': battle.status,
-                'first_turn': battle.current_turn if battle.player1_ready and battle.player2_ready else None
+                'first_turn': battle.current_turn if both_ready else None
             }
-            
+                
         except Exception as e:
             return {'event': 'error', 'message': str(e)}
 
@@ -382,6 +432,73 @@ class BattleConsumer(AsyncWebsocketConsumer):
             
         except Exception as e:
             return {'event': 'error', 'message': str(e)}
+    
+    @database_sync_to_async
+    def get_current_state(self):
+        try:
+            battle = Battle.objects.get(room_id=self.room_id)
+            is_player1 = battle.player1.user == self.user
+            opponent = battle.player2 if is_player1 else battle.player1
+            
+            state = {
+                'event': 'game_state',
+                'status': battle.status,
+                'is_player1': is_player1,
+                'opponent_name': opponent.user.username if opponent else None,
+                'both_ready': battle.both_ready(),
+                'current_turn': battle.current_turn if battle.status == 'in_progress' else None
+            }
+            
+            # If battle is in progress, get current cards directly here instead of using await
+            if battle.status == 'in_progress':
+                try:
+                    # Get current decks for both players
+                    p1_deck = BattleDeck.objects.get(battle=battle, player=battle.player1)
+                    p2_deck = BattleDeck.objects.get(battle=battle, player=battle.player2)
+                    
+                    p1_cards = list(p1_deck.cards.all())
+                    p2_cards = list(p2_deck.cards.all())
+                    
+                    p1_card = p1_cards[p1_deck.current_card_index] if p1_deck.current_card_index < len(p1_cards) else None
+                    p2_card = p2_cards[p2_deck.current_card_index] if p2_deck.current_card_index < len(p2_cards) else None
+                    
+                    if p1_card and p2_card:
+                        # Include detailed player card info based on which player is requesting
+                        if is_player1:
+                            state.update({
+                                'player_card': {
+                                    'name': p1_card.card_name,
+                                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None,
+                                    'environmental_friendliness': p1_card.environmental_friendliness,
+                                    'beauty': p1_card.beauty,
+                                    'cost': p1_card.cost
+                                },
+                                'opponent_card': {
+                                    'name': p2_card.card_name,
+                                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None
+                                }
+                            })
+                        else:
+                            state.update({
+                                'player_card': {
+                                    'name': p2_card.card_name,
+                                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None,
+                                    'environmental_friendliness': p2_card.environmental_friendliness,
+                                    'beauty': p2_card.beauty,
+                                    'cost': p2_card.cost
+                                },
+                                'opponent_card': {
+                                    'name': p1_card.card_name,
+                                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None
+                                }
+                            })
+                except Exception as e:
+                    state.update({'error': str(e)})
+            
+            return state
+            
+        except Battle.DoesNotExist:
+            return {'event': 'error', 'message': 'Battle not found'}
     
     # Send message to WebSocket
     async def battle_message(self, event):
