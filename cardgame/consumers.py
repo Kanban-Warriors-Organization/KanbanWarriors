@@ -161,6 +161,18 @@ class BattleConsumer(AsyncWebsocketConsumer):
         
         if event == 'request_state':
             result = await self.get_current_state()
+            
+            # If we need to fetch cards, do it here in the async function
+            if result.get('needs_cards'):
+                cards_result = await self.handle_request_current_cards()
+                if 'player_card' in cards_result:
+                    result['player_card'] = cards_result['player_card']
+                    result['opponent_card'] = cards_result['opponent_card']
+                    result['is_my_turn'] = cards_result['is_my_turn']
+                # Remove the needs_cards flag
+                if 'needs_cards' in result:
+                    del result['needs_cards']
+                    
         elif event == 'select_cards':
             result = await self.handle_select_cards(data)
         elif event == 'ready':
@@ -209,15 +221,17 @@ class BattleConsumer(AsyncWebsocketConsumer):
             
             # Clear existing cards and add new ones
             deck.cards.clear()
-            for card in cards:
-                deck.cards.add(card)
             
-            # Shuffle the order by creating a list and randomizing it
-            card_list = list(deck.cards.all())
+            # Convert cards QuerySet to list for shuffling
+            card_list = list(cards)
             random.shuffle(card_list)
             
-            # Need to save the order somehow - could add a through model with order field
-            # For now, just notify that cards were selected
+            # Add cards in the shuffled order
+            for card in card_list:
+                deck.cards.add(card)
+                
+            deck.current_card_index = 0
+            deck.save()
             
             return {
                 'event': 'cards_selected',
@@ -244,7 +258,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             elif battle.player2 and battle.player2.user == self.user:
                 battle.player2_ready = True
             
-            both_ready = battle.player1_ready and battle.player2_ready
+            both_ready = battle.player1_ready and battle.player2_ready 
             
             # Start battle if both players are ready
             if both_ready and battle.status == 'selecting':
@@ -268,8 +282,8 @@ class BattleConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def handle_request_current_cards(self):
         try:
-            user_profile = UserProfile.objects.get(user=self.user)
             battle = Battle.objects.get(room_id=self.room_id)
+            is_player1 = battle.player1.user == self.user
             
             # Get current decks for both players
             p1_deck = BattleDeck.objects.get(battle=battle, player=battle.player1)
@@ -278,46 +292,48 @@ class BattleConsumer(AsyncWebsocketConsumer):
             p1_cards = list(p1_deck.cards.all())
             p2_cards = list(p2_deck.cards.all())
             
+            # Check if we've reached the end of the cards
+            if p1_deck.current_card_index >= len(p1_cards) or p2_deck.current_card_index >= len(p2_cards):
+                return self.end_battle(battle)
+            
             # Get the current card for each player
             p1_card = p1_cards[p1_deck.current_card_index] if p1_deck.current_card_index < len(p1_cards) else None
             p2_card = p2_cards[p2_deck.current_card_index] if p2_deck.current_card_index < len(p2_cards) else None
             
-            # Only include information that should be visible to this player
-            is_player1 = battle.player1.user == self.user
+            # If either card is None, we can't continue
+            if not p1_card or not p2_card:
+                return {'event': 'error', 'message': 'Cards not available'}
             
+            # Create the result with common data for both players
             result = {
                 'event': 'current_cards',
                 'current_turn': battle.current_turn,
+                'player1_score': battle.player1_score,
+                'player2_score': battle.player2_score,
+                'cards_remaining': min(len(p1_cards) - p1_deck.current_card_index, len(p2_cards) - p2_deck.current_card_index)
             }
             
-            # Include detailed player card info
+            # Add player-specific data
             if is_player1:
-                result['player_card'] = {
-                    'name': p1_card.card_name,
-                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None,
-                    'environmental_friendliness': p1_card.environmental_friendliness,
-                    'beauty': p1_card.beauty,
-                    'cost': p1_card.cost
-                }
+                result['player_card'] = self.card_to_dict(p1_card)
                 result['opponent_card'] = {
-                    'name': p2_card.card_name,  # Only show name
+                    'name': p2_card.card_name,
                     'image': p2_card.card_image_link.url if p2_card.card_image_link else None
                 }
+                result['is_my_turn'] = battle.current_turn == 1
             else:
-                result['player_card'] = {
-                    'name': p2_card.card_name,
-                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None,
-                    'environmental_friendliness': p2_card.environmental_friendliness,
-                    'beauty': p2_card.beauty,
-                    'cost': p2_card.cost
-                }
+                result['player_card'] = self.card_to_dict(p2_card)
                 result['opponent_card'] = {
-                    'name': p1_card.card_name,  # Only show name 
+                    'name': p1_card.card_name,
                     'image': p1_card.card_image_link.url if p1_card.card_image_link else None
                 }
+                result['is_my_turn'] = battle.current_turn == 2
             
             return result
+            
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return {'event': 'error', 'message': str(e)}
     
     @database_sync_to_async
@@ -327,54 +343,29 @@ class BattleConsumer(AsyncWebsocketConsumer):
             if stat not in ['environmental_friendliness', 'beauty', 'cost']:
                 return {'event': 'error', 'message': 'Invalid stat selected'}
             
-            user_profile = UserProfile.objects.get(user=self.user)
             battle = Battle.objects.get(room_id=self.room_id)
-            
-            # Check if it's this player's turn
             is_player1 = battle.player1.user == self.user
+            
+            # Verify it's this player's turn
             if (is_player1 and battle.current_turn != 1) or (not is_player1 and battle.current_turn != 2):
                 return {'event': 'error', 'message': 'Not your turn'}
             
-            # Get current cards for both players
+            # Get current decks and cards
             p1_deck = BattleDeck.objects.get(battle=battle, player=battle.player1)
             p2_deck = BattleDeck.objects.get(battle=battle, player=battle.player2)
             
-            # Get the current card for each player
             p1_cards = list(p1_deck.cards.all())
             p2_cards = list(p2_deck.cards.all())
             
+            # Check if we've reached the end of the battle
             if p1_deck.current_card_index >= len(p1_cards) or p2_deck.current_card_index >= len(p2_cards):
-                # Battle is over, determine winner
-                if battle.player1_score > battle.player2_score:
-                    battle.winner = battle.player1
-                elif battle.player2_score > battle.player1_score:
-                    battle.winner = battle.player2
-                
-                battle.status = 'completed'
-                battle.save()
-                
-                # Award points to users
-                if battle.winner == battle.player1:
-                    battle.player1.user_profile_points += 10  # Winner gets 10 points
-                    battle.player2.user_profile_points += 2   # Loser gets 2 points
-                else:
-                    battle.player2.user_profile_points += 10
-                    battle.player1.user_profile_points += 2
-                
-                battle.player1.save()
-                battle.player2.save()
-                
-                return {
-                    'event': 'battle_completed',
-                    'winner': battle.winner.user.username,
-                    'player1_score': battle.player1_score,
-                    'player2_score': battle.player2_score
-                }
+                return self.end_battle(battle)
             
+            # Get current cards
             p1_card = p1_cards[p1_deck.current_card_index]
             p2_card = p2_cards[p2_deck.current_card_index]
             
-            # Compare the chosen stat
+            # Compare stats and determine winner
             p1_value = getattr(p1_card, stat)
             p2_value = getattr(p2_card, stat)
             
@@ -399,7 +390,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 battle.player2_score += 3
                 result = "player2"
             
-            # Move to next card
+            # Move to next cards
             p1_deck.current_card_index += 1
             p2_deck.current_card_index += 1
             p1_deck.save()
@@ -409,29 +400,86 @@ class BattleConsumer(AsyncWebsocketConsumer):
             battle.current_turn = 2 if battle.current_turn == 1 else 1
             battle.save()
             
-            # Return the comparison result
-            return {
+            # Create full response with all card details visible to both players
+            response = {
                 'event': 'round_result',
+                'notify_room': True,  # Send to both players
                 'stat': stat,
-                'p1_card': {
-                    'name': p1_card.card_name,
-                    'value': p1_value,
-                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None
-                },
-                'p2_card': {
-                    'name': p2_card.card_name,
-                    'value': p2_value,
-                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None
-                },
+                'p1_card': self.card_to_dict(p1_card, p1_value),
+                'p2_card': self.card_to_dict(p2_card, p2_value),
                 'result': result,
                 'player1_score': battle.player1_score,
                 'player2_score': battle.player2_score,
                 'next_turn': battle.current_turn,
-                'cards_remaining': len(p1_cards) - p1_deck.current_card_index
+                'cards_remaining': min(len(p1_cards) - p1_deck.current_card_index, len(p2_cards) - p2_deck.current_card_index)
             }
             
+            # If this was the last card, end the battle
+            if response['cards_remaining'] <= 0:
+                end_result = self.end_battle(battle)
+                if end_result:
+                    return end_result
+            
+            return response
+            
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return {'event': 'error', 'message': str(e)}
+
+    def card_to_dict(self, card, value=None):
+        """Helper method to convert a card to a dictionary"""
+        result = {
+            'name': card.card_name,
+            'image': card.card_image_link.url if card.card_image_link else None,
+            'environmental_friendliness': card.environmental_friendliness,
+            'beauty': card.beauty,
+            'cost': card.cost
+        }
+        if value is not None:
+            result['value'] = value
+        return result
+
+    def end_battle(self, battle):
+        """Helper method to end the battle and award points"""
+        # Determine winner
+        if battle.player1_score > battle.player2_score:
+            battle.winner = battle.player1
+        elif battle.player2_score > battle.player1_score:
+            battle.winner = battle.player2
+        # if tie, winner remains null
+        
+        battle.status = 'completed'
+        battle.save()
+        
+        # Award points to users
+        if battle.winner:
+            if battle.winner == battle.player1:
+                battle.player1.user_profile_points += 10  # Winner gets 10 points
+                battle.player2.user_profile_points += 2   # Loser gets 2 points
+            else:
+                battle.player2.user_profile_points += 10
+                battle.player1.user_profile_points += 2
+            
+            battle.player1.save()
+            battle.player2.save()
+        else:
+            # In case of a tie, both get 5 points
+            battle.player1.user_profile_points += 5
+            battle.player2.user_profile_points += 5
+            battle.player1.save()
+            battle.player2.save()
+        
+        return {
+            'event': 'battle_completed',
+            'notify_room': True,  # Send to both players
+            'winner': battle.winner.user.username if battle.winner else None,
+            'is_tie': battle.winner is None,
+            'player1_score': battle.player1_score,
+            'player2_score': battle.player2_score,
+            'player1_name': battle.player1.user.username,
+            'player2_name': battle.player2.user.username
+        }
     
     @database_sync_to_async
     def get_current_state(self):
@@ -441,64 +489,30 @@ class BattleConsumer(AsyncWebsocketConsumer):
             opponent = battle.player2 if is_player1 else battle.player1
             
             state = {
-                'event': 'game_state',
+                'event': 'battle_state',
                 'status': battle.status,
                 'is_player1': is_player1,
                 'opponent_name': opponent.user.username if opponent else None,
                 'both_ready': battle.both_ready(),
-                'current_turn': battle.current_turn if battle.status == 'in_progress' else None
+                'current_turn': battle.current_turn if battle.status == 'in_progress' else None,
+                'player1_score': battle.player1_score,
+                'player2_score': battle.player2_score
             }
             
-            # If battle is in progress, get current cards directly here instead of using await
+            # If battle is in progress, include current cards
             if battle.status == 'in_progress':
-                try:
-                    # Get current decks for both players
-                    p1_deck = BattleDeck.objects.get(battle=battle, player=battle.player1)
-                    p2_deck = BattleDeck.objects.get(battle=battle, player=battle.player2)
-                    
-                    p1_cards = list(p1_deck.cards.all())
-                    p2_cards = list(p2_deck.cards.all())
-                    
-                    p1_card = p1_cards[p1_deck.current_card_index] if p1_deck.current_card_index < len(p1_cards) else None
-                    p2_card = p2_cards[p2_deck.current_card_index] if p2_deck.current_card_index < len(p2_cards) else None
-                    
-                    if p1_card and p2_card:
-                        # Include detailed player card info based on which player is requesting
-                        if is_player1:
-                            state.update({
-                                'player_card': {
-                                    'name': p1_card.card_name,
-                                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None,
-                                    'environmental_friendliness': p1_card.environmental_friendliness,
-                                    'beauty': p1_card.beauty,
-                                    'cost': p1_card.cost
-                                },
-                                'opponent_card': {
-                                    'name': p2_card.card_name,
-                                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None
-                                }
-                            })
-                        else:
-                            state.update({
-                                'player_card': {
-                                    'name': p2_card.card_name,
-                                    'image': p2_card.card_image_link.url if p2_card.card_image_link else None,
-                                    'environmental_friendliness': p2_card.environmental_friendliness,
-                                    'beauty': p2_card.beauty,
-                                    'cost': p2_card.cost
-                                },
-                                'opponent_card': {
-                                    'name': p1_card.card_name,
-                                    'image': p1_card.card_image_link.url if p1_card.card_image_link else None
-                                }
-                            })
-                except Exception as e:
-                    state.update({'error': str(e)})
+                # We can't use await inside a sync function
+                # Instead, return a flag indicating we need cards
+                state['needs_cards'] = True
             
             return state
             
         except Battle.DoesNotExist:
             return {'event': 'error', 'message': 'Battle not found'}
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return {'event': 'error', 'message': str(e)}
     
     # Send message to WebSocket
     async def battle_message(self, event):

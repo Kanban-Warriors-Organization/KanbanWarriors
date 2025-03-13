@@ -11,6 +11,11 @@ function connect() {
     const host = window.location.host;
     
     try {
+        if (socket && socket.readyState !== WebSocket.CLOSED) {
+            // Socket already exists and is not closed
+            return;
+        }
+        
         socket = new WebSocket(`${protocol}//${host}/ws/battle/${roomId}/`);
         
         socket.addEventListener('open', () => {
@@ -21,14 +26,18 @@ function connect() {
         
         socket.addEventListener('message', (event) => {
             try {
-                handleMessage(JSON.parse(event.data));
+                const data = JSON.parse(event.data);
+                console.log('Received message:', data); // Debug logging
+                handleMessage(data);
             } catch (e) {
                 logMessage('Error processing message: ' + e.message, true);
+                console.error('Error processing message:', e, event.data);
             }
         });
         
-        socket.addEventListener('close', () => {
+        socket.addEventListener('close', (event) => {
             logMessage('Disconnected from battle server. Attempting to reconnect...', true);
+            console.log('WebSocket closed with code:', event.code, 'reason:', event.reason);
             setTimeout(connect, 1000);
         });
         
@@ -38,12 +47,15 @@ function connect() {
         });
     } catch (e) {
         logMessage('Failed to connect: ' + e.message, true);
+        console.error('Connection setup error:', e);
         setTimeout(connect, 1000);
     }
 }
 
 // Handle incoming messages
 function handleMessage(data) {
+    console.log("Received message:", data); // Debug logging
+    
     switch(data.event) {
         case 'battle_created':
             logMessage('Battle room created. Waiting for opponent...');
@@ -51,7 +63,6 @@ function handleMessage(data) {
             isPlayer1 = true;
             document.getElementById('opponent-name').textContent = 'Waiting for opponent...';
             
-            // If status is 'selecting', transition to card selection immediately
             if (data.status === 'selecting') {
                 logMessage('Select your cards while waiting for an opponent...');
                 transitionToCardSelection();
@@ -59,24 +70,18 @@ function handleMessage(data) {
             break;
             
         case 'battle_joined':
-            // Update both players when player 2 joins
             gameState = "selecting";
             
-            // Set player role based on data or keep existing
+            // Set player role based on data
             if (data.is_player1 !== undefined) {
                 isPlayer1 = data.is_player1;
             }
             
-            // For player 1, the opponent is the joining player (username)
-            // For player 2, the opponent is the battle creator (opponent_name)
+            // Update opponent name
             const opponentName = isPlayer1 ? data.username : data.opponent_name;
             document.getElementById('opponent-name').textContent = opponentName;
             
-            if (isPlayer1) {
-                logMessage(`${opponentName} has joined the battle! Select your cards.`);
-            } else {
-                logMessage('You joined the battle! Select your cards.');
-            }
+            logMessage(`${isPlayer1 ? opponentName + ' has joined' : 'You joined'} the battle! Select your cards.`);
             
             // Both players transition to card selection
             transitionToCardSelection();
@@ -95,7 +100,11 @@ function handleMessage(data) {
                 transitionToCardSelection();
             } else if (data.status === 'in_progress') {
                 gameState = "playing";
-                transitionToBattle(data.current_turn);
+                if (data.player_card && data.opponent_card) {
+                    renderInitialCards(data);
+                } else {
+                    transitionToBattle(data.current_turn);
+                }
             }
             break;
             
@@ -125,6 +134,10 @@ function handleMessage(data) {
             
         case 'current_cards':
             renderInitialCards(data);
+            break;
+            
+        case 'error':
+            logMessage(`Error: ${data.message}`, true);
             break;
     }
 }
@@ -225,10 +238,16 @@ function updateTurnIndicator() {
     const playerArea = document.querySelector('.player-area');
     const opponentArea = document.querySelector('.opponent-area');
     
+    if (!playerArea || !opponentArea) return;
+    
     playerArea.classList.toggle('active-turn', isMyTurn);
     opponentArea.classList.toggle('active-turn', !isMyTurn);
     
-    logMessage(isMyTurn ? "Your turn! Select a stat to compare." : "Opponent's turn...");
+    if (gameState === "playing") {
+        logMessage(isMyTurn ? 
+            "Your turn! Select a stat to compare." : 
+            "Opponent's turn. Waiting for them to select a stat...");
+    }
 }
 
 // UI Helpers
@@ -292,6 +311,10 @@ function renderInitialCards(data) {
     document.getElementById('opponent-score').textContent = isPlayer1 ? 
         data.player2_score || 0 : data.player1_score || 0;
     
+    // Update turn status
+    isMyTurn = data.is_my_turn !== undefined ? data.is_my_turn : 
+               ((data.current_turn === 1 && isPlayer1) || (data.current_turn === 2 && !isPlayer1));
+    
     // Render player card with stats
     if (data.player_card) {
         const playerCardElement = createCardElement(data.player_card, true);
@@ -308,16 +331,24 @@ function renderInitialCards(data) {
                     }
                 });
             });
+            logMessage("Your turn! Select a stat to compare.");
+        } else {
+            // Make it clear it's not their turn
+            logMessage("Waiting for opponent to select a stat...");
         }
+    } else {
+        logMessage("Error: Your card could not be loaded", true);
     }
     
     // Render opponent card without stats
     if (data.opponent_card) {
         const opponentCardElement = createCardElement(data.opponent_card, false);
         document.getElementById('opponent-cards').appendChild(opponentCardElement);
+    } else {
+        logMessage("Error: Opponent card could not be loaded", true);
     }
     
-    logMessage('Cards loaded for battle. ' + (isMyTurn ? 'Your turn!' : 'Waiting for opponent...'));
+    updateTurnIndicator();
 }
 
 function selectStat(stat) {
@@ -349,13 +380,46 @@ function getStatDisplayName(stat) {
 }
 
 function displayRoundResult(data) {
+    // Clear existing cards
+    document.getElementById('player-cards').innerHTML = '';
+    document.getElementById('opponent-cards').innerHTML = '';
+    
     // Update scores
     document.getElementById('player-score').textContent = isPlayer1 ? 
         data.player1_score : data.player2_score;
     document.getElementById('opponent-score').textContent = isPlayer1 ? 
         data.player2_score : data.player1_score;
     
-    // Display round result
+    // Create card elements with full stats for both cards
+    const playerCard = isPlayer1 ? data.p1_card : data.p2_card;
+    const opponentCard = isPlayer1 ? data.p2_card : data.p1_card;
+    
+    // Create card elements with full stats visible for both cards
+    const playerCardElement = createCardElement(playerCard, true);
+    const opponentCardElement = createCardElement(opponentCard, true);
+    
+    // Highlight the chosen stat
+    if (data.stat) {
+        const playerStatButtons = playerCardElement.querySelectorAll('.stat-button');
+        const opponentStatButtons = opponentCardElement.querySelectorAll('.stat-button');
+        
+        playerStatButtons.forEach(button => {
+            if (button.dataset.stat === data.stat) {
+                button.classList.add('selected-stat');
+            }
+        });
+        
+        opponentStatButtons.forEach(button => {
+            if (button.dataset.stat === data.stat) {
+                button.classList.add('selected-stat');
+            }
+        });
+    }
+    
+    document.getElementById('player-cards').appendChild(playerCardElement);
+    document.getElementById('opponent-cards').appendChild(opponentCardElement);
+    
+    // Display round result message
     let resultMessage;
     if (data.result === 'tie') {
         resultMessage = `Round ${currentRound}: It's a tie! Both players get 1 point.`;
@@ -370,14 +434,14 @@ function displayRoundResult(data) {
     
     logMessage(resultMessage);
     
-    // Set up for next round
+    // Update turns for next round
     currentRound++;
     isMyTurn = (data.next_turn === 1 && isPlayer1) || (data.next_turn === 2 && !isPlayer1);
     
     // Show remaining cards
     logMessage(`${data.cards_remaining} cards remaining`);
     
-    // After a short delay, fetch new cards
+    // After a delay, fetch cards for the next round
     setTimeout(() => {
         if (data.cards_remaining > 0) {
             socket.send(JSON.stringify({
@@ -385,7 +449,7 @@ function displayRoundResult(data) {
             }));
             updateTurnIndicator();
         }
-    }, 2000);
+    }, 3000); // 3 seconds to let players see the results
 }
 
 function displayBattleResult(data) {
@@ -397,31 +461,44 @@ function displayBattleResult(data) {
     document.getElementById('opponent-score').textContent = isPlayer1 ? 
         data.player2_score : data.player1_score;
     
-    const playerWon = (isPlayer1 && data.winner === username) || (!isPlayer1 && data.winner !== username);
+    let playerWon;
+    if (data.is_tie) {
+        playerWon = null;
+    } else {
+        const playerName = isPlayer1 ? data.player1_name : data.player2_name;
+        playerWon = data.winner === playerName;
+    }
     
     // Display title and message
     const resultOverlay = document.getElementById('result-overlay');
     const resultTitle = document.getElementById('result-title');
     const resultMessage = document.getElementById('result-message');
     
-    resultTitle.textContent = playerWon ? 'Victory!' : 'Defeat!';
-    resultMessage.textContent = playerWon ? 
-        'You won the battle! +10 points awarded.' : 
-        'You lost the battle. +2 points awarded for participating.';
-    
-    resultTitle.className = `result-title ${playerWon ? 'win' : 'lose'}`;
+    if (data.is_tie) {
+        resultTitle.textContent = 'It\'s a Tie!';
+        resultMessage.textContent = 'The battle ended in a draw. +5 points awarded to both players.';
+        resultTitle.className = 'result-title tie';
+    } else {
+        resultTitle.textContent = playerWon ? 'Victory!' : 'Defeat!';
+        resultMessage.textContent = playerWon ? 
+            'You won the battle! +10 points awarded.' : 
+            'You lost the battle. +2 points awarded for participating.';
+        resultTitle.className = `result-title ${playerWon ? 'win' : 'lose'}`;
+    }
     
     // Show the overlay
     resultOverlay.classList.add('active');
     
-    logMessage(playerWon ? 
-        'Battle complete! You are victorious!' : 
-        'Battle complete! Better luck next time.');
+    const finalMessage = data.is_tie ? 
+        'Battle complete! It\'s a tie!' :
+        (playerWon ? 'Battle complete! You are victorious!' : 'Battle complete! Better luck next time.');
+    logMessage(finalMessage);
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     connect();
+    addStyleForTie();
     
     document.getElementById('confirm-selection').addEventListener('click', () => {
         if (selectedCards.length === 4) {
@@ -431,10 +508,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
             socket.send(JSON.stringify({ event: 'ready' }));
             document.getElementById('confirm-selection').disabled = true;
+            logMessage("Cards selected and ready for battle!");
         }
     });
     
     document.getElementById('new-battle').addEventListener('click', () => {
-        window.location.href = '/battle/';
+        window.location.href = '/battle-select/';
     });
 });
+
+// Add CSS for a tie result
+function addStyleForTie() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .result-title.tie {
+            color: #f8d347;
+            text-shadow: 0 0 10px rgba(248, 211, 71, 0.7);
+        }
+    `;
+    document.head.appendChild(styleElement);
+}

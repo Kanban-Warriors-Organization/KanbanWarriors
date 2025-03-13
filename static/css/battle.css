@@ -115,9 +115,21 @@ html, body {
     padding: 20px;
 }
 
+.player-area.active-turn,
+.opponent-area.active-turn {
+    border-color: #0fce14;
+    box-shadow: 0 0 15px rgba(15, 206, 20, 0.3);
+    transition: all 0.3s ease;
+}
+
 .active-turn {
     border-color: #0fce14;
     box-shadow: 0 0 15px rgba(15, 206, 20, 0.5);
+}
+
+.active-turn .card {
+    border-color: #0fce14;
+    transform: translateY(-5px);
 }
 
 /* Stats */
@@ -143,6 +155,37 @@ html, body {
     border-color: #12c5f8;
     color: #08546B;
     font-weight: bold;
+}
+
+.stat-button.selected-stat {
+    background-color: #12c5f8;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #08546B;
+}
+
+.active-turn .stat-button.selectable {
+    cursor: pointer;
+    background-color: #f0f8ff;
+    border: 2px solid #12c5f8;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(18, 197, 248, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(18, 197, 248, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(18, 197, 248, 0);
+    }
+}
+
+.active-turn .stat-button.selectable:hover {
+    background-color: #dcf1fa;
+    transform: translateY(-2px);
 }
 
 /* Battle Log */
