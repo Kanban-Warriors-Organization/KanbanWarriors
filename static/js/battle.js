@@ -194,15 +194,31 @@ function toggleCardSelection(cardElement, card) {
 // Battle phase
 function transitionToBattle(firstTurn) {
     gameState = "playing";
+    currentRound = 1;
+    
+    // Update UI elements
     document.getElementById('card-selection').style.display = 'none';
     document.getElementById('battle-area').style.display = 'flex';
     
+    // Reset scores display
+    document.getElementById('player-score').textContent = '0';
+    document.getElementById('opponent-score').textContent = '0';
+    
+    // Determine if it's the player's turn
     isMyTurn = (firstTurn === 1 && isPlayer1) || (firstTurn === 2 && !isPlayer1);
+    
+    // Clear previous cards
+    document.getElementById('player-cards').innerHTML = '';
+    document.getElementById('opponent-cards').innerHTML = '';
+    
     updateTurnIndicator();
     
+    // Request initial cards
     socket.send(JSON.stringify({
         event: 'request_current_cards'
     }));
+    
+    logMessage(`Battle begins! ${isMyTurn ? 'Your turn first.' : 'Opponent goes first.'}`);
 }
 
 function updateTurnIndicator() {
@@ -219,10 +235,14 @@ function updateTurnIndicator() {
 function createCardElement(card, showStats = false) {
     const el = document.createElement('div');
     el.className = 'card';
+    
+    // Use a default image if none provided
+    const imageSrc = card.image || '/static/img/card_placeholder.png';
+    
     el.innerHTML = `
-        <h3>${card.name}</h3>
+        <h3>${card.name || 'Unknown Card'}</h3>
         <div class="card-image">
-            <img src="${card.image || ''}" alt="${card.name}">
+            <img src="${imageSrc}" alt="${card.name || 'Card'}" onerror="this.src='/static/img/card_placeholder.png'">
         </div>
         ${showStats ? createStatsHTML(card) : ''}
     `;
@@ -230,16 +250,23 @@ function createCardElement(card, showStats = false) {
 }
 
 function createStatsHTML(card) {
+    if (!card) return '';
+    
+    // Default values in case stats are undefined
+    const envFriendliness = card.environmental_friendliness !== undefined ? card.environmental_friendliness : '?';
+    const beauty = card.beauty !== undefined ? card.beauty : '?';
+    const cost = card.cost !== undefined ? card.cost : '?';
+    
     return `
         <div class="card-stats">
             <button class="stat-button" data-stat="environmental_friendliness">
-                Environment: ${card.environmental_friendliness}
+                Environment: ${envFriendliness}
             </button>
             <button class="stat-button" data-stat="beauty">
-                Beauty: ${card.beauty}
+                Beauty: ${beauty}
             </button>
             <button class="stat-button" data-stat="cost">
-                Cost: ${card.cost}
+                Cost: ${cost}
             </button>
         </div>
     `;
@@ -252,6 +279,144 @@ function logMessage(message, isError = false) {
     entry.textContent = message;
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
+}
+
+function renderInitialCards(data) {
+    // Clear existing cards
+    document.getElementById('player-cards').innerHTML = '';
+    document.getElementById('opponent-cards').innerHTML = '';
+    
+    // Update scores
+    document.getElementById('player-score').textContent = isPlayer1 ? 
+        data.player1_score || 0 : data.player2_score || 0;
+    document.getElementById('opponent-score').textContent = isPlayer1 ? 
+        data.player2_score || 0 : data.player1_score || 0;
+    
+    // Render player card with stats
+    if (data.player_card) {
+        const playerCardElement = createCardElement(data.player_card, true);
+        document.getElementById('player-cards').appendChild(playerCardElement);
+        
+        // Add event listeners to stat buttons if it's player's turn
+        if (isMyTurn) {
+            const statButtons = playerCardElement.querySelectorAll('.stat-button');
+            statButtons.forEach(button => {
+                button.classList.add('selectable');
+                button.addEventListener('click', () => {
+                    if (isMyTurn) {
+                        selectStat(button.dataset.stat);
+                    }
+                });
+            });
+        }
+    }
+    
+    // Render opponent card without stats
+    if (data.opponent_card) {
+        const opponentCardElement = createCardElement(data.opponent_card, false);
+        document.getElementById('opponent-cards').appendChild(opponentCardElement);
+    }
+    
+    logMessage('Cards loaded for battle. ' + (isMyTurn ? 'Your turn!' : 'Waiting for opponent...'));
+}
+
+function selectStat(stat) {
+    if (!isMyTurn || gameState !== 'playing') {
+        return;
+    }
+    
+    logMessage(`You selected ${getStatDisplayName(stat)} to compare`);
+    
+    socket.send(JSON.stringify({
+        event: 'select_stat',
+        stat: stat
+    }));
+    
+    // Disable further selections until next turn
+    const statButtons = document.querySelectorAll('.stat-button');
+    statButtons.forEach(button => {
+        button.classList.remove('selectable');
+    });
+}
+
+function getStatDisplayName(stat) {
+    switch(stat) {
+        case 'environmental_friendliness': return 'Environmental Friendliness';
+        case 'beauty': return 'Beauty';
+        case 'cost': return 'Cost';
+        default: return stat;
+    }
+}
+
+function displayRoundResult(data) {
+    // Update scores
+    document.getElementById('player-score').textContent = isPlayer1 ? 
+        data.player1_score : data.player2_score;
+    document.getElementById('opponent-score').textContent = isPlayer1 ? 
+        data.player2_score : data.player1_score;
+    
+    // Display round result
+    let resultMessage;
+    if (data.result === 'tie') {
+        resultMessage = `Round ${currentRound}: It's a tie! Both players get 1 point.`;
+    } else if (
+        (data.result === 'player1' && isPlayer1) || 
+        (data.result === 'player2' && !isPlayer1)
+    ) {
+        resultMessage = `Round ${currentRound}: You win! Your card has better ${getStatDisplayName(data.stat)}.`;
+    } else {
+        resultMessage = `Round ${currentRound}: Opponent wins! Their card has better ${getStatDisplayName(data.stat)}.`;
+    }
+    
+    logMessage(resultMessage);
+    
+    // Set up for next round
+    currentRound++;
+    isMyTurn = (data.next_turn === 1 && isPlayer1) || (data.next_turn === 2 && !isPlayer1);
+    
+    // Show remaining cards
+    logMessage(`${data.cards_remaining} cards remaining`);
+    
+    // After a short delay, fetch new cards
+    setTimeout(() => {
+        if (data.cards_remaining > 0) {
+            socket.send(JSON.stringify({
+                event: 'request_current_cards'
+            }));
+            updateTurnIndicator();
+        }
+    }, 2000);
+}
+
+function displayBattleResult(data) {
+    gameState = 'completed';
+    
+    // Update final scores
+    document.getElementById('player-score').textContent = isPlayer1 ? 
+        data.player1_score : data.player2_score;
+    document.getElementById('opponent-score').textContent = isPlayer1 ? 
+        data.player2_score : data.player1_score;
+    
+    const playerWon = (isPlayer1 && data.winner === username) || (!isPlayer1 && data.winner !== username);
+    
+    // Display title and message
+    const resultOverlay = document.getElementById('result-overlay');
+    const resultTitle = document.getElementById('result-title');
+    const resultMessage = document.getElementById('result-message');
+    
+    resultTitle.textContent = playerWon ? 'Victory!' : 'Defeat!';
+    resultMessage.textContent = playerWon ? 
+        'You won the battle! +10 points awarded.' : 
+        'You lost the battle. +2 points awarded for participating.';
+    
+    resultTitle.className = `result-title ${playerWon ? 'win' : 'lose'}`;
+    
+    // Show the overlay
+    resultOverlay.classList.add('active');
+    
+    logMessage(playerWon ? 
+        'Battle complete! You are victorious!' : 
+        'Battle complete! Better luck next time.');
 }
 
 // Event Listeners
