@@ -37,6 +37,7 @@ urlpatterns = [
     path('battle/', views.battle_room, name='battle'),
     path('battle/<str:room_id>/', views.battle_room, name='battle_with_id'),
     path("get-battle-cards/", views.get_battle_cards, name="get_battle_cards"),
+    path('battle-select/', views.battle_select, name='battle_select'),
 ]   # [1] DO NOT REMOVE THE SLASH!
 
 # (template_name="cardgame/login.html")

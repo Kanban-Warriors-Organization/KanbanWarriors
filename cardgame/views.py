@@ -554,3 +554,12 @@ def get_battle_cards(request):
         return JsonResponse({'cards': card_data})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@login_required
+def battle_select(request):
+    """
+    Renders the battle selection screen where users can create or join battles.
+    
+    Author: [Your Name]
+    """
+    return render(request, 'cardgame/battle_select.html')
