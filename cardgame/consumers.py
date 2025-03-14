@@ -359,6 +359,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
             p1_cards = list(p1_deck.cards.all())
             p2_cards = list(p2_deck.cards.all())
             
+            # Use the stored seeds to shuffle consistently - THIS IS THE FIX
+            random.Random(p1_deck.shuffle_seed).shuffle(p1_cards)
+            random.Random(p2_deck.shuffle_seed).shuffle(p2_cards)
+            
             # Check if we've reached the end of the battle
             if p1_deck.current_card_index >= len(p1_cards) or p2_deck.current_card_index >= len(p2_cards):
                 return self.end_battle(battle)
