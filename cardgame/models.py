@@ -298,6 +298,7 @@ class BattleDeck(models.Model):
         player (UserProfile): The player who owns this deck
         cards (ManyToManyField): Selected cards for the battle
         current_card_index (int): Index of the current card in play
+        shuffle_seed (int): Seed for shuffling the deck
         
     Author: Samuel Weisz
     """
@@ -306,6 +307,7 @@ class BattleDeck(models.Model):
     player = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="battle_decks")
     cards = models.ManyToManyField(Card, related_name="battle_decks")
     current_card_index = models.IntegerField(default=0)
+    shuffle_seed = models.IntegerField(default=0)
     
     def __str__(self):
         return f"Deck for {self.player.user.username} in battle {self.battle.room_id}"

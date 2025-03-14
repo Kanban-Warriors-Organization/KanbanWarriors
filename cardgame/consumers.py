@@ -216,18 +216,16 @@ class BattleConsumer(AsyncWebsocketConsumer):
             deck, created = BattleDeck.objects.get_or_create(
                 battle=battle,
                 player=user_profile,
-                defaults={'current_card_index': 0}
+                defaults={
+                    'current_card_index': 0,
+                    'shuffle_seed': random.randint(1, 1000000)  # Add unique seed
+                }
             )
             
             # Clear existing cards and add new ones
             deck.cards.clear()
             
-            # Convert cards QuerySet to list for shuffling
-            card_list = list(cards)
-            random.shuffle(card_list)
-            
-            # Add cards in the shuffled order
-            for card in card_list:
+            for card in cards:
                 deck.cards.add(card)
                 
             deck.current_card_index = 0
@@ -291,6 +289,10 @@ class BattleConsumer(AsyncWebsocketConsumer):
             
             p1_cards = list(p1_deck.cards.all())
             p2_cards = list(p2_deck.cards.all())
+
+            # Use the stored seeds to shuffle consistently but differently
+            random.Random(p1_deck.shuffle_seed).shuffle(p1_cards)
+            random.Random(p2_deck.shuffle_seed).shuffle(p2_cards)
             
             # Check if we've reached the end of the cards
             if p1_deck.current_card_index >= len(p1_cards) or p2_deck.current_card_index >= len(p2_cards):
