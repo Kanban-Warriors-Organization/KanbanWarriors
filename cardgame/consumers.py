@@ -384,16 +384,15 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 p1_wins = p1_value > p2_value
                 tie = p1_value == p2_value
             
-            # Update scores
+            # Update scores - simplified scoring system
             if tie:
-                battle.player1_score += 1
-                battle.player2_score += 1
                 result = "tie"
+                # No points awarded for ties
             elif p1_wins:
-                battle.player1_score += 3
+                battle.player1_score += 1  # Just +1 for the winner
                 result = "player1"
             else:
-                battle.player2_score += 3
+                battle.player2_score += 1  # Just +1 for the winner
                 result = "player2"
             
             # Move to next cards
