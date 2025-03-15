@@ -27,7 +27,7 @@ function connect() {
         socket.addEventListener('message', (event) => {
             try {
                 const data = JSON.parse(event.data);
-                console.log('Received message:', data); // Debug logging
+                console.log('Received message:', data);
                 handleMessage(data);
             } catch (e) {
                 logMessage('Error processing message: ' + e.message, true);
@@ -54,7 +54,7 @@ function connect() {
 
 // Handle incoming messages
 function handleMessage(data) {
-    console.log("Received message:", data); // Debug logging
+    console.log("Received message:", data);
     
     switch(data.event) {
         case 'battle_created':
@@ -72,7 +72,7 @@ function handleMessage(data) {
         case 'battle_joined':
             gameState = "selecting";
             
-            // Set player role based on data
+            // Set player role 
             if (data.is_player1 !== undefined) {
                 isPlayer1 = data.is_player1;
             }
@@ -517,7 +517,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Add CSS for a tie result
 function addStyleForTie() {
     const styleElement = document.createElement('style');
     styleElement.textContent = `

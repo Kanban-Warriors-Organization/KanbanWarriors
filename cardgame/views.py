@@ -502,7 +502,7 @@ def battle_room(request, room_id=None):
     """
     Renders the battle room page where users can battle with their cards.
     
-    Author: Samuel Weisz
+    Author: Samuel
     
     Args:
         request: HTTP request object
@@ -526,7 +526,7 @@ def get_battle_cards(request):
     """
     Retrieves cards available for battle from user's collection.
     
-    Author: Samuel Weisz
+    Author: Samuel
     
     Args:
         request: HTTP request object
@@ -546,9 +546,9 @@ def get_battle_cards(request):
                 'subtitle': card.card_subtitle,
                 'description': card.card_description,
                 'image': card.card_image_link.url if card.card_image_link else None,
-                'environmental_friendliness': card.environmental_friendliness if hasattr(card, 'environmental_friendliness') else random.randint(1, 100),
-                'beauty': card.beauty if hasattr(card, 'beauty') else random.randint(1, 100),
-                'cost': card.cost if hasattr(card, 'cost') else random.randint(1, 100)
+                'environmental_friendliness': card.environmental_friendliness if hasattr(card, 'environmental_friendliness') else random.randint(1, 10),
+                'beauty': card.beauty if hasattr(card, 'beauty') else random.randint(1, 10),
+                'cost': card.cost if hasattr(card, 'cost') else random.randint(1, 10)
             })
         
         return JsonResponse({'cards': card_data})
@@ -560,6 +560,6 @@ def battle_select(request):
     """
     Renders the battle selection screen where users can create or join battles.
     
-    Author: [Your Name]
+    Author: Samuel
     """
     return render(request, 'cardgame/battle_select.html')

@@ -218,7 +218,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 player=user_profile,
                 defaults={
                     'current_card_index': 0,
-                    'shuffle_seed': random.randint(1, 1000000)  # Add unique seed
+                    'shuffle_seed': random.randint(1, 1000000)
                 }
             )
             
@@ -315,7 +315,6 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 'cards_remaining': min(len(p1_cards) - p1_deck.current_card_index, len(p2_cards) - p2_deck.current_card_index)
             }
             
-            # Add player-specific data
             if is_player1:
                 result['player_card'] = self.card_to_dict(p1_card)
                 result['opponent_card'] = {
@@ -384,15 +383,15 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 p1_wins = p1_value > p2_value
                 tie = p1_value == p2_value
             
-            # Update scores - simplified scoring system
+            # Simple scoring system
             if tie:
                 result = "tie"
                 # No points awarded for ties
             elif p1_wins:
-                battle.player1_score += 1  # Just +1 for the winner
+                battle.player1_score += 1 
                 result = "player1"
             else:
-                battle.player2_score += 1  # Just +1 for the winner
+                battle.player2_score += 1 
                 result = "player2"
             
             # Move to next cards
@@ -504,10 +503,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 'player2_score': battle.player2_score
             }
             
-            # If battle is in progress, include current cards
             if battle.status == 'in_progress':
-                # We can't use await inside a sync function
-                # Instead, return a flag indicating we need cards
                 state['needs_cards'] = True
             
             return state
@@ -522,6 +518,4 @@ class BattleConsumer(AsyncWebsocketConsumer):
     # Send message to WebSocket
     async def battle_message(self, event):
         message = event['message']
-        
-        # Send message to WebSocket
         await self.send(text_data=json.dumps(message))

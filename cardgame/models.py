@@ -3,16 +3,12 @@ Core data models for the application.
 Defines database structure and relationships for cards, collections,
 user profiles, challenges, and quiz components.
 
-Author: BLANK
 """
 
 import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
-
-# Create your models here.
-
 
 class CardSet(models.Model):
     """
@@ -255,7 +251,7 @@ class Battle(models.Model):
         winner (UserProfile): The winner of the battle (if completed)
         created_at (DateTimeField): When the battle was created
         
-    Author: Samuel Weisz
+    Author: Samuel
     """
     
     room_id = models.CharField(max_length=100, unique=True)
@@ -300,7 +296,7 @@ class BattleDeck(models.Model):
         current_card_index (int): Index of the current card in play
         shuffle_seed (int): Seed for shuffling the deck
         
-    Author: Samuel Weisz
+    Author: Samuel
     """
     
     battle = models.ForeignKey(Battle, on_delete=models.CASCADE, related_name="decks")
