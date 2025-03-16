@@ -11,7 +11,7 @@ from django.http import HttpResponse, Http404
 import json
 from django.shortcuts import redirect, render
 # from django.template import loader
-from django.contrib.auth import logout, login  # authenticate, login
+from django.contrib.auth import logout, login, authenticate  # authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -737,6 +737,9 @@ def submit_trade(request):
 @login_required
 def delete_account(request):
     if request.method == 'POST':
+        password = request.POST.get('pwd')
+        if (password == None or authenticate(username=request.user.username, password=password) == None):
+            return HttpResponse("this is bad")
         #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
         user = request.user
         user.delete()
@@ -764,6 +767,13 @@ def change_username(request):
     if request.method == 'POST':
         user = request.user
         new_name = request.POST.get("new_name")
+        pwd = request.POST.get("pwd")
+        if (pwd == None):
+            return HttpResponse("you done goofed")
+        if (authenticate(username=user.username, password=pwd) == None):
+            return HttpResponse("wrong password!")
+        if (new_name == ''):
+            return HttpResponse("this is an empty name")
         try:
             #verify no other user has that userna,e
             if User.objects.filter(username = new_name):
@@ -774,6 +784,8 @@ def change_username(request):
                 return redirect("home")
         except Exception as e:
             print(e)
-    return HttpResponse("why don't you try hard?")
+    if request.method == 'GET':
+        return render(request,"cardgame/change_username.html")
+
 
 
