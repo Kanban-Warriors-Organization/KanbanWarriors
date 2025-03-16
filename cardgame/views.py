@@ -15,7 +15,7 @@ from django.contrib.auth import logout, login  # authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
@@ -527,7 +527,6 @@ def get_trades_matching_query(request):
             #basic filter for now, can change later
             out_card = request.GET.get("out_card")
             in_card = request.GET.get("in_card")
-            print("out card is " + out_card + " in card is " + in_card)
             trades = Trade.objects.all().filter(recipient=None)
             print(trades)
             if (request.GET.get("out_card") != ''):
@@ -535,10 +534,11 @@ def get_trades_matching_query(request):
             if (request.GET.get("in_card") != ''):
                 trades = trades.filter(offered_card__card_name = in_card)
             if trades.count() == 0:
-                return HttpResponse("no trades!")
+                   return HttpResponse(render(request, "cardgame/search.html"))
             t = []
             for tr in trades:
                 data = {}
+                data['id'] = tr.id
                 data['sender'] = tr.sender.username
                 data['date'] = tr.created_date
                 data['offered_card'] = tr.offered_card.card_name
@@ -558,7 +558,7 @@ def get_outgoing_trades(request):
     t = []
     for tr in trades:
         data = {}
-        data['id'] = tr.id;
+        data['id'] = tr.id
         data['recipient'] = tr.sender.username
         data['date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
@@ -590,6 +590,7 @@ def get_incoming_trades(request):
     return render(request, "cardgame/incoming_trades.html", {'data':t})
 
 @login_required
+@transaction.atomic
 def accept_trade(request, t_id):
             #validate that the trade is still available
         #validate that the user can access the trade
