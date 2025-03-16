@@ -34,11 +34,7 @@ def index(request):
     if request.user.is_authenticated:
         return render(request, "cardgame/home.html")
     else:
-        form = UserCreationForm()
-        return HttpResponse(render(request, "cardgame/signup.html",
-                               {"form": form}))
-
-
+         return redirect("signup")
 def home(request):
     """
     Renders the homepage.
