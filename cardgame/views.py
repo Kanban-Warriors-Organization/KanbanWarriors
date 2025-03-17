@@ -662,7 +662,11 @@ def make_trade_page(request, card_name):
     requested_card = Card.objects.get(card_name=card_name)
     ownedCards = user.user_profile_collected_cards.all()
     all_users = User.objects.all()
+    eligible_users = []
     for user in all_users:
+        if UserProfile.objects.get(user=user).user_profile_collected_cards.filter(card_name=requested_card.card_name).exists():
+            eligible_users.append(user)
+    for user in eligible_users:
         if user != request.user:
             names.append(user.username)
     for card in ownedCards:
@@ -755,7 +759,7 @@ def account(request):
 
         #check type of request we want and call appropriate view
 
-    
+
 
 @login_required
 def change_username(request):
