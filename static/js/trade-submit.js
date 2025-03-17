@@ -18,9 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch("http://127.0.0.1:8000/trades/submit", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
             },
             body: jsonData
-        })
+        }).then(response => {
+            window.location.href = 'http://127.0.0.1:8000/trades/outgoing';
+        });
     });
 });
