@@ -1,7 +1,6 @@
 {% for trade in data %}
 {{trade.date}} {{trade.recipient}} {{trade.incoming_card}}
-<button type="submit" onclick="location.href='{% url 'cancel' t_id=trade.id %}'" name='help '>Cancel the trade</button>
-
+<a href="{% url 'cancel' trade.id %}" class="btn btn-danger">Cancel the trade</a>
 {% endfor %}
 
 
