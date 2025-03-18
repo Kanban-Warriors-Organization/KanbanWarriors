@@ -168,6 +168,9 @@ def create_card(request):
         card_description = request.POST.get("card_description")
         card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
+        card_beauty = request.POST.get("beauty")
+        card_cost = request.POST.get("cost")
+        card_env = request.POST.get("env")
 
         # Check that the required parameters are provided
         if not (card_name and card_subtitle and card_description):
@@ -189,7 +192,7 @@ def create_card(request):
             c = make_image("static/card_gen/back.png", card_name,
                            card_subtitle, "static/card_gen/normal.ttf",
                            "static/card_gen/bold.ttf", card_description,
-                           card_image)
+                           card_image,card_env,card_beauty,card_cost)
 
             c_io = BytesIO()
             c.save(c_io, format="PNG")
@@ -206,6 +209,9 @@ def create_card(request):
                     card_description=card_description,
                     card_set=card_set_instance,
                     card_image_link=django_file,
+                    environmental_friendliness=card_env,
+                    beauty=card_beauty,
+                    cost=card_cost
                     )
             card.save()
 
