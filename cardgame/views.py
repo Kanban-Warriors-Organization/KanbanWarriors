@@ -550,24 +550,24 @@ def get_trades_matching_query(request):
 @login_required
 def get_outgoing_trades(request):
     u = request.user;
-    trades = Trade.objects.filter(sender = u)
+    trades = Trade.objects.filter(recipient = u)
     s = []
     t = []
     for tr in trades:
         data = {}
         data['id'] = tr.id
-        data['recipient'] = tr.sender.username
+        data['sender'] = tr.sender.username
         data['date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
         data['incoming_card_image'] = tr.offered_card.card_image_link
         data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
-    trades2 = Trade.objects.filter(recipient=u)
+    trades2 = Trade.objects.filter(sender=u)
     for trd in trades2:
         data = {}
         data['id'] = trd.id
-        data['sender'] = trd.sender.username
+        data['recipient'] = trd.recipient.username
         data['date'] = trd.created_date
         data['incoming_card'] = trd.offered_card.card_name
         data['incoming_card_image'] = trd.offered_card.card_image_link

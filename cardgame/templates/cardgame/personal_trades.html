@@ -1,13 +1,16 @@
 OUTGOING
-{% for trade in t %}
-{{trade.date}} {{trade.recipient}} offering: {{trade.incoming_card}} wanted: {{trade.requested_card}}
+{% for trade in outgoing %}
+{{trade.date}} {{trade.recipient}} {{trade.incoming_card}} {{trade.requested_card}}
 <a href="{% url 'cancel' trade.id %}" class="btn btn-danger">Cancel the trade</a>
 {% endfor %}
+
 INCOMING
-{% for trade in s %}
-{{trade.date}} {{trade.sender}} wanted: {{trade.requested_card}} offered: {{trade.incoming_card}}
-<button type="submit" onclick="location.href='{% url 'accept' t_id=trade.id %}'" name='help '>Accept the trade</button>
-<button type="submit" onclick="location.href='{% url 'cancel' t_id=trade.id %}'" name='help '>Decline the trade</button>
+{% for trade in incoming %}
+{{trade.date}} {{trade.sender}} {{trade.requested_card}} {{trade.incoming_card}}
+
+<a href="{% url 'accept' trade.id %}" class="btn btn-danger">Accept the trade</a>
+<a href="{% url 'cancel' trade.id %}" class="btn btn-danger">Deny the trade</a>
+
 {% endfor %}
 
 
