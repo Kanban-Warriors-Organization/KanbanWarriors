@@ -548,34 +548,36 @@ def get_trades_matching_query(request):
 
 
 @login_required
-def get_outgoing_trades(request):
+def get_personal_trades(request):
     u = request.user;
-    trades = Trade.objects.filter(recipient = u)
-    s = []
-    t = []
-    for tr in trades:
+    incoming = Trade.objects.filter(recipient = u)
+    inc = []
+    out = []
+    for tr in incoming:
         data = {}
         data['id'] = tr.id
         data['sender'] = tr.sender.username
-        data['date'] = tr.created_date
+        data['recipient'] = tr.recipient.username
+        data['c_date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
         data['incoming_card_image'] = tr.offered_card.card_image_link
         data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
-        t.append(data)
-    trades2 = Trade.objects.filter(sender=u)
-    for trd in trades2:
+        inc.append(data)
+    outgoing = Trade.objects.filter(sender=u)
+    for trd in outgoing:
         data = {}
         data['id'] = trd.id
+        data['sender'] = trd.sender.username
         data['recipient'] = trd.recipient.username
-        data['date'] = trd.created_date
+        data['c_date'] = trd.created_date
         data['incoming_card'] = trd.offered_card.card_name
         data['incoming_card_image'] = trd.offered_card.card_image_link
         data['requested_card'] = trd.requested_card.card_name
         data['requested_card_image'] = trd.requested_card.card_image_link
-        s.append(data)
+        out.append(data)
 
-    return render(request, "cardgame/personal_trades.html", {'incoming':t}, {'outgoing':s})
+    return render(request, "cardgame/personal_trades.html", {'incoming':inc}, {'outgoing':out})
 
 
 
