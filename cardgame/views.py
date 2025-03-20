@@ -551,6 +551,7 @@ def get_trades_matching_query(request):
 def get_outgoing_trades(request):
     u = request.user;
     trades = Trade.objects.filter(sender = u)
+    s = []
     t = []
     for tr in trades:
         data = {}
@@ -562,7 +563,19 @@ def get_outgoing_trades(request):
         data['requested_card'] = tr.requested_card.card_name
         data['requested_card_image'] = tr.requested_card.card_image_link
         t.append(data)
-    return render(request, "cardgame/outgoing_trades.html", {'data':t})
+    trades2 = Trade.objects.filter(recipient=u)
+    for trd in trades2:
+        data = {}
+        data['id'] = trd.id
+        data['sender'] = trd.sender.username
+        data['date'] = trd.created_date
+        data['incoming_card'] = trd.offered_card.card_name
+        data['incoming_card_image'] = trd.offered_card.card_image_link
+        data['requested_card'] = trd.requested_card.card_name
+        data['requested_card_image'] = trd.requested_card.card_image_link
+        s.append(data)
+
+    return render(request, "cardgame/personal_trades.html", {'incoming':t}, {'outgoing':s})
 
 
 
