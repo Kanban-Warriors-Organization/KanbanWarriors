@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
-from .models import Card, CardSet, UserProfile, Challenge, Question, Trade
+from .models import Card, UserProfile, Challenge, Question, Trade
 from .forms import UserCreationForm2
 
 
@@ -177,22 +177,11 @@ def create_card(request):
         card_name = request.POST.get("card_name")
         card_subtitle = request.POST.get("card_subtitle")
         card_description = request.POST.get("card_description")
-        card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
 
         # Check that the required parameters are provided
         if not (card_name and card_subtitle and card_description):
             return HttpResponse("Missing required parameters", status=400)
-
-        # Get card set if available
-        card_set_instance = None
-        if card_set_name:
-            try:
-                card_set_instance = CardSet.objects.get(
-                        card_set_name=card_set_name)
-            except CardSet.DoesNotExist:
-                return HttpResponse("Specified CardSet does not exist",
-                                    status=400)
 
         try:
 
@@ -215,7 +204,6 @@ def create_card(request):
                     card_name=card_name,
                     card_subtitle=card_subtitle,
                     card_description=card_description,
-                    card_set=card_set_instance,
                     card_image_link=django_file,
                     )
             card.save()

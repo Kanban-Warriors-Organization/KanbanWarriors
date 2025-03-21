@@ -14,25 +14,6 @@ from django.forms import ValidationError
 # Create your models here.
 
 
-class CardSet(models.Model):
-    """
-    Represents a collection of related cards.
-
-    Attributes:
-        card_set_name (str): Unique identifier for the set
-        card_set_description (str): Detailed description of the set's theme
-
-    Relationships:
-        One-to-many with Card model
-
-    Author: Timothy Simmons
-    """
-
-    card_set_name = models.CharField(max_length=40, primary_key=True)
-    card_set_description = models.CharField(max_length=200)
-
-    def __str__(self):
-        return str(self.card_set_name)
 
 
 class Card(models.Model):
@@ -60,8 +41,6 @@ class Card(models.Model):
         upload_to="static/card_images",
         default="static/card_images/do_not_remove.png",
     )
-    card_set = models.ForeignKey(CardSet, models.SET_NULL,
-                                 null=True, blank=True)
 
     def __str__(self):
         return str(self.card_name)
