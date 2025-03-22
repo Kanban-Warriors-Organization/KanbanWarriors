@@ -383,7 +383,8 @@ def challenges(request):
     try:
         ctime = datetime.datetime.now()
         upc = UserProfile.objects.get(user=request.user).user_profile_collected_cards
-        # filters all challenges that are ongoing
+        #     return render(request, "cardgame/home.html")
+        #filters all challenges that are ongoing
         challenges = Challenge.objects.filter(
             start_time__lte=ctime, end_time__gte=ctime
         )
@@ -728,7 +729,7 @@ def cancel_trade(request, t_id):
     try:
         user = request.user
         trade = Trade.objects.get(id=t_id)
-        if (trade.sender != user):
+        if (trade.sender != user and trade.recipient != user):
             return HttpResponse("watch out! you can't cancel this trade!")
         #actually cancels the trade
         Trade.objects.get(id=t_id).delete()
@@ -898,6 +899,5 @@ def change_username(request):
             print(e)
     if request.method == 'GET':
         return render(request,"cardgame/change_username.html")
-
 
 
