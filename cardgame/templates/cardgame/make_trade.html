@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="A user can create a trade with another user">
+        <title>Make a Trade</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/make_trade.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <header class="navbar">
+            <a href="home" class="logo">
+                <img src="{% static 'img\logo.png' %}">
+            </a>
+            <nav class="nav-links">
+                <a href="/home">Home</a>
+                <a href="/profile-redirect">Profile</a>
+                <a href="/challenges">Challenges</a>
+                <a href="/collection-redirect">Collection</a>
+                <a href="/logout">Sign Out</a>
+            </nav>
+        </header>
+            <div class="main-content">
+                <div class="trade-form">
+                    <form id="trade-form">
+                        <div class="form-group">
+                            <label for="card-select">Select Card:</label>
+                            <select id="card-select" name="card_name" required>
+                                {% for card in ownedCards %}
+                                    <option value="{{ card }}">{{ card }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <label for="switch">Toggle to Trade a Specific Player</label>
+                        <div class="form-group">
+                            <label id="switch" class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                              </label>
+                        </div>
+                        <div class="user-select">
+                            <label for="user-select" style="display: none;">Select User:</label>
+                            <select id="user-select" name="user_name" style="display: none;">
+                                {% for user in all_users %}
+                                    <option value="{{ user }}">{{ user }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit">Submit Trade</button>
+                    </form>
+                </div>
+            </div>
+            <footer class="footer">
+                <p>@Copyirght 2025. All rights reserved.</p>
+            </footer>
+            <script src="{% static 'js/switch.js' %}"></script>
+            <script src="{% static 'js/trade-submit.js' %}"></script>
+            <div id="data" data-requested="{{ requested_card }}"></div>
+    </body>
+</html>

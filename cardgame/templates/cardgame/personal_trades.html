@@ -1,0 +1,16 @@
+OUTGOING
+{% for trade in outgoing %}
+ {{trade.c_date}} {{trade.recipient}} {{trade.incoming_card}} {{trade.requested_card}} 
+<a href="{% url 'cancel_trade' trade.id %}" class="btn btn-danger">Cancel the trade</a>
+{% endfor %}
+
+INCOMING
+{% for trad in incoming %}
+{{trad.c_date}} {{trad.sender}} {{trad.requested_card}} {{trad.incoming_card}}
+
+<a class = "nav-link" href="{% url 'cancel' trad.id %}">Decline the trade</a>
+
+
+{% endfor %}
+
+

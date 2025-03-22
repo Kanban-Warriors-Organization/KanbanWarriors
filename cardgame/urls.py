@@ -33,6 +33,21 @@ urlpatterns = [
          name="collection-redirect"),
     path("challenges/", views.challenges, name="challenges"),  # [1]
     path("echo_user", views.echo_user, name="echo_user"),
+    path("trades/", views.global_trade_page, name="search"),
+    path("trades/search/", views.get_trades_matching_query, name="search_results"),
+    path("trades/personal", views.get_personal_trades, name="personal"),
+    path("trades/create/<str:card_name>/", views.make_trade_page, name="create"),
+    path("trades/submit", views.submit_trade, name="submit"),
+    path("trade/<int:t_id>", views.trade_page, name="trade"),
+    path("trade/<int:t_id>/accept", views.accept_trade, name="accept"),
+    path("trade/<int:t_id>/cancel", views.cancel_trade, name="cancel"),
+    path("privacy/", views.privacy, name="privacy"),
+    path("account", views.account, name="account"),
+    path("change_username", views.change_username, name="change_username"),
+    path("change_password", auth_views.PasswordChangeView.as_view(template_name="cardgame/change_password.html",success_url="home"),name="change_password"),
+    path("delete_account", views.delete_account, name="delete_account"),
+    path("reset_password", auth_views.PasswordChangeView.as_view(template_name="cardgame/reset.html"), name="reset_password")
+
     # uses django's inbuilt login view
     path('battle/', views.battle_room, name='battle'),
     path('battle/<str:room_id>/', views.battle_room, name='battle_with_id'),

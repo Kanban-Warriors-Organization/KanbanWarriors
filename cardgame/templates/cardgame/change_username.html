@@ -1,0 +1,9 @@
+<form action="" method="post" class="change_username">{% csrf_token %}
+
+<form action="{% url 'change_username' %}" method="post">{% csrf_token %}
+  <input name="new_name" type="text" placeholder="enter your new username">
+  <input name="pwd" type="password" placeholder="enter your password">
+  <button action="{%url 'change_username' %}" type="submit">
+ </button>
+</form>
+

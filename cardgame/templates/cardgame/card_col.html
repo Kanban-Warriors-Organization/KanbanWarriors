@@ -33,7 +33,7 @@
             <h2>Collected Cards</h2>
         </div>
         <div class="grid">
-            {% for card in cardshas%}
+            {% for card in cardshas %}
                 <div class="grid-item">
                     <img src="{{ card.image.url }}" alt="Image", class="card", data-title="{{card.title}}", data-description="{{card.description}}">
                 </div>
@@ -44,9 +44,9 @@
         </div>
         <!-- Section for images the user does not have -->
         <div class="grid">
-            {% for image in imgsnot %}
+            {% for card in cardsnot %}
                 <div class="grid-item">
-                    <img src="{{ image.url }}" alt="Image", class="card-locked">
+                    <img src="{{ card.image.url }}" alt="Image", class="card-locked", data-title="{{card.title}}">
                 </div>
             {% endfor %}
         </div>
@@ -57,9 +57,17 @@
                 <p id="modal-description"></p>
             </div>
         </div>
+        <div id="trade" class="trade">
+            <div class="trade-content">
+                <span class="trade-close">&times;</span>
+                <h2>Trade for this card?</h2>
+                <btn class="trade-btn" id="trade-btn">Trade</btn>
+            </div>
+        </div>
         <!--Footer Bar-->
         <footer class="footer">
             <p>@Copyirght 2025. All rights reserved.</p>
         </footer>
         <script src="{% static 'js/modal.js' %}"></script>
+        <script src="{% static 'js/trade-modal.js' %}"></script>
     </body>

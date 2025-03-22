@@ -1,0 +1,10 @@
+<a href={% url 'change_username' %}>Change username here!</a> 
+
+<a href={% url 'change_password' %}>Change password here!</a>
+
+<form action="{% url 'delete_account' %}" method="post">{% csrf_token %}
+  <input name="pwd" type="password" placeholder="enter your password">
+  <button action="{%url 'delete_account' %}" type="submit"> delete account!!!!:w
+ </button>
+ WARNING: THIS IS IRREVERSIBLE. PROCEED WITH CAUTION!
+</form>

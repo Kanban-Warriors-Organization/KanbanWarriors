@@ -10,25 +10,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
 
-class CardSet(models.Model):
-    """
-    Represents a collection of related cards.
+# Create your models here.
 
-    Attributes:
-        card_set_name (str): Unique identifier for the set
-        card_set_description (str): Detailed description of the set's theme
 
-    Relationships:
-        One-to-many with Card model
-
-    Author: Timothy Simmons
-    """
-
-    card_set_name = models.CharField(max_length=40, primary_key=True)
-    card_set_description = models.CharField(max_length=200)
-
-    def __str__(self):
-        return str(self.card_set_name)
 
 
 class Card(models.Model):
@@ -307,3 +291,24 @@ class BattleDeck(models.Model):
     
     def __str__(self):
         return f"Deck for {self.player.user.username} in battle {self.battle.room_id}"
+class Trade(models.Model):
+
+    offered_card = models.ForeignKey("Card", related_name="offered_card", on_delete=models.CASCADE)
+    requested_card = models.ForeignKey("Card", related_name="requested_card", on_delete=models.CASCADE)
+    STATUS = [("PENDING", "PENDING"),("ACCEPTED", "ACCEPTED"),("DENIED", "DENIED")]
+    #global if the records below are set to the same user
+    recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE, blank=True, null=True)
+    sender = models.ForeignKey(User, related_name="sender", on_delete=models.CASCADE)
+    created_date = models.DateField()
+    actioned_date = models.DateField(blank=True, null=True)
+
+#things we need to with trades:
+#get all treades that a user has active
+#get all trades that a user has incoming
+#get all trades, just in general
+#make a trade
+
+
+
+
+

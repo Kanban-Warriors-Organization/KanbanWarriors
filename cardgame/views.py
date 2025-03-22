@@ -10,32 +10,35 @@ import datetime
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse, Http404
+import json
 from django.shortcuts import redirect, render
 
 # from django.template import loader
-from django.contrib.auth import logout, login  # authenticate, login
+from django.contrib.auth import logout, login, authenticate  # authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
-from .models import Card, CardSet, UserProfile, Challenge, Question
 import uuid
+from .models import Card, UserProfile, Challenge, Question, Trade
+from .forms import UserCreationForm2
 
 
 def index(request):
     """
     Default index landing page
     """
-    form = UserCreationForm()
-    return HttpResponse(render(request, "cardgame/signup.html", {"form": form}))
-
-
+    if request.user.is_authenticated:
+        return render(request, "cardgame/home.html")
+    else:
+         return redirect("signup")
 def home(request):
     """
     Renders the homepage.
@@ -68,6 +71,7 @@ def card_col(request, user_name):
         imgs_has = []
         imgs_not = []
         card_titleshas = []
+        card_titlenot = []
         card_descriptionshas = []
         u = UserProfile.objects.get(user__username=user_name)
         for i in u.user_profile_collected_cards.all():
@@ -76,19 +80,21 @@ def card_col(request, user_name):
             card_descriptionshas.append(i.card_description)
         for j in Card.objects.all():
             imgs_not.append(j.card_image_link)
+            card_titlenot.append(j.card_name)
         imgs_not = list(filter(lambda x: x not in imgs_has, imgs_not))
+        card_titlenot = list(filter(lambda x: x not in card_titleshas,
+                                    card_titlenot))
 
-        cards_has = [
-            {"image": img, "title": title, "description": description}
-            for img, title, description in zip(
-                imgs_has, card_titleshas, card_descriptionshas
-            )
-        ]
-        return render(
-            request,
-            "cardgame/card_col.html",
-            {"cardshas": cards_has, "imgsnot": imgs_not},
-        )
+        cards_has = [{"image": img, "title": title, "description": description}
+                     for img, title, description in
+                     zip(imgs_has, card_titleshas,
+                         card_descriptionshas)]
+        cards_not = [{"image": img, "title": title}
+                     for img, title in zip(imgs_not, card_titlenot)]
+        print(cards_has)
+        print(cards_not)
+        return render(request, "cardgame/card_col.html",
+                      {"cardshas": cards_has, "cardsnot": cards_not})
 
     except ObjectDoesNotExist:
         # if user does not exist
@@ -124,31 +130,35 @@ def signup(request):
     """
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = UserCreationForm2(request.POST)
         # Validates the contents of the form.
         # Since we're using a DJANGO inbuilt form, this is
         # handled automatically.
         if form.is_valid():
             try:
                 username = form.cleaned_data["username"]
+                print(form.cleaned_data["email"])
+                if (User.objects.filter(email = form.cleaned_data["email"]).count() > 0):
+                    messages.error(request, "This email has already been used. Sorry!")
+                    return HttpResponse(render(request, "cardgame/signup.html", {"form":form}))
                 # Creates user and user profile objects
-                user = User.objects.create_user(
-                    username, None, form.cleaned_data["password1"]
-                )
+                user = User.objects.create_user(username, form.cleaned_data["email"],
+                                                form.cleaned_data["password1"])
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
                 login(request, user)
                 messages.success(request, "Account Created!")
                 return redirect(f"/user/{username}/profile")
             except IntegrityError:
-                pass
-        messages.error(request, "Account with that name already exists!")
-        return HttpResponse(render(request, "cardgame/signup.html", {"form": form}))
+                messages.error(request, "This username has already been used. sorry!")
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
     # GET request: gets and renders the form.
     else:
-        form = UserCreationForm()
-        return HttpResponse(render(request, "cardgame/signup.html", {"form": form}))
+        form = UserCreationForm2()
+        return HttpResponse(render(request, "cardgame/signup.html",
+                                   {"form": form}))
 
 
 @staff_member_required  # Makes sure only system admins can execute this code
@@ -172,7 +182,6 @@ def create_card(request):
         card_name = request.POST.get("card_name")
         card_subtitle = request.POST.get("card_subtitle")
         card_description = request.POST.get("card_description")
-        card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
         card_cost = int(request.POST.get("cost", 0))
         card_beauty = int(request.POST.get("beauty", 0))
@@ -180,14 +189,6 @@ def create_card(request):
         # Check that the required parameters are provided
         if not (card_name and card_subtitle and card_description):
             return HttpResponse("Missing required parameters", status=400)
-
-        # Get card set if available
-        card_set_instance = None
-        if card_set_name:
-            try:
-                card_set_instance = CardSet.objects.get(card_set_name=card_set_name)
-            except CardSet.DoesNotExist:
-                return HttpResponse("Specified CardSet does not exist", status=400)
 
         try:
 
@@ -222,7 +223,6 @@ def create_card(request):
                 card_name=card_name,
                 card_subtitle=card_subtitle,
                 card_description=card_description,
-                card_set=card_set_instance,
                 card_image_link=django_file,
                 environmental_friendliness=card_env,
                 beauty=card_beauty,
@@ -606,3 +606,298 @@ def battle_select(request):
     Author: Samuel
     """
     return render(request, "cardgame/battle_select.html")
+def global_trade_page(request):
+    #this is currently unimplemented, if you see this tell lizard to write this view!
+    #idk what to put here, jake message me if you're reading this
+    return render(request, "cardgame/search.html")
+
+def get_trades_matching_query(request):
+    if request.method == 'GET':
+        try:
+            #we expect some variety of form here
+            #not sure how the form is going to pass the values so i'm just going to write down this and hope it works
+            #this probably doesn't work
+            #basic filter for now, can change later
+            out_card = request.GET.get("out_card")
+            in_card = request.GET.get("in_card")
+            trades = Trade.objects.all().filter(recipient=None)
+            print(trades)
+            if (request.GET.get("out_card") != ''):
+                trades = trades.filter(requested_card__card_name = out_card)
+            if (request.GET.get("in_card") != ''):
+                trades = trades.filter(offered_card__card_name = in_card)
+            if trades.count() == 0:
+                   return HttpResponse(render(request, "cardgame/search.html"))
+            t = []
+            for tr in trades:
+                data = {}
+                data['id'] = tr.id
+                data['sender'] = tr.sender.username
+                data['date'] = tr.created_date
+                data['offered_card'] = tr.offered_card.card_name
+                data['offered_card_image'] = tr.offered_card.card_image_link
+                data['requested_card'] = tr.requested_card.card_name
+                data['requested_card_image'] = tr.requested_card.card_image_link
+                t.append(data)
+            return render(request, "cardgame/search_results.html", {'data':t})
+        except ObjectDoesNotExist:
+             return HttpResponse("why don't you try hard?")
+
+
+@login_required
+def get_personal_trades(request):
+    u = request.user;
+    incoming = Trade.objects.filter(recipient = u)
+    inc = []
+    out = []
+    for tr in incoming:
+        data = {}
+        data['id'] = tr.id
+        data['sender'] = tr.sender.username
+        data['recipient'] = tr.recipient.username
+        data['c_date'] = tr.created_date
+        data['incoming_card'] = tr.offered_card.card_name
+        data['incoming_card_image'] = tr.offered_card.card_image_link
+        data['requested_card'] = tr.requested_card.card_name
+        data['requested_card_image'] = tr.requested_card.card_image_link
+        inc.append(data)
+    outgoing = Trade.objects.filter(sender=u)
+    for trd in outgoing:
+        data = {}
+        data['id'] = trd.id
+        data['sender'] = trd.sender.username
+        data['recipient'] = trd.recipient.username
+        data['c_date'] = trd.created_date
+        data['incoming_card'] = trd.offered_card.card_name
+        data['incoming_card_image'] = trd.offered_card.card_image_link
+        data['requested_card'] = trd.requested_card.card_name
+        data['requested_card_image'] = trd.requested_card.card_image_link
+        out.append(data)
+
+    return render(request, "cardgame/personal_trades.html", {'incoming':inc}, {'outgoing':out})
+
+
+
+
+
+@login_required
+def get_incoming_trades(request):
+    u = request.user
+    trades = Trade.objects.filter(recipient = u)
+    t = []
+    for tr in trades:
+        data = {}
+        data['id'] = tr.id
+        data['sender'] = tr.sender.username
+        data['date'] = tr.created_date
+        data['incoming_card'] = tr.offered_card.card_name
+        data['incoming_card_image'] = tr.offered_card.card_image_link
+        data['requested_card'] = tr.requested_card.card_name
+        data['requested_card_image'] = tr.requested_card.card_image_link
+        t.append(data)
+    return render(request, "cardgame/incoming_trades.html", {'data':t})
+
+@login_required
+@transaction.atomic
+def accept_trade(request, t_id):
+            #validate that the trade is still available
+        #validate that the user can access the trade
+        user = request.user
+        trade = Trade.objects.get(id = t_id)
+        if (trade.recipient != None and trade.recipient != user):
+            return HttpResponse("watch out! you can't make this trade!")
+        if trade.STATUS == "ACCEPTED":
+            return HttpResponse("this trade has already been completed! sorry!")
+        #now we verify that both players have the cards they need
+        sender_profile = UserProfile.objects.get(user=trade.sender)
+        recipient_profile = UserProfile.objects.get(user=user)
+        requested_card = trade.requested_card
+        offered_card = trade.offered_card
+        if not (sender_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name).exists()
+                and recipient_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists()):
+            return HttpResponse("oh no, this trade is no longer available!")
+        #now we can proceed with the trade
+        #TODO: make this atomic or something
+        sender_profile.user_profile_collected_cards.add(requested_card)
+        recipient_profile.user_profile_collected_cards.add(offered_card)
+        sender_profile.user_profile_collected_cards.remove(offered_card)
+        recipient_profile.user_profile_collected_cards.remove(requested_card)
+        Trade.objects.get(id=t_id).delete()
+        return HttpResponse("trade completed successfully!")
+    #there is no way this works but that's life
+
+@login_required
+def cancel_trade(request, t_id):
+    try:
+        user = request.user
+        trade = Trade.objects.get(id=t_id)
+        if (trade.sender != user):
+            return HttpResponse("watch out! you can't cancel this trade!")
+        #actually cancels the trade
+        Trade.objects.get(id=t_id).delete()
+        return HttpResponse("success!")
+
+    except ObjectDoesNotExist:
+        return HttpResponse("critical system error")
+
+
+
+
+@login_required
+def trade_page(request, t_id):
+
+    if request.method == 'POST':
+        pass
+        #this is for if a trade gets accepted
+    else:
+        try:
+            #check that the user can access the trade
+            user = request.user
+            tr = Trade.objects.get(id = t_id)
+            if (tr.recipient != None and tr.recipient != user):
+                return HttpResponse("no!")
+            #if the user can access the trade:
+            return render(request, "cardgame/trade.html", {'id': t_id, 'sender':tr.sender.username, 'date':tr.created_date,
+                                                  'incoming_card':tr.offered_card.card_name,
+                                                  'incoming_card_image':tr.offered_card.card_image_link,
+                                                  'requested_card':tr.requested_card.card_name, 'requested_card_image':tr.requested_card.card_image_link})
+
+        except ObjectDoesNotExist:
+            raise Http404()
+
+
+@login_required
+def make_trade_page(request, card_name):
+    titles = []
+    names = []
+    user = UserProfile.objects.get(user=request.user)
+    requested_card = Card.objects.get(card_name=card_name)
+    ownedCards = user.user_profile_collected_cards.all()
+    all_users = User.objects.all()
+    eligible_users = []
+    for user in all_users:
+        if UserProfile.objects.get(user=user).user_profile_collected_cards.filter(card_name=requested_card.card_name).exists():
+            eligible_users.append(user)
+    for user in eligible_users:
+        if user != request.user:
+            names.append(user.username)
+    for card in ownedCards:
+        titles.append(card.card_name)
+    return render(request, "cardgame/make_trade.html", {"requested_card": requested_card, "ownedCards": titles, "all_users": names})
+
+    # user = user.request
+    # up = UserProfile.objects.get(user=user)
+    # #page for creating a trade
+    # if request.method == 'POST':
+    #     print(request.POST.get('card'))
+    #     wanted_card = Card.objects.get(card_name = request.POST.get(wanted_card))
+    #     offered_card = Card.objects.get(card_name = request.POST.get(offered_card))
+    #     recipient = User.objects.get(username = request.POST.get(recipient)) #specifically the username of the user
+
+    #     #validate that the user can make a trade
+    #     if (recipient != user.username):
+    #         #gets number of outgoing trades to that user
+    #         if Trade.objects.filter(recipient=recipient).filter(sender=user).count() > 2:
+    #             return HttpResponse("the invisible hand smiteth thee")
+
+
+    #     elif (recipient == user.username):
+    #         if Trade.objects.filter(recipient=user).count() > 2:
+    #             return HttpResponse("the invisible hand striketh thee down")
+    #     #adds the trade
+    #     new_trade = Trade.objects.create(offered_card=offered_card, requested_card = wanted_card,
+    #                                      STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
+    #     new_trade.save()
+    #     return HttpResponse("trade created successfully!")
+
+
+   # else:
+       # return render(request, "make_trade.html") #renders the form page or something
+
+@csrf_exempt
+@login_required
+def submit_trade(request):
+    user = request.user
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        offered_card_name = data.get('card_name')
+        requested_card_name = data.get('requested_card')
+        recipient_username = data.get('user_name')
+
+        try:
+            offered_card = Card.objects.get(card_name=offered_card_name)
+            requested_card = Card.objects.get(card_name=requested_card_name)
+            recipient = User.objects.get(username=recipient_username)
+
+            # Create the trade
+            trade = Trade.objects.create(
+                offered_card=offered_card,
+                requested_card=requested_card,
+                sender=user,
+                recipient=recipient,
+                created_date=datetime.datetime.now()
+            )
+            trade.save()
+            return HttpResponse("Trade created successfully!")
+
+        except ObjectDoesNotExist:
+            return HttpResponse("Invalid card or user specified.")
+    else:
+        return HttpResponse("Invalid request method.")
+
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        password = request.POST.get('pwd')
+        if (password == None or authenticate(username=request.user.username, password=password) == None):
+            return HttpResponse("this is bad")
+        #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
+        user = request.user
+        user.delete()
+        return HttpResponse("thanks for playing this game! bye!")
+
+
+
+    return HttpResponse("why don't you try hard?")
+
+def privacy(request):
+    return render(request, "cardgame/privacy.html")
+
+@login_required
+def account(request):
+    return render(request, "cardgame/account_page.html")
+
+
+        #check type of request we want and call appropriate view
+
+
+
+@login_required
+def change_username(request):
+
+    if request.method == 'POST':
+        user = request.user
+        new_name = request.POST.get("new_name")
+        pwd = request.POST.get("pwd")
+        if (pwd == None):
+            return HttpResponse("you done goofed")
+        if (authenticate(username=user.username, password=pwd) == None):
+            return HttpResponse("wrong password!")
+        if (new_name == ''):
+            return HttpResponse("this is an empty name")
+        try:
+            #verify no other user has that userna,e
+            if User.objects.filter(username = new_name):
+                return HttpResponse("that name is taken, sorry")
+            else:
+                user.username = new_name
+                user.save()
+                return redirect("home")
+        except Exception as e:
+            print(e)
+    if request.method == 'GET':
+        return render(request,"cardgame/change_username.html")
+
+
+
