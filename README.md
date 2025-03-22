@@ -1,4 +1,4 @@
-# ⚔️ EcoSplore 🛡️
+# 🌱 EcoSplore 🌿
 
 ## 🌍 Overview
 
