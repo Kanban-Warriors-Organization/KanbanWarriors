@@ -3,16 +3,12 @@ Core data models for the application.
 Defines database structure and relationships for cards, collections,
 user profiles, challenges, and quiz components.
 
-Author: BLANK
 """
 
 import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
-
-# Create your models here.
-
 
 class CardSet(models.Model):
     """
@@ -44,6 +40,9 @@ class Card(models.Model):
         card_subtitle (str): Secondary descriptive text
         card_description (str): Detailed card information
         card_image_link (ImageField): Visual representation
+        environmental_friendliness (int): Battle stat for environmental impact
+        beauty (int): Battle stat for aesthetic appeal
+        cost (int): Battle stat for resource cost
 
     Relationships:
         Many-to-one with CardSet
@@ -62,6 +61,11 @@ class Card(models.Model):
     )
     card_set = models.ForeignKey(CardSet, models.SET_NULL,
                                  null=True, blank=True)
+    
+    # Battle stats
+    environmental_friendliness = models.IntegerField(default=0)
+    beauty = models.IntegerField(default=0)
+    cost = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.card_name)
@@ -233,3 +237,73 @@ class Challenge(models.Model):
 
         # If all the answers are right, return True
         return True
+
+
+class Battle(models.Model):
+    """
+    Represents an active card battle between two players.
+    
+    Attributes:
+        room_id (str): Unique identifier for the battle room
+        player1/player2 (UserProfile): The two participants
+        current_turn (int): Which player's turn it is (1 or 2)
+        status (str): Current state of the battle
+        winner (UserProfile): The winner of the battle (if completed)
+        created_at (DateTimeField): When the battle was created
+        
+    Author: Samuel
+    """
+    
+    room_id = models.CharField(max_length=100, unique=True)
+    player1 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="battles_as_player1")
+    player2 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, 
+                               related_name="battles_as_player2", null=True, blank=True)
+    current_turn = models.IntegerField(default=1)  # 1 for player1, 2 for player2
+    
+    STATUS_CHOICES = [
+        ("waiting", "Waiting for Player 2"),
+        ("selecting", "Selecting Cards"),
+        ("ready", "Ready to Start"),
+        ("in_progress", "Battle in Progress"),
+        ("completed", "Battle Completed"),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="waiting")
+    
+    winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, 
+                              related_name="battles_won", null=True, blank=True)
+    player1_ready = models.BooleanField(default=False)
+    player2_ready = models.BooleanField(default=False)
+    player1_score = models.IntegerField(default=0)
+    player2_score = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Battle {self.room_id}: {self.player1.user.username} vs {self.player2.user.username if self.player2 else 'Waiting'}"
+        
+    def both_ready(self):
+        return self.player1_ready and self.player2_ready
+
+
+class BattleDeck(models.Model):
+    """
+    Represents cards selected by a player for a battle.
+    
+    Attributes:
+        battle (Battle): The battle this deck belongs to
+        player (UserProfile): The player who owns this deck
+        cards (ManyToManyField): Selected cards for the battle
+        current_card_index (int): Index of the current card in play
+        shuffle_seed (int): Seed for shuffling the deck
+        
+    Author: Samuel
+    """
+    
+    battle = models.ForeignKey(Battle, on_delete=models.CASCADE, related_name="decks")
+    player = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="battle_decks")
+    cards = models.ManyToManyField(Card, related_name="battle_decks")
+    current_card_index = models.IntegerField(default=0)
+    shuffle_seed = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"Deck for {self.player.user.username} in battle {self.battle.room_id}"

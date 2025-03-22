@@ -3,6 +3,7 @@ Core functionality for user interactions, authentication, and data management.
 Handles routing and processing for user profiles, card collections, challenges,
 and administrative functions.
 """
+import random
 import sys
 import datetime
 from io import BytesIO
@@ -22,6 +23,7 @@ from django.contrib import messages
 from django.urls import reverse
 from image_gen import make_image
 from .models import Card, CardSet, UserProfile, Challenge, Question
+import uuid 
 
 
 def index(request):
@@ -166,6 +168,9 @@ def create_card(request):
         card_description = request.POST.get("card_description")
         card_set_name = request.POST.get("card_set")
         card_image = request.FILES.get("card_image")
+        card_beauty = request.POST.get("beauty")
+        card_cost = request.POST.get("cost")
+        card_env = request.POST.get("env")
 
         # Check that the required parameters are provided
         if not (card_name and card_subtitle and card_description):
@@ -187,7 +192,7 @@ def create_card(request):
             c = make_image("static/card_gen/back.png", card_name,
                            card_subtitle, "static/card_gen/normal.ttf",
                            "static/card_gen/bold.ttf", card_description,
-                           card_image)
+                           card_image,card_env,card_beauty,card_cost)
 
             c_io = BytesIO()
             c.save(c_io, format="PNG")
@@ -204,6 +209,9 @@ def create_card(request):
                     card_description=card_description,
                     card_set=card_set_instance,
                     card_image_link=django_file,
+                    environmental_friendliness=card_env,
+                    beauty=card_beauty,
+                    cost=card_cost
                     )
             card.save()
 
@@ -494,3 +502,70 @@ def add_card(request, chal_id):
 def echo_user(request):
     u = request.user
     return HttpResponse(str(u))
+
+@login_required
+def battle_room(request, room_id=None):
+    """
+    Renders the battle room page where users can battle with their cards.
+    
+    Author: Samuel
+    
+    Args:
+        request: HTTP request object
+        room_id: Optional room ID parameter
+        
+    Returns:
+        Rendered battle room template
+    """
+    if room_id is None:
+        # Generate a new room ID if none is provided
+        room_id = str(uuid.uuid4())[:8]
+        return redirect('battle_with_id', room_id=room_id)
+    
+    return render(request, 'cardgame/battle.html', {
+        'room_id': room_id,
+        'username': request.user.username
+    })
+
+@login_required
+def get_battle_cards(request):
+    """
+    Retrieves cards available for battle from user's collection.
+    
+    Author: Samuel
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        JsonResponse: User's collected cards with battle stats
+    """
+    try:
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        cards = user_profile.user_profile_collected_cards.all()
+        
+        card_data = []
+        for card in cards:
+            card_data.append({
+                'name': card.card_name,
+                'subtitle': card.card_subtitle,
+                'description': card.card_description,
+                'image': card.card_image_link.url if card.card_image_link else None,
+                'environmental_friendliness': card.environmental_friendliness if hasattr(card, 'environmental_friendliness') else random.randint(1, 10),
+                'beauty': card.beauty if hasattr(card, 'beauty') else random.randint(1, 10),
+                'cost': card.cost if hasattr(card, 'cost') else random.randint(1, 10)
+            })
+        
+        return JsonResponse({'cards': card_data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@login_required
+def battle_select(request):
+    """
+    Renders the battle selection screen where users can create or join battles.
+    
+    Author: Samuel
+    """
+    return render(request, 'cardgame/battle_select.html')

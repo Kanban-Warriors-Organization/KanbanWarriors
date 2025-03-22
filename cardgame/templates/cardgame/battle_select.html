@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Battle selection screen for EcoSplore">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Battle Select - EcoSplore</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/battle.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header class="navbar">
+            <a href="/home" class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="EcoSplore Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="/home">Home</a>
+                <a href="/profile-redirect">Profile</a>
+                <a href="/challenges">Challenges</a>
+                <a href="/collection-redirect">Collection</a>
+                <a href="/logout">Sign Out</a>
+            </nav>
+        </header>
+
+        <div class="battle-container">
+            <div class="battle-header">
+                <h1>Card Battle</h1>
+                <p>Create a new battle or join an existing one!</p>
+            </div>
+
+            <div class="battle-select">
+                <div class="battle-option">
+                    <h2>Create Battle</h2>
+                    <p>Start a new battle and invite a friend</p>
+                    <button id="create-battle" class="btn btn-primary">Create Battle</button>
+                </div>
+
+                <div class="battle-option">
+                    <h2>Join Battle</h2>
+                    <p>Enter a room ID to join an existing battle</p>
+                    <input type="text" id="room-id" placeholder="Enter Room ID">
+                    <button id="join-battle" class="btn btn-primary">Join Battle</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>@Copyright 2025. All rights reserved.</p>
+        </footer>
+
+        <script src="{% static 'js/battle-select.js' %}"></script>
+    </body>
+</html>

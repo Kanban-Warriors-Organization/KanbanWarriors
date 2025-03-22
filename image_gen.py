@@ -9,7 +9,7 @@ from PIL import Image, ImageFont, ImageDraw
 from pathlib import Path
 
 def make_image(background:str, title:str, subtitle:str, 
-               font:str, font_bf:str, desc:str, image):
+               font:str, font_bf:str, desc:str, image, env:float, beauty:float, cost:float):
 
     """
         Written by Adam
@@ -45,6 +45,8 @@ def make_image(background:str, title:str, subtitle:str,
     bold = ImageFont.truetype(font_bf, 64) #creates font objects that we need 
     st_font = ImageFont.truetype(font, 64)
     reg_font = ImageFont.truetype(font, 32)
+    medium_font = ImageFont.truetype(font, 48)
+    stat_line = "Impact: "+str(env) + "  Cost: "+str(cost) + "  Beauty: "+str(beauty)
     draw.text((160,128), title, font=bold, fill=(16,64,16)) #adds title
     draw.text((160,216), subtitle, font=st_font, fill=(16,64,16)) #adds subtitle
 
@@ -76,6 +78,7 @@ def make_image(background:str, title:str, subtitle:str,
         
     #Writes description onto the card.
     draw.multiline_text((160,1024), des_mod, font=reg_font, fill=(0, 128, 64))
+    draw.text((160,1400), stat_line, font=medium_font, fill=(0,0,0))
     #Returns the generated image.
     return back    
 
