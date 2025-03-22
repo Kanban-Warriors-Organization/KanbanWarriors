@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 
 
-from cardgame.models import Card, CardSet, UserProfile, Challenge, Question, Trade
+from cardgame.models import Card, UserProfile, Challenge, Question, Trade
 
 
 class TradeTestCase(TestCase):

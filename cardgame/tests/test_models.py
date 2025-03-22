@@ -9,13 +9,13 @@ from django.forms import ValidationError
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
-from cardgame.models import Card, CardSet, UserProfile, Question, Challenge
+from cardgame.models import Card, UserProfile, Question, Challenge
 
 
 class CardModelTests(TestCase):
     """
     Test suite for validating model functionality.
-    Ensures proper creation and storage of Card, CardSet, and UserProfile
+    Ensures proper creation and storage of Card, and UserProfile
     including their relationships and attributes.
 
     Author: Timothy Simmons
@@ -27,14 +27,7 @@ class CardModelTests(TestCase):
         attributes correctly.
         Tests card name, subtitle, description, and card set relationship.
         """
-        # Create the test CardSet
-        test_card_set_name = "Test_Card_Set_Name"
-        test_card_set_description = "Test_Card_Set_Description"
-        test_card_set = CardSet(
-            card_set_name=test_card_set_name,
-            card_set_description=test_card_set_description,
-        )
-        test_card_set.save()
+
 
         # Create the test Card
         test_card_name = "Test_Card_Name"
@@ -44,7 +37,6 @@ class CardModelTests(TestCase):
             card_name=test_card_name,
             card_subtitle=test_card_subtitle,
             card_description=test_card_description,
-            card_set=test_card_set,
         )
         test_card.save()
 
@@ -83,57 +75,6 @@ class CardModelTests(TestCase):
                       actual:   "
             + str(test_card.card_description),
         )
-
-        # Test card_set is the expected value
-        self.assertIs(
-            test_card.card_set,
-            test_card_set,
-            "card_set was not set or returned correctly\n\
-                      expected: "
-            + str(test_card_set)
-            + "\n\
-                      actual:   "
-            + str(test_card.card_set),
-        )
-
-    def test_card_set_with_correct_details(self):
-        """
-        Verifies that a card set maintains accurate attribute storage.
-        Tests card set name and description fields.
-        """
-        # Create the test CardSet
-        test_card_set_name = "Test_Card_Set_Name"
-        test_card_set_description = "Test_Card_Set_Description"
-        test_card_set = CardSet(
-            card_set_name=test_card_set_name,
-            card_set_description=test_card_set_description,
-        )
-
-        # Test card_set_name is the expected value
-        self.assertIs(
-            test_card_set.card_set_name,
-            test_card_set_name,
-            "card_set_name was not set or returned correctly\n\
-                      expected: "
-            + str(test_card_set_name)
-            + "\n\
-                      actual:   "
-            + str(test_card_set.card_set_name),
-        )
-
-        # Test card_set_description is the expected value
-        self.assertIs(
-            test_card_set.card_set_description,
-            test_card_set_description,
-            "card_set_name was not set or returned correctly\n\
-                      expected: "
-            + str(test_card_set_description)
-            + "\n\
-                      actual:   "
-            + str(test_card_set.card_set_description),
-        )
-
-        # TODO Create tests for image once implemented
 
     def test_user_profile_set_with_correct_details_and_links_to_user(self):
         """

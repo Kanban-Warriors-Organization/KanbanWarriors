@@ -29,7 +29,6 @@ class Card(models.Model):
         cost (int): Battle stat for resource cost
 
     Relationships:
-        Many-to-one with CardSet
         Many-to-many with UserProfile
 
     Author: Timothy Simmons
@@ -43,9 +42,7 @@ class Card(models.Model):
         upload_to="static/card_images",
         default="static/card_images/do_not_remove.png",
     )
-    card_set = models.ForeignKey(CardSet, models.SET_NULL,
-                                 null=True, blank=True)
-    
+
     # Battle stats
     environmental_friendliness = models.IntegerField(default=0)
     beauty = models.IntegerField(default=0)

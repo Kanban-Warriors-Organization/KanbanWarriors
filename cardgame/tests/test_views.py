@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 
 
-from cardgame.models import Card, CardSet, UserProfile, Challenge, Question
+from cardgame.models import Card, UserProfile, Challenge, Question
 
 
 class EmptyTestCase(TestCase):
@@ -67,10 +67,7 @@ class ViewsTestCase(TestCase):
             user_profile_points=50,
             user_signup_date=timezone.now()
         )
-        # Create a card and card set for testing card_col view
-        self.card_set = CardSet.objects.create(
-            card_set_name="Set1", card_set_description="Test set"
-        )
+
         self.card = Card.objects.create(
             card_name="TestCard",
             card_subtitle="Subtitle",
