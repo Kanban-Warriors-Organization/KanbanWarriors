@@ -680,22 +680,6 @@ def get_personal_trades(request):
 
 
 
-@login_required
-def get_incoming_trades(request):
-    u = request.user
-    trades = Trade.objects.filter(recipient = u)
-    t = []
-    for tr in trades:
-        data = {}
-        data['id'] = tr.id
-        data['sender'] = tr.sender.username
-        data['date'] = tr.created_date
-        data['incoming_card'] = tr.offered_card.card_name
-        data['incoming_card_image'] = tr.offered_card.card_image_link
-        data['requested_card'] = tr.requested_card.card_name
-        data['requested_card_image'] = tr.requested_card.card_image_link
-        t.append(data)
-    return render(request, "cardgame/incoming_trades.html", {'data':t})
 
 @login_required
 @transaction.atomic
@@ -716,6 +700,8 @@ def accept_trade(request, t_id):
         if not (sender_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name).exists()
                 and recipient_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists()):
             return HttpResponse("oh no, this trade is no longer available!")
+        if (sender_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists() or recipient_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name)):
+            return HttpResponse("avoided duplicate")
         #now we can proceed with the trade
         #TODO: make this atomic or something
         sender_profile.user_profile_collected_cards.add(requested_card)

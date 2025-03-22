@@ -79,7 +79,6 @@ class TradeTestCase(TestCase):
         self.client.login(username="stoatfan",password="ilikestoat") #this is user 2
         url = reverse("personal")
         response = self.client.get(url)
-        print(response.context)
         self.assertEqual(len(response.context['outgoing']), 2)
         self.assertEqual(len(response.context['incoming']), 1)
 
@@ -196,6 +195,30 @@ class TradeTestCase(TestCase):
         #checks the state of the database
         self.assertTrue(self.card1 not in self.user_profile2.user_profile_collected_cards.all())
         self.assertTrue(self.card2 not in self.user_profile1.user_profile_collected_cards.all())
+
+    def test_accepting_when_sender_has_requested_card(self):
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user2,created_date=datetime.datetime.now())
+        self.user_profile1.user_profile_collected_cards.add(self.card1)
+        self.user_profile1.user_profile_collected_cards.add(self.card2)
+        self.user_profile2.user_profile_collected_cards.add(self.card2)
+        self.client.login(username="stoatfan",password="ilikestoat")
+        url=reverse("accept", kwargs={"t_id":1})
+        response = self.client.get(url)
+        #checks the state of the database
+        self.assertEqual(Trade.objects.all().count(),1)
+
+    def test_accepting_when_receiver_has_offered_card(self):
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user2,created_date=datetime.datetime.now())
+        self.user_profile1.user_profile_collected_cards.add(self.card1)
+        self.user_profile2.user_profile_collected_cards.add(self.card1)
+        self.user_profile2.user_profile_collected_cards.add(self.card2)
+        #user_profile1.user_profile_collected_cards.add(card1)
+        self.client.login(username="stoatfan",password="ilikestoat")
+        url=reverse("accept", kwargs={"t_id":1})
+        response = self.client.get(url)
+        #checks the state of the database
+        self.assertEqual(Trade.objects.all().count(),1)
+
 
     def test_accepting_trade_directed_to_another_person(self):
         #tests that a user cannot accept a trade not directed towards them
