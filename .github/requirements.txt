@@ -1,2 +1,4 @@
 Django==5.1.6
 Pillow==11.1.0
+channels==4.2.0
+whitenoise==6.9.0
