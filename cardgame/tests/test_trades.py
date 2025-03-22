@@ -70,7 +70,18 @@ class TradeTestCase(TestCase):
         #-lizard
 
 
-
+    def test_personal_trades(self):
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user2,created_date=datetime.datetime.now()) #incoming
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,created_date=datetime.datetime.now()) #no recip
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user3,created_date=datetime.datetime.now()) #not allowd
+        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user2,recipient=self.user3,created_date=datetime.datetime.now()) #outgoing
+        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user2,created_date=datetime.datetime.now()) #outgoing public
+        self.client.login(username="stoatfan",password="ilikestoat") #this is user 2
+        url = reverse("personal")
+        response = self.client.get(url)
+        print(response.context)
+        self.assertEqual(len(response.context['outgoing']), 2)
+        self.assertEqual(len(response.context['incoming']), 1)
 
 
     def test_trade_404(self):
@@ -200,18 +211,9 @@ class TradeTestCase(TestCase):
         self.assertTrue(self.card1 not in self.user_profile2.user_profile_collected_cards.all())
         self.assertTrue(self.card1 in self.user_profile1.user_profile_collected_cards.all())
 
+#1: Stoat #2: Marten #3: Wolverine
 
 
-
-    def test_searching_trades(self):
-        #create some trades for us to look at
-        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,created_date=datetime.datetime.now())
-        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user3,created_date=datetime.datetime.now())
-        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user2,created_date=datetime.datetime.now())
-        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user1,created_date=datetime.datetime.now())
-        self.client.login(username="wolverinefan",password="ilikewolverine")
-        url=self.client.get("/search_results", {"out_card":"", "in_card":""})
-        pass #i'll finish this tomorrow -l-
 
 
     #JAKE PLEASE CAN YOU WRITE TESTS FOR THE "make_trade" STUFF
@@ -224,4 +226,24 @@ class TradeTestCase(TestCase):
   
 
 
+"""
+    def test_searching_trades(self):
+        #create some trades for us to look at
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,created_date=datetime.datetime.now())
+        Trade.objects.create(offered_card=self.card1,requested_card=self.card2,sender=self.user1,recipient=self.user3,created_date=datetime.datetime.now())
+        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user2,created_date=datetime.datetime.now())
+        Trade.objects.create(offered_card=self.card2,requested_card=self.card3,sender=self.user1,created_date=datetime.datetime.now())
+        self.client.login(username="wolverinefan",password="ilikewolverine") #this is user 3
+        url = self.client.get("/trades/search", {"out_card":"", "in_card":""})
+        print(url.context)
+        self.assertEqual(len(url.context['data']), 3)
+        url = self.client.get("/trades/search", {"out_card":"Stoat", "in_card":""})
+        self.assertEqual(len(url.context['data']), 1)
+        url = self.client.get("/trades/search", {"out_card":"", "in_card":"Wolverine"})
+        self.assertEqual(len(url.context['data']), 2)
+        url = self.client.get("/trades/search", {"out_card":"Stoat", "in_card":"Marten"})
+        self.assertEqual(len(url.context['data']), 1)
+        url = self.client.get("/trades/search", {"out_card":"not", "in_card":"valid"})
+        self.assertEqual(len(url.context['data']), 0)
+"""
 

@@ -652,7 +652,6 @@ def get_personal_trades(request):
         data = {}
         data['id'] = tr.id
         data['sender'] = tr.sender.username
-        data['recipient'] = tr.recipient.username
         data['c_date'] = tr.created_date
         data['incoming_card'] = tr.offered_card.card_name
         data['incoming_card_image'] = tr.offered_card.card_image_link
@@ -661,10 +660,13 @@ def get_personal_trades(request):
         inc.append(data)
     outgoing = Trade.objects.filter(sender=u)
     for trd in outgoing:
+        if trd.recipient:
+            data['recipient'] = trd.recipient.username
+        else:
+            data['recipient'] = "public"
         data = {}
         data['id'] = trd.id
         data['sender'] = trd.sender.username
-        data['recipient'] = trd.recipient.username
         data['c_date'] = trd.created_date
         data['incoming_card'] = trd.offered_card.card_name
         data['incoming_card_image'] = trd.offered_card.card_image_link
@@ -672,7 +674,7 @@ def get_personal_trades(request):
         data['requested_card_image'] = trd.requested_card.card_image_link
         out.append(data)
 
-    return render(request, "cardgame/personal_trades.html", {'incoming':inc}, {'outgoing':out})
+    return render(request, "cardgame/personal_trades.html", {'incoming':inc, 'outgoing':out})
 
 
 

@@ -1,7 +1,7 @@
 OUTGOING
 {% for trade in outgoing %}
  {{trade.c_date}} {{trade.recipient}} {{trade.incoming_card}} {{trade.requested_card}} 
-<a href="{% url 'cancel_trade' trade.id %}" class="btn btn-danger">Cancel the trade</a>
+<a href="{% url 'cancel' trade.id %}" class="btn btn-danger">Cancel the trade</a>
 {% endfor %}
 
 INCOMING
