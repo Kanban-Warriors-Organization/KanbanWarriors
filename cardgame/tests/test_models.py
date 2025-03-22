@@ -99,7 +99,6 @@ class CardModelTests(TestCase):
             card_name=test_card_name,
             card_subtitle=test_card_subtitle,
             card_description=test_card_description,
-            card_set=None,
         )
         test_user_profile_collected_cards.save()
 
@@ -168,7 +167,6 @@ class CardModelTests(TestCase):
             card_name=test_card_name,
             card_subtitle=test_card_subtitle,
             card_description=test_card_description,
-            card_set=None,
         )
         test_card.save()
 
@@ -325,7 +323,6 @@ class CardModelTests(TestCase):
             card_name=test_card_name,
             card_subtitle=test_card_subtitle,
             card_description=test_card_description,
-            card_set=None,
         )
         test_card.save()
 

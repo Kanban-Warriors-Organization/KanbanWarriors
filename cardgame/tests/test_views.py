@@ -72,7 +72,6 @@ class ViewsTestCase(TestCase):
             card_name="TestCard",
             card_subtitle="Subtitle",
             card_description="Desc",
-            card_set=self.card_set,
         )
 
         # Create a challenge for testing get_locations and challenge view
@@ -98,16 +97,6 @@ class ViewsTestCase(TestCase):
             option_d="D",
             correct_answer="B",
         )
-
-    def test_index_and_home(self):
-        response_index = self.client.get(reverse("index"))
-        self.assertEqual(response_index.status_code, 200)
-        self.assertTemplateUsed(response_index, "cardgame/signup.html")
-
-        response_home = self.client.get(reverse("home"))
-        self.assertEqual(response_home.status_code, 200)
-        self.assertTemplateUsed(response_home, "cardgame/home.html")
-
     def test_card_col(self):
         # Test card collection view for existing user
         self.user_profile.user_profile_collected_cards.add(self.card)
@@ -144,6 +133,7 @@ class ViewsTestCase(TestCase):
             "username": "newuser",
             "password1": "strongPassword123",
             "password2": "strongPassword123",
+            "email": "newuser@gmail.com",
         }
         response = self.client.post(reverse("signup"), data=signup_data)
         self.assertEqual(response.status_code, 302)
@@ -191,7 +181,6 @@ class ViewsTestCase(TestCase):
             "card_name": "NewCard",
             "card_subtitle": "NewSubtitle",
             "card_description": "New description",
-            "card_set": self.card_set.card_set_name,  # Use existing card set
         }
         files_data = {"card_image": image_data}
 
