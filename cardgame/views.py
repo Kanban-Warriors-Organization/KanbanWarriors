@@ -30,15 +30,12 @@ import uuid
 from .models import Card, UserProfile, Challenge, Question, Trade
 from .forms import UserCreationForm2
 
-
+@login_required
 def index(request):
-    """
-    Default index landing page
-    """
-    if request.user.is_authenticated:
-        return render(request, "cardgame/home.html")
-    else:
-         return redirect("signup")
+    return render(request, "cardgame/home.html")
+
+
+@login_required
 def home(request):
     """
     Renders the homepage.
@@ -829,6 +826,10 @@ def submit_trade(request):
             requested_card = Card.objects.get(card_name=requested_card_name)
             recipient = User.objects.get(username=recipient_username)
 
+            #validates that trade isn't a duplicate
+            if (Trade.objects.filter(recipient=recipient).filter(sender=user).filter(requested_card=requested_card).filter(offered_card=offered_card).count() > 0):
+                return HttpResponse("this trade already exists. Sorry!")
+
             # Create the trade
             trade = Trade.objects.create(
                 offered_card=offered_card,
@@ -838,8 +839,7 @@ def submit_trade(request):
                 created_date=datetime.datetime.now()
             )
             trade.save()
-            return HttpResponse("Trade created successfully!")
-
+            return redirect("trades/personal")
         except ObjectDoesNotExist:
             return HttpResponse("Invalid card or user specified.")
     else:
