@@ -109,34 +109,48 @@
             </nav>
         </div>
             
-        <div class="main-content">
-            <div class="trade-form">
-                <form id="trade-form">
-                    <div class="form-group">
-                        <label for="card-select">Select Card:</label>
-                        <select id="card-select" name="card_name" required>
-                            {% for card in ownedCards %}
-                                <option value="{{ card }}">{{ card }}</option>
+        <!-- Trade Form Container -->
+        <div class="main-content flex-1 flex items-center justify-center p-4">
+            <div class="bg-neutral-200/50 rounded-xl shadow-md h-full w-full md:w-[400px]">
+                <div class="bg-gradient-to-r from-[#6aa243] to-[#1A281F] font-[kanit] text-2xl text-white shadow-md rounded-t-xl p-4">
+                    Trade
+                </div>
+                <div class="p-4">
+                    <form id="trade-form"class="flex flex-col gap-4">
+                        
+                        <div class="flex flex-col">
+                            <select id="card-select" name="card_name" required class="p-2 rounded-md border border-gray-300">
+                                {% for card in ownedCards %}
+                                    <option value="{{ card }}">{{ card }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <label for="switch" class="font-[kanit]">Toggle to Trade a Specific Player</label>
+                            <label class="switch relative inline-block w-10 h-6">
+
+                                <input type="checkbox" id="switch-checkbox" class="opacity-0 w-0 h-0 peer"/>
+                              
+                            <div class="form-group">
+                                <label id="switch" class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="user-select">
+                            <label for="user-select" style="display: none;">Select User:</label>
+                            <select id="user-select" name="user_name" style="display: none;">
+                                {% for user in all_users %}
+                                    <option value="{{ user }}">{{ user }}</option>
                             {% endfor %}
-                        </select>
-                    </div>
-                    <label for="switch">Toggle to Trade a Specific Player</label>
-                    <div class="form-group">
-                        <label id="switch" class="switch">
-                            <input type="checkbox">
-                            <span class="slider"></span>
-                            </label>
-                    </div>
-                    <div class="user-select">
-                        <label for="user-select" style="display: none;">Select User:</label>
-                        <select id="user-select" name="user_name" style="display: none;">
-                            {% for user in all_users %}
-                                <option value="{{ user }}">{{ user }}</option>
-                        {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit">Submit Trade</button>
-                </form>
+                            </select>
+                        </div>
+                        
+                        <button type="submit">Submit Trade</button>
+                    </form>
+                </div>
             </div>
         </div>
             
