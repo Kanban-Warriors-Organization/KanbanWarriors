@@ -9,6 +9,8 @@ import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -49,7 +51,7 @@ class Card(models.Model):
     cost = models.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.card_name)
+        return str(self.card_name) 
 
 
 class UserProfile(models.Model):
