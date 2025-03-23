@@ -142,7 +142,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2">
               {% for card in cardshas %}
               <div
-                class="card bg-white rounded-lg shadow-lg transition-transform duration-100 ease-in-out hover:scale-105 hover:bg-[#3498db]"
+                class="card bg-white rounded-lg shadow-lg transition-transform duration-100 ease-in-out hover:scale-105 hover:bg-[#3498db]" data-title="{{card.title}}" data-description="{{card.description}}"
               >
                 <img
                   src="{{ card.image.url }}"
@@ -166,7 +166,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2">
               {% for card in cardsnot %}
               <div
-                class="card-locked bg-white rounded-lg shadow-lg transition-transform duration-100 ease-in-out hover:scale-105 hover:bg-[#3498db]"
+                class="card-locked bg-white rounded-lg shadow-lg transition-transform duration-100 ease-in-out hover:scale-105 hover:bg-[#3498db]" data-title="{{card.title}}"
               >
                 <img
                   src="{{ card.image.url }}"
