@@ -11,6 +11,11 @@ from django.db import models
 from django.forms import ValidationError
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+from image_gen import make_image
+
 
 # Create your models here.
 
@@ -51,7 +56,33 @@ class Card(models.Model):
     cost = models.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.card_name) 
+        return str(self.card_name)
+
+    def save(self, *args, **kwargs):
+            c = make_image(
+                "static/card_gen/back.png",
+                self.card_name,
+                self.card_description,
+                self.card_image_link,
+                self.environmental_friendliness,
+                self.beauty,
+                self.cost,
+            )
+
+            c_io = BytesIO()
+            c.save(c_io, format="PNG")
+            # We have to convert from a PIL image to a DJANGO image
+            django_file = InMemoryUploadedFile(
+                c_io,
+                None,
+                str(self.card_name).replace(" ", "_") + ".png",
+                "image/png",
+                sys.getsizeof(c_io),
+                None,
+            )
+            self.card_image_link = django_file
+            super(Card,self).save(*args, **kwargs)
+
 
 
 class UserProfile(models.Model):
