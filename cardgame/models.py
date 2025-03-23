@@ -59,6 +59,7 @@ class Card(models.Model):
         return str(self.card_name)
 
     def save(self, *args, **kwargs):
+            print(str(self.card_image_link))
             c = make_image(
                 "static/card_gen/back.png",
                 self.card_name,

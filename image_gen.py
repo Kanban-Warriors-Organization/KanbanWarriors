@@ -43,7 +43,7 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
 
     title_font = ImageFont.truetype("static/card_gen/font/Kanit-Bold.ttf", 84)
     stat_font = ImageFont.truetype("static/card_gen/font/Kanit-Bold.ttf", 84)
-    desc_font = ImageFont.truetype("static/card_gen/font/Kanit-Regular.ttf", 48)
+    desc_font = ImageFont.truetype("static/card_gen/font/Kanit-Regular.ttf", 50)
 
     stat_line = "Impact: "+str(env) + "\nCost: "+str(cost) + "\nBeauty: "+str(beauty)
     draw.text((160,72), title, font=title_font, fill=(255,255,255)) #adds title
@@ -52,7 +52,7 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
     #We just have to separate the text into several lines and write each line.
     #In terms of font size and line length we just have to guess and check.
 
-    MAX_CHARS:int = 36   #Defines how many chars we can have in a line before we wrap around.
+    MAX_CHARS:int = 32   #Defines how many chars we can have in a line before we wrap around.
     count:int = 0
     positions = []   #Stores positions at which we need to have a newline char.
     des_mod:str = ""
