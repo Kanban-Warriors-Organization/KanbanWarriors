@@ -8,8 +8,7 @@ Proceed with the utmost caution!
 from PIL import Image, ImageFont, ImageDraw
 from pathlib import Path
 
-def make_image(background:str, title:str, subtitle:str, 
-               font:str, font_bf:str, desc:str, image, env:float, beauty:float, cost:float):
+def make_image(background:str, title:str, desc:str, image, env:float, beauty:float, cost:float):
 
     """
         Written by Adam
@@ -38,23 +37,22 @@ def make_image(background:str, title:str, subtitle:str,
         return 1
     
     #Scales foreground image and pastes it on to the background.
-    front = front.resize((800,600))
-    Image.Image.paste(back,front, (200,340))
+    front = front.resize((885,618))
+    Image.Image.paste(back,front, (156,210))
     draw = ImageDraw.Draw(back)
 
-    bold = ImageFont.truetype(font_bf, 64) #creates font objects that we need 
-    st_font = ImageFont.truetype(font, 64)
-    reg_font = ImageFont.truetype(font, 32)
-    medium_font = ImageFont.truetype(font, 48)
-    stat_line = "Impact: "+str(env) + "  Cost: "+str(cost) + "  Beauty: "+str(beauty)
-    draw.text((160,128), title, font=bold, fill=(16,64,16)) #adds title
-    draw.text((160,216), subtitle, font=st_font, fill=(16,64,16)) #adds subtitle
+    title_font = ImageFont.truetype("static/card_gen/font/Kanit-Bold.ttf", 84)
+    stat_font = ImageFont.truetype("static/card_gen/font/Kanit-Bold.ttf", 84)
+    desc_font = ImageFont.truetype("static/card_gen/font/Kanit-Regular.ttf", 48)
+
+    stat_line = "Impact: "+str(env) + "\nCost: "+str(cost) + "\nBeauty: "+str(beauty)
+    draw.text((160,72), title, font=title_font, fill=(255,255,255)) #adds title
 
     #Turns out there's no nice way to draw text across multiple lines.
     #We just have to separate the text into several lines and write each line.
     #In terms of font size and line length we just have to guess and check.
 
-    MAX_CHARS:int = 54   #Defines how many chars we can have in a line before we wrap around.
+    MAX_CHARS:int = 36   #Defines how many chars we can have in a line before we wrap around.
     count:int = 0
     positions = []   #Stores positions at which we need to have a newline char.
     des_mod:str = ""
@@ -77,8 +75,8 @@ def make_image(background:str, title:str, subtitle:str,
             des_mod += desc[i]
         
     #Writes description onto the card.
-    draw.multiline_text((160,1024), des_mod, font=reg_font, fill=(0, 128, 64))
-    draw.text((160,1400), stat_line, font=medium_font, fill=(0,0,0))
+    draw.multiline_text((160,860), des_mod, font=desc_font, fill=(0,0,0))
+    draw.text((160,1200), stat_line, font=stat_font, fill=(0,0,0))
     #Returns the generated image.
     return back    
 

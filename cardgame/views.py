@@ -193,9 +193,6 @@ def create_card(request):
             c = make_image(
                 "static/card_gen/back.png",
                 card_name,
-                card_subtitle,
-                "static/card_gen/normal.ttf",
-                "static/card_gen/bold.ttf",
                 card_description,
                 card_image,
                 card_env,
