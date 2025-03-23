@@ -799,6 +799,7 @@ def submit_trade(request):
                 created_date=datetime.datetime.now()
             )
             trade.save()
+            return redirect("trades/personal")
         except ObjectDoesNotExist:
             return HttpResponse("Invalid card or user specified.")
     else:
