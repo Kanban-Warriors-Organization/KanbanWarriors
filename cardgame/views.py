@@ -801,7 +801,8 @@ def submit_trade(request):
                 created_date=datetime.datetime.now()
             )
             trade.save()
-            return redirect("/personal")
+            return HttpResponse(200)
+            # return render(request, "cardgame/personal_trades.html")
         except ObjectDoesNotExist:
             return HttpResponse("Invalid card or user specified.")
     else:
