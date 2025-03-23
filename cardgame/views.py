@@ -144,6 +144,12 @@ def signup(request):
                                                 form.cleaned_data["password1"])
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
+                #adds some random cards, so new users can battle other new users
+                c_list = Card.objects.order_by('?')[:4]
+                for c in c_list:
+                    new_user_profile.user_profile_collected_cards.add(c)
+                
+                new_user_profile.save()
                 login(request, user)
                 messages.success(request, "Account Created!")
                 return redirect(f"/user/{username}/profile")
@@ -192,7 +198,7 @@ def create_card(request):
 
             # Generates card image with given script.
             c = make_image(
-                "static/card_gen/back.png",
+                "staticfiles/card_gen/back.png",
                 card_name,
                 card_description,
                 card_image,
