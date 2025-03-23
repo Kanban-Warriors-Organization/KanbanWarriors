@@ -18,4 +18,5 @@ def make_admin_user_profile(sender , instance , created , **kwargs):
 @receiver(post_delete, sender=Card)
 def remove_card_image_after_deletion(sender, instance, using, **kwargs):
     os.remove(str(instance.card_image_link))
+
   

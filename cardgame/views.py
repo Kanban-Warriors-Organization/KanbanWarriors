@@ -131,10 +131,11 @@ def signup(request):
         # Validates the contents of the form.
         # Since we're using a DJANGO inbuilt form, this is
         # handled automatically.
+        if not form.is_valid():
+            print("help")
         if form.is_valid():
             try:
                 username = form.cleaned_data["username"]
-                print(form.cleaned_data["email"])
                 if (User.objects.filter(email = form.cleaned_data["email"]).count() > 0):
                     messages.error(request, "This email has already been used. Sorry!")
                     return HttpResponse(render(request, "cardgame/signup.html", {"form":form}))
