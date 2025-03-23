@@ -4,4 +4,3 @@ cardgame/migrations/
 manage.py
 cardgame/__pycache__/
 cards/__pycache__/
-/staticfiles
