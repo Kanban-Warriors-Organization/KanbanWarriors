@@ -42,7 +42,7 @@ def home(request):
     """
     return render(request, "cardgame/home.html")
 
-
+@login_required
 def collection_redirect(request):
     return redirect(
         reverse("cardcollection", kwargs={"user_name": request.user.username})
@@ -312,7 +312,7 @@ def log_out(request):
     logout(request)
     return redirect("login")
 
-
+@login_required
 def profile_redirect(request):
     """
     Redirects to a user's profile
@@ -645,6 +645,7 @@ def get_trades_matching_query(request):
 @login_required
 def get_personal_trades(request):
     u = request.user
+    print(u)
     incoming = Trade.objects.filter(recipient = u)
     inc = []
     out = []
@@ -659,20 +660,21 @@ def get_personal_trades(request):
         data['requested_card_image'] = tr.requested_card.card_image_link
         inc.append(data)
     outgoing = Trade.objects.filter(sender=u)
+    print(outgoing)
     for trd in outgoing:
-        data = {}
+        data_out = {}
         if trd.recipient:
-            data['recipient'] = trd.recipient.username
+            data_out['recipient'] = trd.recipient.username
         else:
-            data['recipient'] = "public"
-        data['id'] = trd.id
-        data['sender'] = trd.sender.username
-        data['c_date'] = trd.created_date
-        data['incoming_card'] = trd.offered_card.card_name
-        data['incoming_card_image'] = trd.offered_card.card_image_link
-        data['requested_card'] = trd.requested_card.card_name
-        data['requested_card_image'] = trd.requested_card.card_image_link
-        out.append(data)
+            data_out['recipient'] = "public"
+        data_out['id'] = trd.id
+        data_out['sender'] = trd.sender.username
+        data_out['c_date'] = trd.created_date
+        data_out['incoming_card'] = trd.offered_card.card_name
+        data_out['incoming_card_image'] = trd.offered_card.card_image_link
+        data_out['requested_card'] = trd.requested_card.card_name
+        data_out['requested_card_image'] = trd.requested_card.card_image_link
+        out.append(data_out)
 
     return render(request, "cardgame/personal_trades.html", {'incoming':inc, 'outgoing':out})
 
@@ -799,7 +801,7 @@ def submit_trade(request):
                 created_date=datetime.datetime.now()
             )
             trade.save()
-            return redirect("trades/personal")
+            return redirect("/personal")
         except ObjectDoesNotExist:
             return HttpResponse("Invalid card or user specified.")
     else:
