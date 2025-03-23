@@ -61,14 +61,13 @@ html, body {
 .leaderboard {
     display: flex;
     flex-direction: column;
-    padding: 45px 0px 15px 60px;
+    padding: 45px 0px 15px 20px;
 }
 
 .leaderboard-header {
     display: flex;
     align-items: center;
     background-color: #096079;
-    width: 300px;
     box-sizing: border-box;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
@@ -77,7 +76,6 @@ html, body {
 .leaderboard h1 {
     font-family: kanit;
     color: white;
-    width: 300px;
 }
 
 .leaderboard img {
@@ -91,26 +89,23 @@ html, body {
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
-    width: 300px;
     border-radius: 0 0 20px 20px;
-    background-color: #08546B;
     box-sizing: border-box;
 }
 
 .leaderboard-links a {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold ;
-    width: 300px;
     text-decoration: none;
     width: auto;
-    color: white;
     flex: 1;
 }
 
 .leaderboard-links p {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    color: white;
+    color: black;
+    justify-content: end;
     padding-right: 30px;
 }
 
