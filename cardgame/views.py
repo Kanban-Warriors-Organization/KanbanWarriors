@@ -644,7 +644,7 @@ def get_trades_matching_query(request):
 
 @login_required
 def get_personal_trades(request):
-    u = request.user;
+    u = request.user
     incoming = Trade.objects.filter(recipient = u)
     inc = []
     out = []
@@ -660,11 +660,11 @@ def get_personal_trades(request):
         inc.append(data)
     outgoing = Trade.objects.filter(sender=u)
     for trd in outgoing:
+        data = {}
         if trd.recipient:
             data['recipient'] = trd.recipient.username
         else:
             data['recipient'] = "public"
-        data = {}
         data['id'] = trd.id
         data['sender'] = trd.sender.username
         data['c_date'] = trd.created_date
@@ -771,35 +771,6 @@ def make_trade_page(request, card_name):
         titles.append(card.card_name)
     return render(request, "cardgame/make_trade.html", {"requested_card": requested_card, "ownedCards": titles, "all_users": names})
 
-    # user = user.request
-    # up = UserProfile.objects.get(user=user)
-    # #page for creating a trade
-    # if request.method == 'POST':
-    #     print(request.POST.get('card'))
-    #     wanted_card = Card.objects.get(card_name = request.POST.get(wanted_card))
-    #     offered_card = Card.objects.get(card_name = request.POST.get(offered_card))
-    #     recipient = User.objects.get(username = request.POST.get(recipient)) #specifically the username of the user
-
-    #     #validate that the user can make a trade
-    #     if (recipient != user.username):
-    #         #gets number of outgoing trades to that user
-    #         if Trade.objects.filter(recipient=recipient).filter(sender=user).count() > 2:
-    #             return HttpResponse("the invisible hand smiteth thee")
-
-
-    #     elif (recipient == user.username):
-    #         if Trade.objects.filter(recipient=user).count() > 2:
-    #             return HttpResponse("the invisible hand striketh thee down")
-    #     #adds the trade
-    #     new_trade = Trade.objects.create(offered_card=offered_card, requested_card = wanted_card,
-    #                                      STATUS="PENDING", sender=user, recipient=recipient, created_date = datetime.datetime.now())
-    #     new_trade.save()
-    #     return HttpResponse("trade created successfully!")
-
-
-   # else:
-       # return render(request, "make_trade.html") #renders the form page or something
-
 @csrf_exempt
 @login_required
 def submit_trade(request):
@@ -828,7 +799,6 @@ def submit_trade(request):
                 created_date=datetime.datetime.now()
             )
             trade.save()
-            return redirect("trades/personal")
         except ObjectDoesNotExist:
             return HttpResponse("Invalid card or user specified.")
     else:

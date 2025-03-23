@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: jsonData
         }).then(response => {
-            window.location.href = 'http://127.0.0.1:8000/trades/personal';
+            console.log(response);
         });
+        window.location.href = "http://127.0.0.1:8000/trades/personal"
     });
 });
