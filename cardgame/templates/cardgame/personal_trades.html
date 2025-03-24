@@ -1,15 +1,20 @@
-OUTGOING
+OUTGOING: <br>
 {% for trade in outgoing %}
- {{trade.c_date}} {{trade.recipient}} {{trade.incoming_card}} {{trade.requested_card}} 
+{{trade.c_date}}: {{trade.recipient}}<br> You offered: {{trade.incoming_card}}<br> You requested:{{trade.requested_card}} <br>
 <a href="{% url 'cancel' trade.id %}" class="btn btn-danger">Cancel the trade</a>
+<br> <br>
 {% endfor %}
 
-INCOMING
+
+INCOMING: <br>
 {% for trad in incoming %}
-{{trad.c_date}} {{trad.sender}} {{trad.requested_card}} {{trad.incoming_card}}
+{{trad.c_date}}: {{trad.sender}} <br> You are being asked for:{{trad.requested_card}}<br> You are being offered:{{trad.incoming_card}} <br>
+
+<a class = "nav-link" href="{% url 'accept' trad.id %}">Accept the trade</a>
 
 <a class = "nav-link" href="{% url 'cancel' trad.id %}">Decline the trade</a>
 
+<br> <br>
 
 {% endfor %}
 

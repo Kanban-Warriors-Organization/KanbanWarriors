@@ -730,7 +730,7 @@ def cancel_trade(request, t_id):
         return HttpResponse("success!")
 
     except ObjectDoesNotExist:
-        return HttpResponse("critical system error")
+        return HttpResponse("It seems that you have already cancelled this trade!")
 
 
 
