@@ -160,14 +160,19 @@
             </nav>
         </header> -->
 
+		{% for error in messages %}
+		<p>{{ error }}</p><br>
+		{% endfor %}
 
 	<div class="main-container">
         <div class="grid">
             {% for trade in data %}
             <div class="grid-item bg-neutral-200/50 rounded-xl shadow-md p-6 m-4">
-                <h2 class="text-2xl font font-[kanit] mb-2"> Offered:{{ trade.offered_card}}</h2>
+                <h2 class="text-2xl font font-[kanit] mb-2"> Offered:{{trade.offered_card}}</h2>
                 <h2 class="text-2xl font font-[kanit] mb-2"> Wanted:{{trade.requested_card}}</h2>
                 <p class="text-gray-700 font-[kanit] pb-4">Offered By: {{trade.sender}}</p>
+
+		
 
                 <button class="btn bg-gradient-to-r from-[#6aa243] to-[#1A281F] text-white font-[kanit] py-2 px-4 rounded hover:opacity-90 transition hover:scale-[1.05] duration-100" data-url="{% url 'accept' trade.id %}">
                   Accept
@@ -184,39 +189,8 @@
         class="flex h-12 items-center sm:justify-center lg:justify-between bg-gradient-to-r from-[#6aa243] to-[#1A281F] shadow-md">
         <p class="ml-6 text-white font-[kanit]">@Copyright KanBan Warriors 2025. All rights reserved.</p>
     </footer>
-    <script src="{% static 'js/leaderboard.js' %}"></script>
-    <script src="{% static 'js/recent_card.js' %}"></script>
-    <script>
+    <script src="{% static 'js/challenge-button.js' %}"></script>
 
-        // Select the container and the card element
-        const container = document.querySelector(".ground");
-        const card = document.getElementById("tilt-card");
-
-        container.addEventListener('mousemove', (e) => {
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left; // x position within container
-            const y = e.clientY - rect.top;  // y position within container
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            // Calculate the offset from the center
-            const deltaX = x - centerX;
-            const deltaY = y - centerY;
-
-            // Here, multiplying by a factor (e.g., 10) sets the rotation sensitivity
-            const rotateX = (deltaY / centerY) * -30; // negative to invert direction
-            const rotateY = (deltaX / centerX) * 30;
-
-            // Apply the rotation transform
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-
-        // Reset the transform when the mouse leaves the container
-        container.addEventListener('mouseleave', () => {
-            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-        });
-    </script>
 </body>
 
 </html>

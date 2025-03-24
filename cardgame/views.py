@@ -608,11 +608,14 @@ def battle_select(request):
     Author: Samuel
     """
     return render(request, "cardgame/battle_select.html")
+
+@login_required
 def global_trade_page(request):
     #this is currently unimplemented, if you see this tell lizard to write this view!
     #idk what to put here, jake message me if you're reading this
     return render(request, "cardgame/search.html")
 
+@login_required
 def get_trades_matching_query(request):
     if request.method == 'GET':
         try:
@@ -622,14 +625,14 @@ def get_trades_matching_query(request):
             #basic filter for now, can change later
             out_card = request.GET.get("out_card")
             in_card = request.GET.get("in_card")
-            trades = Trade.objects.all().filter(recipient=None)
-            print(trades)
+            trades = Trade.objects.all().filter(recipient=None).exclude(sender=request.user)
             if (request.GET.get("out_card") != ''):
                 trades = trades.filter(requested_card__card_name = out_card)
             if (request.GET.get("in_card") != ''):
                 trades = trades.filter(offered_card__card_name = in_card)
             if trades.count() == 0:
-                   return HttpResponse(render(request, "cardgame/search.html"))
+                messages.error(request,"No trades available with these conditions!")
+                return redirect(request.META['HTTP_REFERER'])
             t = []
             for tr in trades:
                 data = {}
@@ -695,9 +698,8 @@ def accept_trade(request, t_id):
         user = request.user
         trade = Trade.objects.get(id = t_id)
         if (trade.recipient != None and trade.recipient != user):
-            return HttpResponse("watch out! you can't make this trade!")
-        if trade.STATUS == "ACCEPTED":
-            return HttpResponse("this trade has already been completed! sorry!")
+            messages.error(request,"You can't make this trade!")
+            return redirect(request.META['HTTP_REFERER'])
         #now we verify that both players have the cards they need
         sender_profile = UserProfile.objects.get(user=trade.sender)
         recipient_profile = UserProfile.objects.get(user=user)
@@ -705,9 +707,11 @@ def accept_trade(request, t_id):
         offered_card = trade.offered_card
         if not (sender_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name).exists()
                 and recipient_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists()):
-            return HttpResponse("oh no, this trade is no longer available!")
+            messages.error(request,"You can't make this trade,\n as either you or the sender doesn't have the right card!")
+            return redirect(request.META['HTTP_REFERER'])
         if (sender_profile.user_profile_collected_cards.filter(card_name=requested_card.card_name).exists() or recipient_profile.user_profile_collected_cards.filter(card_name=offered_card.card_name)):
-            return HttpResponse("avoided duplicate")
+            messages.error(request,"You can't make this trade,\n as either you or the sender already has the card!")
+            return redirect(request.META['HTTP_REFERER'])
         #now we can proceed with the trade
         #TODO: make this atomic or something
         sender_profile.user_profile_collected_cards.add(requested_card)
@@ -724,13 +728,16 @@ def cancel_trade(request, t_id):
         user = request.user
         trade = Trade.objects.get(id=t_id)
         if (trade.sender != user and trade.recipient != user):
-            return HttpResponse("watch out! you can't cancel this trade!")
+            messages.error(request,"You can't cancel this trade!")
+            return redirect(request.META['HTTP_REFERER'])
+
         #actually cancels the trade
         Trade.objects.get(id=t_id).delete()
         return HttpResponse("success!")
 
     except ObjectDoesNotExist:
-        return HttpResponse("It seems that you have already cancelled this trade!")
+            messages.error(request,"You have already cancelled this trade!")
+            return redirect(request.META['HTTP_REFERER'])
 
 
 
