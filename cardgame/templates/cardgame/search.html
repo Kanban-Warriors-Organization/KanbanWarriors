@@ -165,7 +165,6 @@
     <div class="bg-neutral-200/50 rounded-xl shadow-md w-full max-w-md p-6">
 	    <h1 class="text-2xl font-bold text-center mb-6 font-[kanit]">Search Public Trades</h1>
       <form action="{% url 'search_results' %}" method="submit" class="flex flex-col gap-4">
-        {% csrf_token %}
         <div>
 	<label for="text" class="block font-[kanit] text-lg">Card you want</label>
           <input id="in" name="in_card" type="text"            class="w-full p-2 border rounded">
