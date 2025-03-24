@@ -145,10 +145,14 @@ def signup(request):
                 new_user_profile = UserProfile.create(user)
                 new_user_profile.save()
                 #adds some random cards, so new users can battle other new users
-                c_list = Card.objects.order_by('?')[:4]
-                for c in c_list:
-                    new_user_profile.user_profile_collected_cards.add(c)
-                
+                #c_list = Card.objects.order_by('?')[:4]
+                #for c in c_list:
+                    #new_user_profile.user_profile_collected_cards.add(c)
+                new_user_profile.user_profile_collected_cards.add(Card.objects.get(card_name = "Comida"))
+                new_user_profile.user_profile_collected_cards.add(Card.objects.get(card_name = "No. 4 Bus"))
+                new_user_profile.user_profile_collected_cards.add(Card.objects.get(card_name = "Hoopern Valley"))
+                new_user_profile.user_profile_collected_cards.add(Card.objects.get(card_name = "Physics Building Solar Panels"))
+
                 new_user_profile.save()
                 login(request, user)
                 messages.success(request, "Account Created!")
