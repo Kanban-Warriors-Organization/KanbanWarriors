@@ -693,10 +693,13 @@ def get_personal_trades(request):
 @login_required
 @transaction.atomic
 def accept_trade(request, t_id):
-            #validate that the trade is still available
         #validate that the user can access the trade
         user = request.user
-        trade = Trade.objects.get(id = t_id)
+        try:
+            trade = Trade.objects.get(id = t_id)
+        except ObjectDoesNotExist:
+            return Http404()
+
         if (trade.recipient != None and trade.recipient != user):
             messages.error(request,"You can't make this trade!")
             return redirect(request.META['HTTP_REFERER'])
@@ -726,18 +729,20 @@ def accept_trade(request, t_id):
 def cancel_trade(request, t_id):
     try:
         user = request.user
-        trade = Trade.objects.get(id=t_id)
+        try:
+            trade = Trade.objects.get(id = t_id)
+        except ObjectDoesNotExist:
+            return Http404()
         if (trade.sender != user and trade.recipient != user):
             messages.error(request,"You can't cancel this trade!")
-            return redirect(request.META['HTTP_REFERER'])
-
+            return render(request,"cardgame/personal_trades.html")
         #actually cancels the trade
         Trade.objects.get(id=t_id).delete()
         return HttpResponse("success!")
 
     except ObjectDoesNotExist:
             messages.error(request,"You have already cancelled this trade!")
-            return redirect(request.META['HTTP_REFERER'])
+            return render(request,"cardgame/personal_trades.html")
 
 
 
@@ -825,7 +830,7 @@ def delete_account(request):
         password = request.POST.get('pwd')
         if (password == None or authenticate(username=request.user.username, password=password) == None):
             messages.error(request,"Invalid password.")
-            return redirect(request.META['HTTP_REFERER'])
+            return render(request, "cardgame/account_page.html")
         #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
         user = request.user
         user.delete()

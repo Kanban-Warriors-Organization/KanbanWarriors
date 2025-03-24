@@ -59,7 +59,8 @@ class Card(models.Model):
         return str(self.card_name)
 
     def save(self, *args, **kwargs):
-            print(str(self.card_image_link))
+        print(self.card_image_link)
+        if (self.card_image_link != "static/card_images/do_not_remove.png"):
             c = make_image(
                 "static/card_gen/back.png",
                 self.card_name,
@@ -82,7 +83,11 @@ class Card(models.Model):
                 None,
             )
             self.card_image_link = django_file
-            super(Card,self).save(*args, **kwargs)
+        super(Card,self).save(*args, **kwargs)
+
+
+
+
 
 
 

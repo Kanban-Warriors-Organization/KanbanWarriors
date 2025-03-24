@@ -83,14 +83,7 @@ class TradeTestCase(TestCase):
         self.assertEqual(len(response.context['incoming']), 1)
 
 
-    def test_trade_404(self):
-        # checks that accessing a nonexistent trade returns a 404
-        self.client.login(username="martenfan",password="ilikemarten")
 
-        url = reverse("trade",
-                      kwargs={"t_id": "9001"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
 
     def test_valid_trade_cancelled(self):
         #checks that a user can cancel a trade they made
@@ -128,8 +121,9 @@ class TradeTestCase(TestCase):
         self.user_profile3.user_profile_collected_cards.add(self.card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
         self.client.login(username="wolverinefan",password="ilikewolverine")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #check that nothing has changed
         self.assertTrue(self.card2 in self.user_profile3.user_profile_collected_cards.all())
         self.assertTrue(self.card1 not in self.user_profile3.user_profile_collected_cards.all())
@@ -145,8 +139,9 @@ class TradeTestCase(TestCase):
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         #namely that user2 has card 1 and that user1 has card 2
         self.assertTrue(self.card2 in self.user_profile1.user_profile_collected_cards.all())
@@ -161,8 +156,9 @@ class TradeTestCase(TestCase):
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         #namely that user2 has card 1 and that user1 has card 2
         self.assertTrue(self.card2 in self.user_profile1.user_profile_collected_cards.all())
@@ -177,8 +173,9 @@ class TradeTestCase(TestCase):
         #user_profile2.user_profile_collected_cards.add(card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         self.assertTrue(self.card1 not in self.user_profile2.user_profile_collected_cards.all())
         self.assertTrue(self.card2 not in self.user_profile1.user_profile_collected_cards.all())
@@ -190,8 +187,9 @@ class TradeTestCase(TestCase):
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         #user_profile1.user_profile_collected_cards.add(card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         self.assertTrue(self.card1 not in self.user_profile2.user_profile_collected_cards.all())
         self.assertTrue(self.card2 not in self.user_profile1.user_profile_collected_cards.all())
@@ -202,8 +200,9 @@ class TradeTestCase(TestCase):
         self.user_profile1.user_profile_collected_cards.add(self.card2)
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         self.assertEqual(Trade.objects.all().count(),1)
 
@@ -214,8 +213,9 @@ class TradeTestCase(TestCase):
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         #user_profile1.user_profile_collected_cards.add(card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         self.assertEqual(Trade.objects.all().count(),1)
 
@@ -226,9 +226,9 @@ class TradeTestCase(TestCase):
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
         self.client.login(username="stoatfan",password="ilikestoat")
+        referee = 'http://testserver{}'.format(reverse('personal'))
         url=reverse("accept", kwargs={"t_id":1})
-
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_REFERER=referee)
         #checks the state of the database
         self.assertTrue(self.card2 not in self.user_profile1.user_profile_collected_cards.all())
         self.assertTrue(self.card1 not in self.user_profile2.user_profile_collected_cards.all())

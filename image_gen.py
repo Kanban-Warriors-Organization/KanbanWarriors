@@ -61,10 +61,8 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
     des_mod:str = ""
 
     for i in range(0,len(desc)):
-        print("count and since: " + str(count) + " " + str(count_since))
         if desc[i] == " ":
             if count > MAX_CHARS:
-                print(i-count_since)
                 positions.append(i - count_since - 1)
                 count = deepcopy(count_since)
             else:
