@@ -829,7 +829,6 @@ def delete_account(request):
         #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
         user = request.user
         user.delete()
-        return HttpResponse("thanks for playing this game! bye!")
 
 
 
