@@ -46,7 +46,7 @@ urlpatterns = [
     path("change_username", views.change_username, name="change_username"),
     path("change_password", auth_views.PasswordChangeView.as_view(template_name="cardgame/change_password.html",success_url="home"),name="change_password"),
     path("delete_account", views.delete_account, name="delete_account"),
-    path("reset_password", auth_views.PasswordChangeView.as_view(template_name="cardgame/reset.html"), name="reset_password"),
+    path("reset_password", auth_views.PasswordResetView.as_view(template_name="cardgame/reset.html"), name="reset_password"),
 
     # uses django's inbuilt login view
     path('battle/', views.battle_room, name='battle'),
