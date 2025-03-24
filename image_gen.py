@@ -7,6 +7,7 @@ Proceed with the utmost caution!
 """
 from PIL import Image, ImageFont, ImageDraw
 from pathlib import Path
+from copy import deepcopy
 
 def make_image(background:str, title:str, desc:str, image, env:float, beauty:float, cost:float):
 
@@ -54,19 +55,23 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
 
     MAX_CHARS:int = 32   #Defines how many chars we can have in a line before we wrap around.
     count:int = 0
+    count_since:int = 0
     positions = []   #Stores positions at which we need to have a newline char.
     des_mod:str = ""
 
     for i in range(0,len(desc)):
+        print("count and since: " + str(count) + " " + str(count_since))
         if desc[i] == " ":
             if count > MAX_CHARS:
-                positions.append(i)
-                count = 0
+                print(i-count_since)
+                positions.append(i - count_since - 1)
+                count = deepcopy(count_since)
             else:
-                pos = i
                 count += 1
+            count_since = 0
         else:
             count += 1
+            count_since += 1
     #Rewrites string but with newlines instead of spaces where required.
     for i in range(0,len(desc)):
         if i in positions:
