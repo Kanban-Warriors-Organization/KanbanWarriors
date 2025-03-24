@@ -1,9 +1,13 @@
 
 <ul>
   {% for trade in data %}
-  <li>
-	  {{trade.sender}} {{trade.requested_card}}
-    </li>
+  {{trade.sender}} wants: {{trade.requested_card}} <br>
+  in exchange for: {{trade.offered_card}} <br>
+<a class = "nav-link" href="{% url 'accept' trade.id %}">Accept the trade</a>
+
+
+    <br>
+    <br>
   {% endfor %}
 </ul>
 
