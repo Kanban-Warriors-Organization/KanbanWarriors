@@ -150,6 +150,10 @@
         {% csrf_token %}
         <input name="new_name" type="text" placeholder="Enter your new username" class="p-2 border rounded">
         <input name="pwd" type="password" placeholder="Enter your password" class="p-2 border rounded">
+	{% for error in messages %}
+	<p>{{ error }}</p><br>
+	{% endfor %}
+
         <button type="submit" class="bg-gradient-to-r from-[#6aa243] to-[#1A281F] text-white font-[kanit] py-2 px-4 rounded hover:opacity-90 transition">
           Change Username
         </button>

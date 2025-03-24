@@ -825,14 +825,12 @@ def delete_account(request):
     if request.method == 'POST':
         password = request.POST.get('pwd')
         if (password == None or authenticate(username=request.user.username, password=password) == None):
-            return HttpResponse("this is bad")
+            messages.error(request,"Invalid password.")
+            return redirect(request.META['HTTP_REFERER'])
         #TODO: make sure that models with the user as a foreign key delete properly when the user is removed
         user = request.user
         user.delete()
-
-
-
-    return HttpResponse("why don't you try hard?")
+        return HttpResponse("Thanks for playing this game! Bye!")
 
 def privacy(request):
     return render(request, "cardgame/privacy.html")

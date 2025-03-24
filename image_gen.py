@@ -19,10 +19,11 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
         background: a path to the background image for the card, represented as a string
         title: the name of the card
         subtitle: the text below the name of the card
-        font: a path to a font used to write text on the card
-        font_bf: a path to a bold font used to write text on the card
         desc: the description of the card, written to a box below the image
         image: either a string representing a path to an image, or a django ImageField object
+        env: the "environmental friendliness" stat of the card
+        beauty: the "beauty" stat of the card
+        cost: the "cost" stat of the card
 
     Returns:
     a PIL image file representing the card image
@@ -34,7 +35,7 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
         back = back.resize((1200,1600))
         front = Image.open(image)
     except FileNotFoundError:
-        print("help!")
+        print("Card image could not be generated.")
         return 1
     
     #Scales foreground image and pastes it on to the background.
@@ -72,6 +73,7 @@ def make_image(background:str, title:str, desc:str, image, env:float, beauty:flo
         else:
             count += 1
             count_since += 1
+
     #Rewrites string but with newlines instead of spaces where required.
     for i in range(0,len(desc)):
         if i in positions:

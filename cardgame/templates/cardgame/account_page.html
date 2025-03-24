@@ -169,6 +169,10 @@
           class="bg-red-500 hover:bg-red-600 text-white font-[kanit] p-2 rounded transition transform duration-300 hover:scale-[1.05] hover:rotate-1">
           Delete Account
         </button>
+		{% for error in messages %}
+		<p>{{ error }}</p><br>
+		{% endfor %}
+
         <p class="text-center text-red-600 font-bold">
           WARNING: THIS IS IRREVERSIBLE. PROCEED WITH CAUTION!
         </p>
