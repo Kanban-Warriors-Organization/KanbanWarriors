@@ -793,11 +793,10 @@ def submit_trade(request):
         offered_card_name = data.get('card_name')
         requested_card_name = data.get('requested_card')
         recipient_username = data.get('user_name')
-
         try:
             offered_card = Card.objects.get(card_name=offered_card_name)
             requested_card = Card.objects.get(card_name=requested_card_name)
-            recipient = User.objects.get(username=recipient_username)
+            recipient = User.objects.get(username=recipient_username) if recipient_username else None
 
             #validates that trade isn't a duplicate
             if (Trade.objects.filter(recipient=recipient).filter(sender=user).filter(requested_card=requested_card).filter(offered_card=offered_card).count() > 0):
