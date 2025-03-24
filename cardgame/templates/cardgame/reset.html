@@ -1,9 +1,7 @@
-<!-- <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form -->
-
+<!--
+    Author: Yigit
+    Description: Reset Password Page
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -57,8 +55,7 @@
 
 
         <a href="/home" class="flex w-[10%]">
-            <img src="{% static 'img\ecosplorelogo.png' %}"
-                class="ml-2 w-20 rounded-full shadow-md hover:scale-[1.05] duration-100">
+            <img src="{% static 'img\ecosplorelogo.png' %}" class="ml-2 w-20 rounded-full shadow-md hover:scale-[1.05] duration-100">
 
         </a>
         <nav class="flex w-[100%] justify-center font-[kanit] font-xl text-white">
@@ -128,6 +125,19 @@
                 Account
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+                href="/trades">
+                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="arrow-circle-down"
+                    viewBox="0 0 24 24" width="512" height="512">
+                    <g>
+                        <path
+                            d="M23,16H2.681l.014-.015L4.939,13.7a1,1,0,1,0-1.426-1.4L1.274,14.577c-.163.163-.391.413-.624.676a2.588,2.588,0,0,0,0,3.429c.233.262.461.512.618.67l2.245,2.284a1,1,0,0,0,1.426-1.4L2.744,18H23a1,1,0,0,0,0-2Z" />
+                        <path
+                            d="M1,8H21.255l-2.194,2.233a1,1,0,1,0,1.426,1.4l2.239-2.279c.163-.163.391-.413.624-.675a2.588,2.588,0,0,0,0-3.429c-.233-.263-.461-.513-.618-.67L20.487,2.3a1,1,0,0,0-1.426,1.4l2.251,2.29L21.32,6H1A1,1,0,0,0,1,8Z" />
+                    </g>
+                </svg>
+                Trades
+            </a>
+            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/collection-redirect">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
                     data-name="Layer 1" viewBox="0 0 24 24">
@@ -172,7 +182,7 @@
         class="fixed bottom-[50px] w-full flex h-24 items-center bg-gradient-to-r from-[#6aa243] to-[#1A281F] shadow-md lg:hidden">
         <nav class="flex w-[100%] justify-center font-[kanit] font-xl text-white">
 
-            <a class="m-4 ml-1 mr-1 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+            <a class="m-2 ml-1 mr-1 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/challenges">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
                     data-name="Layer 1" viewBox="0 0 24 24" width="512" height="512">
@@ -181,7 +191,7 @@
                 </svg>
                 Challenges
             </a>
-            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+            <a class="m-2 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/battle-select">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
                     data-name="Layer 1" viewBox="0 0 24 24">
@@ -190,7 +200,7 @@
                 </svg>
                 Battle
             </a>
-            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+            <a class="m-2 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/home">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
@@ -209,7 +219,7 @@
                 </svg>
                 Home
             </a>
-            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+            <a class="m-2 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/account">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
@@ -222,7 +232,20 @@
                 </svg>
                 Account
             </a>
-            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+            <a class="m-2 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+                href="/trades">
+                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="arrow-circle-down"
+                    viewBox="0 0 24 24" width="512" height="512">
+                    <g>
+                        <path
+                            d="M23,16H2.681l.014-.015L4.939,13.7a1,1,0,1,0-1.426-1.4L1.274,14.577c-.163.163-.391.413-.624.676a2.588,2.588,0,0,0,0,3.429c.233.262.461.512.618.67l2.245,2.284a1,1,0,0,0,1.426-1.4L2.744,18H23a1,1,0,0,0,0-2Z" />
+                        <path
+                            d="M1,8H21.255l-2.194,2.233a1,1,0,1,0,1.426,1.4l2.239-2.279c.163-.163.391-.413.624-.675a2.588,2.588,0,0,0,0-3.429c-.233-.263-.461-.513-.618-.67L20.487,2.3a1,1,0,0,0-1.426,1.4l2.251,2.29L21.32,6H1A1,1,0,0,0,1,8Z" />
+                    </g>
+                </svg>
+                Trades
+            </a>
+            <a class="m-2 p-2 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/collection-redirect">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
                     data-name="Layer 1" viewBox="0 0 24 24">

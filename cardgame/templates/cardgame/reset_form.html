@@ -7,6 +7,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="description" content="Password Reset">
@@ -16,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
+
 <body class="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#ABD8ED]">
   <div class="flex-grow flex items-center justify-center p-8">
     <div class="bg-neutral-200/50 rounded-xl shadow-md p-6 w-full max-w-md">
@@ -26,7 +28,8 @@
       <form method="post" class="flex flex-col gap-4">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="bg-gradient-to-r from-[#6aa243] to-[#1A281F] text-white font-[kanit] py-2 px-4 rounded hover:opacity-90 transition">
+        <button type="submit"
+          class="bg-gradient-to-r from-[#6aa243] to-[#1A281F] text-white font-[kanit] py-2 px-4 rounded hover:opacity-90 transition">
           Submit
         </button>
       </form>
@@ -36,4 +39,5 @@
     <p class="font-[kanit] text-gray-700">&copy; Copyright KanBan Warriors 2025. All rights reserved.</p>
   </footer>
 </body>
+
 </html>
