@@ -19,18 +19,47 @@
 <body class="flex flex-col h-screen justify-between bg-gradient-to-b from-[#FFFFFF] to-[#ABD8ED]">
     <!-- Navigation Bar -->
     <div class="lg:hidden h-24 items-center bg-gradient-to-r from-[#6aa243] to-[#1A281F] shadow-md">
+
         <nav class="flex w-[100%] justify-center font-[kanit] font-xl text-white">
-            <a class="justify-center" href="home">
-                <img src="{% static 'img\logo.png' %}" class="ml-2 mt-2 w-20 rounded-xl shadow-md">
+            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+                href="/profile-redirect">
+                <!-- Generator: Adobe Illustrator 25.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+                <svg class="h-6 w-6 mb-1 drop-shadow-xl" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512"
+                    height="512">
+                    <g>
+                        <circle cx="256" cy="128" r="128" />
+                        <path
+                            d="M256,298.667c-105.99,0.118-191.882,86.01-192,192C64,502.449,73.551,512,85.333,512h341.333   c11.782,0,21.333-9.551,21.333-21.333C447.882,384.677,361.99,298.784,256,298.667z" />
+                    </g>
+                </svg>
+                Profile
+            </a>
+            <a class="justify-center" href="/home">
+                <img src="{% static 'img\ecosplorelogo.png' %}" class="ml-2 mt-2 w-20 rounded-full shadow-md">
+            </a>
+            <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
+                href="/logout">
+                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
+                    data-name="Layer 1" viewBox="0 0 24 24" width="512" height="512">
+                    <path
+                        d="M23.117,9.879l-4.95-4.95L16.046,7.05,19.5,10.5H6.617v3H19.5l-3.45,3.45,2.121,2.121,4.95-4.95A3,3,0,0,0,23.117,9.879Z" />
+                    <path
+                        d="M9.994,20.5a.5.5,0,0,1-.5.5H3.506a.5.5,0,0,1-.5-.5V3.531a.5.5,0,0,1,.5-.5H9.494a.5.5,0,0,1,.5.5V8.345h3V3.531a3.505,3.505,0,0,0-3.5-3.5H3.506a3.505,3.505,0,0,0-3.5,3.5V20.5a3.5,3.5,0,0,0,3.5,3.5H9.494a3.5,3.5,0,0,0,3.5-3.5V15.683h-3Z" />
+                </svg>
+                Sign Out
             </a>
         </nav>
     </div>
     <div class="hidden lg:flex h-24 items-center bg-gradient-to-r from-[#6aa243] to-[#1A281F] shadow-md">
 
-        <a href="/home">
-            <img src="{% static 'img\logo.png' %}" class="ml-2 w-20 rounded-full shadow-md">
+
+        <a href="/home" class="flex w-[10%]">
+            <img src="{% static 'img\ecosplorelogo.png' %}" class="ml-2 w-20 rounded-full shadow-md hover:scale-[1.05] duration-100">
+
         </a>
-        <nav class="flex w-[90%] justify-center font-[kanit] font-xl text-white">
+        <nav class="flex w-[100%] justify-center font-[kanit] font-xl text-white">
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/home">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
@@ -84,17 +113,17 @@
                 Battle
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
-                href="/battle">
-                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="arrow-circle-down"
-                    viewBox="0 0 24 24" width="512" height="512">
+                href="/account">
+                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512"
+                    height="512">
                     <g>
                         <path
-                            d="M23,16H2.681l.014-.015L4.939,13.7a1,1,0,1,0-1.426-1.4L1.274,14.577c-.163.163-.391.413-.624.676a2.588,2.588,0,0,0,0,3.429c.233.262.461.512.618.67l2.245,2.284a1,1,0,0,0,1.426-1.4L2.744,18H23a1,1,0,0,0,0-2Z" />
-                        <path
-                            d="M1,8H21.255l-2.194,2.233a1,1,0,1,0,1.426,1.4l2.239-2.279c.163-.163.391-.413.624-.675a2.588,2.588,0,0,0,0-3.429c-.233-.263-.461-.513-.618-.67L20.487,2.3a1,1,0,0,0-1.426,1.4l2.251,2.29L21.32,6H1A1,1,0,0,0,1,8Z" />
+                            d="M34.283,384c17.646,30.626,56.779,41.148,87.405,23.502c0.021-0.012,0.041-0.024,0.062-0.036l9.493-5.483   c17.92,15.332,38.518,27.222,60.757,35.072V448c0,35.346,28.654,64,64,64s64-28.654,64-64v-10.944   c22.242-7.863,42.841-19.767,60.757-35.115l9.536,5.504c30.633,17.673,69.794,7.167,87.467-23.467   c17.673-30.633,7.167-69.794-23.467-87.467l0,0l-9.472-5.461c4.264-23.201,4.264-46.985,0-70.187l9.472-5.461   c30.633-17.673,41.14-56.833,23.467-87.467c-17.673-30.633-56.833-41.14-87.467-23.467l-9.493,5.483   C362.862,94.638,342.25,82.77,320,74.944V64c0-35.346-28.654-64-64-64s-64,28.654-64,64v10.944   c-22.242,7.863-42.841,19.767-60.757,35.115l-9.536-5.525C91.073,86.86,51.913,97.367,34.24,128s-7.167,69.794,23.467,87.467l0,0   l9.472,5.461c-4.264,23.201-4.264,46.985,0,70.187l-9.472,5.461C27.158,314.296,16.686,353.38,34.283,384z M256,170.667   c47.128,0,85.333,38.205,85.333,85.333S303.128,341.333,256,341.333S170.667,303.128,170.667,256S208.872,170.667,256,170.667z" />
                     </g>
                 </svg>
-                Trade
+                Account
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/collection-redirect">
@@ -186,7 +215,7 @@
                 Challenges
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
-                href="/battle">
+                href="/battle-select">
                 <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="Layer_1"
                     data-name="Layer 1" viewBox="0 0 24 24">
                     <path
@@ -214,17 +243,17 @@
                 Home
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
-                href="/battle">
-                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg" id="arrow-circle-down"
-                    viewBox="0 0 24 24" width="512" height="512">
+                href="/account">
+                <svg class="h-6 w-6 mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512"
+                    height="512">
                     <g>
                         <path
-                            d="M23,16H2.681l.014-.015L4.939,13.7a1,1,0,1,0-1.426-1.4L1.274,14.577c-.163.163-.391.413-.624.676a2.588,2.588,0,0,0,0,3.429c.233.262.461.512.618.67l2.245,2.284a1,1,0,0,0,1.426-1.4L2.744,18H23a1,1,0,0,0,0-2Z" />
-                        <path
-                            d="M1,8H21.255l-2.194,2.233a1,1,0,1,0,1.426,1.4l2.239-2.279c.163-.163.391-.413.624-.675a2.588,2.588,0,0,0,0-3.429c-.233-.263-.461-.513-.618-.67L20.487,2.3a1,1,0,0,0-1.426,1.4l2.251,2.29L21.32,6H1A1,1,0,0,0,1,8Z" />
+                            d="M34.283,384c17.646,30.626,56.779,41.148,87.405,23.502c0.021-0.012,0.041-0.024,0.062-0.036l9.493-5.483   c17.92,15.332,38.518,27.222,60.757,35.072V448c0,35.346,28.654,64,64,64s64-28.654,64-64v-10.944   c22.242-7.863,42.841-19.767,60.757-35.115l9.536,5.504c30.633,17.673,69.794,7.167,87.467-23.467   c17.673-30.633,7.167-69.794-23.467-87.467l0,0l-9.472-5.461c4.264-23.201,4.264-46.985,0-70.187l9.472-5.461   c30.633-17.673,41.14-56.833,23.467-87.467c-17.673-30.633-56.833-41.14-87.467-23.467l-9.493,5.483   C362.862,94.638,342.25,82.77,320,74.944V64c0-35.346-28.654-64-64-64s-64,28.654-64,64v10.944   c-22.242,7.863-42.841,19.767-60.757,35.115l-9.536-5.525C91.073,86.86,51.913,97.367,34.24,128s-7.167,69.794,23.467,87.467l0,0   l9.472,5.461c-4.264,23.201-4.264,46.985,0,70.187l-9.472,5.461C27.158,314.296,16.686,353.38,34.283,384z M256,170.667   c47.128,0,85.333,38.205,85.333,85.333S303.128,341.333,256,341.333S170.667,303.128,170.667,256S208.872,170.667,256,170.667z" />
                     </g>
                 </svg>
-                Trade
+                Account
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
                 href="/collection-redirect">

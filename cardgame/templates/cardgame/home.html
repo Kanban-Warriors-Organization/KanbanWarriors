@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <!--
-    Author: Jake Klar
+    Author: Jake Klar, Yigit Keles, Taha Cem Bakirhan
     Description: This is the homepage of the card game, featuring:
     a dynamic map, leaderboards, information about the latest card and navigation.
 -->
@@ -42,7 +42,7 @@
                 </svg>
                 Profile
             </a>
-            <a class="justify-center" href="home">
+            <a class="justify-center" href="/home">
                 <img src="{% static 'img\ecosplorelogo.png' %}" class="ml-2 mt-2 w-20 rounded-full shadow-md">
             </a>
             <a class="m-4 p-4 flex flex-col items-center hover:scale-[1.1] hover:bg-neutral-200/25 rounded-xl transition duration-50 ease-in-out"
@@ -303,12 +303,12 @@
                     <h1>Recent Card!</h1>
                 </div>
 
-                <div class="ground group relative w-64 h-96 mx-auto mt-4 mb-4 [perspective:1000px]">
-                    <div id="tilt-card"
-                        class="absolute inset-0 rounded-xl shadow-xl bg-white transition-transform duration-0 [tranform-style:preserve-3d]">
-                        <div class="recent-card-body">
+                <div class="">
+                    <div class="recent-card ground group relative w-64 h-96 mx-auto mt-4 mb-4 [perspective:1000px]"
+                        >
+                        <div class="">
                             <h2></h2>
-                            <img>
+                            <img id="tilt-card" class="absolute inset-0 rounded-xl shadow-xl bg-white transition-transform duration-0 [tranform-style:preserve-3d]">
                             <p></p>
                         </div>
                     </div>
@@ -416,8 +416,8 @@
             const deltaY = y - centerY;
 
             // Here, multiplying by a factor (e.g., 10) sets the rotation sensitivity
-            const rotateX = (deltaY / centerY) * -10; // negative to invert direction
-            const rotateY = (deltaX / centerX) * 10;
+            const rotateX = (deltaY / centerY) * -30; // negative to invert direction
+            const rotateY = (deltaX / centerX) * 30;
 
             // Apply the rotation transform
             card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
