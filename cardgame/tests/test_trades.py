@@ -78,7 +78,7 @@ class TradeTestCase(TestCase):
                              sender=self.user1,
                              # no recip
                              created_date=datetime.datetime.now())
-        Trade.objects.create(offered_card=self.card1, 
+        Trade.objects.create(offered_card=self.card1,
                              requested_card=self.card2,
                              sender=self.user1,
                              recipient=self.user3,
@@ -132,7 +132,7 @@ class TradeTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         # Validate that the trade is cancelled
         self.assertEqual(
-            Trade.objects.filter(offered_card=self.card1).count(),0)
+            Trade.objects.filter(offered_card=self.card1).count(), 0)
 
     def test_invalid_trade_not_cancelled(self):
         # Checks that a user cannot cancel a trade they did not make or receive
@@ -211,7 +211,7 @@ class TradeTestCase(TestCase):
                              created_date=datetime.datetime.now())
         self.user_profile2.user_profile_collected_cards.add(self.card2)
         self.user_profile1.user_profile_collected_cards.add(self.card1)
-        self.client.login(username="stoatfan",password="ilikestoat")
+        self.client.login(username="stoatfan", password="ilikestoat")
         referee = 'http://testserver{}'.format(reverse('personal'))
         url = reverse("accept", kwargs={"t_id": 1})
         self.client.get(url, HTTP_REFERER=referee)
@@ -264,7 +264,7 @@ class TradeTestCase(TestCase):
         self.client.login(username="stoatfan",
                           password="ilikestoat")
         referee = 'http://testserver{}'.format(reverse('personal'))
-        url=reverse("accept", kwargs={"t_id": 1})
+        url = reverse("accept", kwargs={"t_id": 1})
         self.client.get(url, HTTP_REFERER=referee)
 
         # checks the state of the database
@@ -286,7 +286,7 @@ class TradeTestCase(TestCase):
                           password="ilikestoat")
         referee = 'http://testserver{}'.format(reverse('personal'))
         url = reverse("accept", kwargs={"t_id": 1})
-        response = self.client.get(url, HTTP_REFERER=referee)
+        self.client.get(url, HTTP_REFERER=referee)
         # checks the state of the database
         self.assertEqual(Trade.objects.all().count(), 1)
 
@@ -308,7 +308,6 @@ class TradeTestCase(TestCase):
 
         # checks the state of the database
         self.assertEqual(Trade.objects.all().count(), 1)
-
 
     def test_accepting_trade_directed_to_another_person(self):
         # tests that a user cannot accept a trade not directed towards them
