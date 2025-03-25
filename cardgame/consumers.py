@@ -2,7 +2,7 @@ import json
 import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from .models import Battle, BattleDeck, UserProfile, Card
 
 
@@ -64,7 +64,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
 
             try:
                 battle = Battle.objects.get(room_id=self.room_id)
-    
+
                 # If battle exists, try to join it
                 if battle.status == 'completed':
                     return {'event': 'error', 'message':
@@ -268,7 +268,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
             elif battle.player2 and battle.player2.user == self.user:
                 battle.player2_ready = True
 
-            both_ready = battle.player1_ready and battle.player2_ready 
+            both_ready = battle.player1_ready and battle.player2_ready
 
             # Start battle if both players are ready
             if both_ready and battle.status == 'selecting':
