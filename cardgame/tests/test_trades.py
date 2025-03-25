@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
-from cardgame.models import Card, UserProfile Trade
+from cardgame.models import Card, UserProfile, Trade
 
 
 class TradeTestCase(TestCase):
@@ -12,7 +12,7 @@ class TradeTestCase(TestCase):
         # initialises a few users and makes a few trades between them
         self.client = Client()
         self.user1 = User.objects.create_user(username="martenfan",
-                                             password="ilikemarten")
+                                              password="ilikemarten")
         self.user_profile1 = UserProfile.objects.create(
             user=self.user1,
             user_profile_points=50,
@@ -20,7 +20,7 @@ class TradeTestCase(TestCase):
         )
 
         self.user2 = User.objects.create_user(username="stoatfan",
-                                             password="ilikestoat")
+                                              password="ilikestoat")
         self.user_profile2 = UserProfile.objects.create(
             user=self.user2,
             user_profile_points=64,
@@ -28,7 +28,7 @@ class TradeTestCase(TestCase):
         )
 
         self.user3 = User.objects.create_user(username="wolverinefan",
-                                             password="ilikewolverine")
+                                              password="ilikewolverine")
         self.user_profile3 = UserProfile.objects.create(
             user=self.user3,
             user_profile_points=78,

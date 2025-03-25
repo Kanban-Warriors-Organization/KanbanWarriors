@@ -28,7 +28,6 @@ class CardModelTests(TestCase):
         Tests card name, subtitle, description, and card set relationship.
         """
 
-
         # Create the test Card
         test_card_name = "Test_Card_Name"
         test_card_subtitle = "Test_Card_Subtitle"
