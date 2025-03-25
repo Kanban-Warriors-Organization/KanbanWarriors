@@ -79,19 +79,24 @@ Ensure the following dependencies are installed:
 
 1. **Navigate to the project root directory.**
 2. **Activate the virtual environment.**
-3. **Apply database migrations:**
+3. **Change instance-specific settings**
+    Open **cards/settings.py** and make sure that **DEBUG** is set to **FALSE**.
+    Replace the secret key with your own secret key. This must **NOT** be used anywhere else and must **NOT** be included in version control.
+    Change the value(s) in **ALLOWED_HOSTS** to your IP Address / URL.
+    Add **EMAIL_HOST** = $YOUREMAILHOST. This is required for sending verification emails.
+4. **Apply database migrations:**
    ```bash
    python manage.py migrate
    ```
-4. **Prepare static files**
+5. **Prepare static files**
    ```bash
    python manage.py collectstatic
    ```
-5. **Run the server using uvicorn:**
+6. **Run the server using uvicorn:**
    ```bash
-   uvicorn cards.asgi:application
+   uvicorn cards.asgi:application --host $YOUR_IP_ADDRESS --port 8000
    ```
-6. **Access the application:** Open `http://127.0.0.1:8000/` in a web browser.
+7. **Access the application:** Open `http://127.0.0.1:8000/` in a web browser.
 
 ### 🧪 Running Tests
 
