@@ -14,13 +14,11 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
 
-# from django.template import loader
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-# from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
