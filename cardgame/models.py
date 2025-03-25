@@ -5,21 +5,14 @@ user profiles, challenges, and quiz components.
 
 """
 
+import sys
 import datetime
+from io import BytesIO
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ValidationError
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
-from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import sys
 from image_gen import make_image
-
-
-# Create your models here.
-
-
 
 
 class Card(models.Model):
@@ -83,12 +76,7 @@ class Card(models.Model):
                 None,
             )
             self.card_image_link = django_file
-        super(Card,self).save(*args, **kwargs)
-
-
-
-
-
+        super(Card, self).save(*args, **kwargs)
 
 
 class UserProfile(models.Model):
@@ -262,7 +250,7 @@ class Challenge(models.Model):
 class Battle(models.Model):
     """
     Represents an active card battle between two players.
-    
+
     Attributes:
         room_id (str): Unique identifier for the battle room
         player1/player2 (UserProfile): The two participants
@@ -270,16 +258,19 @@ class Battle(models.Model):
         status (str): Current state of the battle
         winner (UserProfile): The winner of the battle (if completed)
         created_at (DateTimeField): When the battle was created
-        
+
     Author: Samuel
     """
-    
+
     room_id = models.CharField(max_length=100, unique=True)
-    player1 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="battles_as_player1")
-    player2 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, 
-                               related_name="battles_as_player2", null=True, blank=True)
-    current_turn = models.IntegerField(default=1)  # 1 for player1, 2 for player2
-    
+    player1 = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
+                                related_name="battles_as_player1")
+    player2 = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
+                                related_name="battles_as_player2",
+                                null=True, blank=True)
+    # 1 for player1, 2 for player2
+    current_turn = models.IntegerField(default=1)
+
     STATUS_CHOICES = [
         ("waiting", "Waiting for Player 2"),
         ("selecting", "Selecting Cards"),
@@ -287,20 +278,24 @@ class Battle(models.Model):
         ("in_progress", "Battle in Progress"),
         ("completed", "Battle Completed"),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="waiting")
-    
-    winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, 
-                              related_name="battles_won", null=True, blank=True)
+    status = models.CharField(max_length=20,
+                              choices=STATUS_CHOICES,
+                              default="waiting")
+
+    winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL,
+                               related_name="battles_won",
+                               null=True, blank=True)
     player1_ready = models.BooleanField(default=False)
     player2_ready = models.BooleanField(default=False)
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
-        return f"Battle {self.room_id}: {self.player1.user.username} vs {self.player2.user.username if self.player2 else 'Waiting'}"
-        
+        return f"Battle {self.room_id}: {self.player1.user.username}\
+            vs {self.player2.user.username if self.player2 else 'Waiting'}"
+
     def both_ready(self):
         return self.player1_ready and self.player2_ready
 
@@ -308,43 +303,45 @@ class Battle(models.Model):
 class BattleDeck(models.Model):
     """
     Represents cards selected by a player for a battle.
-    
+
     Attributes:
         battle (Battle): The battle this deck belongs to
         player (UserProfile): The player who owns this deck
         cards (ManyToManyField): Selected cards for the battle
         current_card_index (int): Index of the current card in play
         shuffle_seed (int): Seed for shuffling the deck
-        
+
     Author: Samuel
     """
-    
-    battle = models.ForeignKey(Battle, on_delete=models.CASCADE, related_name="decks")
-    player = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="battle_decks")
+
+    battle = models.ForeignKey(Battle, on_delete=models.CASCADE,
+                               related_name="decks")
+    player = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
+                               related_name="battle_decks")
     cards = models.ManyToManyField(Card, related_name="battle_decks")
     current_card_index = models.IntegerField(default=0)
     shuffle_seed = models.IntegerField(default=0)
-    
+
     def __str__(self):
-        return f"Deck for {self.player.user.username} in battle {self.battle.room_id}"
+        return f"Deck for {self.player.user.username}\
+            in battle {self.battle.room_id}"
+
+
 class Trade(models.Model):
 
-    offered_card = models.ForeignKey("Card", related_name="offered_card", on_delete=models.CASCADE)
-    requested_card = models.ForeignKey("Card", related_name="requested_card", on_delete=models.CASCADE)
-    STATUS = [("PENDING", "PENDING"),("ACCEPTED", "ACCEPTED"),("DENIED", "DENIED")]
-    #global if the records below are set to the same user
-    recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE, blank=True, null=True)
-    sender = models.ForeignKey(User, related_name="sender", on_delete=models.CASCADE)
+    offered_card = models.ForeignKey("Card", related_name="offered_card",
+                                     on_delete=models.CASCADE)
+    requested_card = models.ForeignKey("Card", related_name="requested_card",
+                                       on_delete=models.CASCADE)
+    STATUS = [("PENDING", "PENDING"),
+              ("ACCEPTED", "ACCEPTED"),
+              ("DENIED", "DENIED")]
+
+    # global if the records below are set to the same user
+    recipient = models.ForeignKey(User, related_name="recipient",
+                                  on_delete=models.CASCADE,
+                                  blank=True, null=True)
+    sender = models.ForeignKey(User, related_name="sender",
+                               on_delete=models.CASCADE)
     created_date = models.DateField()
     actioned_date = models.DateField(blank=True, null=True)
-
-#things we need to with trades:
-#get all treades that a user has active
-#get all trades that a user has incoming
-#get all trades, just in general
-#make a trade
-
-
-
-
-
