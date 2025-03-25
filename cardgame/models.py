@@ -265,7 +265,7 @@ class Battle(models.Model):
     room_id = models.CharField(max_length=100, unique=True)
     player1 = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
                                 related_name="battles_as_player1")
-    player2 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, 
+    player2 = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
                                 related_name="battles_as_player2",
                                 null=True, blank=True)
     # 1 for player1, 2 for player2
@@ -281,7 +281,7 @@ class Battle(models.Model):
     status = models.CharField(max_length=20,
                               choices=STATUS_CHOICES,
                               default="waiting")
-    
+
     winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL,
                                related_name="battles_won",
                                null=True, blank=True)
@@ -336,7 +336,7 @@ class Trade(models.Model):
     STATUS = [("PENDING", "PENDING"),
               ("ACCEPTED", "ACCEPTED"),
               ("DENIED", "DENIED")]
-    
+
     # global if the records below are set to the same user
     recipient = models.ForeignKey(User, related_name="recipient",
                                   on_delete=models.CASCADE,
