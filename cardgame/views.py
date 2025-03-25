@@ -606,7 +606,8 @@ def get_battle_cards(request):
                         else random.randint(1, 10)
                     ),
                     "cost": (
-                        card.cost if hasattr(card, "cost") else random.randint(1, 10)
+                        card.cost if hasattr(card, "cost")
+                        else random.randint(1, 10)
                     ),
                 }
             )
@@ -625,12 +626,14 @@ def battle_select(request):
     """
     return render(request, "cardgame/battle_select.html")
 
+
 @login_required
 def global_trade_page(request):
     # This is currently unimplemented, if you see this tell
     # lizard to write this view!
     # idk what to put here, jake message me if you're reading this
     return render(request, "cardgame/search.html")
+
 
 @login_required
 def get_trades_matching_query(request):
@@ -665,7 +668,7 @@ def get_trades_matching_query(request):
                 data['requested_card_image'] = tr.requested_card.\
                     card_image_link
                 t.append(data)
-            return render(request, "cardgame/search_results.html", {'data':t})
+            return render(request, "cardgame/search_results.html", {'data': t})
         except ObjectDoesNotExist:
             return HttpResponse("why don't you try hard?")
 
@@ -804,8 +807,7 @@ def trade_page(request, t_id):
                            tr.requested_card.card_name,
                            'requested_card_image':
                            tr.requested_card.card_image_link
-                           }
-                         )
+                           })
 
         except ObjectDoesNotExist:
             raise Http404()
