@@ -1,5 +1,13 @@
 # 🌱 EcoSplore 🌿
 
+## 🔗Links
+
+Use these links to try the deployed version:
+
+[EcoSplore - ecosplore.xyz](https://ecosplore.xyz/)
+
+[EcoSplore - direct connect via ip](http://45.141.151.64:8000/login)
+
 ## 🌍 Overview
 
 EcoSplore is a location-based card collecting game developed as part of ECM2434 at the University of Exeter by the "Kanban Warriors" project group. Built with Django, the game encourages exploration and engagement with sustainability topics on campus. Players can discover digital cards by visiting real-world locations, fostering an interactive learning experience about sustainability initiatives and environmental awareness.
@@ -109,14 +117,17 @@ python manage.py test
 
 ## 🛠️ Technologies Used
 
-| 🚀 Technology | 📌 Version | 🔍 Purpose                                             |
-| ------------- | ---------- | ------------------------------------------------------ |
-| **Django**    | 5.1.6      | Web framework for backend logic and database handling. |
-| **Pillow**    | 11.1.0     | Image processing for card generation.                  |
-| **Leaflet**   | N/A        | Interactive map rendering.                             |
-| **SQLite**    | N/A        | Lightweight database for development.                  |
-| **pytest**    | N/A        | Automated testing framework.                           |
-| **flake8**    | N/A        | Code quality and linting tool.                         |
+| 🚀 Technology  | 🔍 Purpose                                             |
+| -------------- | ------------------------------------------------------ |
+| **Django**     | Web framework for backend logic and database handling. |
+| **Pillow**     | Image processing for card generation.                  |
+| **Leaflet**    | Interactive map rendering.                             |
+| **SQLite**     | Lightweight database for development.                  |
+| **pytest**     | Automated testing framework.                           |
+| **flake8**     | Code quality and linting tool.                         |
+| **uvicorn**    | Asynchronous server to handle websockets in django     |
+| **websockets** | Real-time aspect of battles                            |
+| **whitenoise** | Middleware to handle Django static files with uvicorn  |
 
 ## 🎯 Features
 
@@ -130,17 +141,13 @@ EcoSplore is packed with features to provide an engaging gameplay experience:
 - [x] **Challenges:** Participate in location-based challenges to earn exclusive rewards and cards.
 - [x] **Card Sets:** Cards are organized into sets, encouraging collection completion. (lines: 64-65, cardgame/models.py)
 - [x] **Recent Card Display:** Stay updated with the latest card releases directly on the homepage. (lines: 72-79, html:cardgame/templates/cardgame/home.html)
-- [ ] **Battles:** Engage in strategic battles with other players or AI opponents using your card collections.
-- [ ] **Trading Cards:** Trade cards with other players to complete your sets and acquire rare cards.
-- [ ] **In-Game Currency:** Earn and use in-game currency for various game enhancements and items.
-- [ ] **Scavenger Hunts:** Participate in complex, multi-location scavenger hunts for valuable rewards.
+- [x] **Battles:** Engage in strategic battles with other players or AI opponents using your card collections.
+- [x] **Trading Cards:** Trade cards with other players to complete your sets and acquire rare cards.
 
 ## 🔮 Future Enhancements
 
 The following features are under consideration for future development:
 
-- ⚔️ **Card Battles:** Engage in strategic battles using collected cards.
-- 🔄 **Card Trading:** Exchange cards with other players.
 - 💰 **In-Game Currency:** Earn and spend virtual currency for enhancements.
 - 🕵️ **Scavenger Hunts:** Multi-location challenges for additional rewards.
 - 🏅 **Badges for Collections:** Unlock achievements based on progress.
