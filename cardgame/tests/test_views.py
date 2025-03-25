@@ -97,6 +97,7 @@ class ViewsTestCase(TestCase):
             option_d="D",
             correct_answer="B",
         )
+
     def test_card_col(self):
         # Test card collection view for existing user
         self.user_profile.user_profile_collected_cards.add(self.card)
