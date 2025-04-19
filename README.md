@@ -4,7 +4,7 @@
 
 Use these links to try the deployed version:
 
-[EcoSplore - ecosplore.xyz](https://ecosplore.xyz/)
+[EcoSplore - ecosplore.xyz](http://ecosplore.xyz/)
 
 [EcoSplore - direct connect via ip](http://45.141.151.64:8000/login)
 
